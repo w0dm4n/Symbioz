@@ -10,6 +10,7 @@ namespace Symbioz
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("coucou");
         }
     }
 }
