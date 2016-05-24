@@ -1,0 +1,34 @@
+using System;
+namespace Symbioz.Enums
+{
+	public enum NotificationEnum
+	{
+		PERSONNAGE_NON_JOUEUR = 1,
+		const_1,
+		CHANGEMENT_DE_CARTE,
+		LANCER_UN_COMBAT,
+		PLACEMENT_EN_COMBAT,
+		const_5,
+		LANCEMENT_D_UN_SORT,
+		PASSER_SON_TOUR,
+		ECRAN_DE_FIN_DE_COMBAT,
+		GAIN_DE_NIVEAU,
+		GAIN_D_UN_NOUVEAU_SORT,
+		MORT_DU_PERSONNAGE,
+		const_12,
+		const_13,
+		INVENTAIRE,
+		const_15,
+		GRIMOIRE,
+		ONGLET_DES_SORTS,
+		const_18,
+		ONGLET_DE_L_ALIGNEMENT,
+		const_20,
+		const_21,
+		REGAGNER_DES_POINTS_DE_VIE,
+		INFORMATION,
+		CHOISIR_UNE_HUMEUR = 29,
+		ERREUR,
+		const_26 = 33
+	}
+}

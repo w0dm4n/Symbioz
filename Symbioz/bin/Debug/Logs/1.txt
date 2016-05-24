@@ -1,0 +1,7 @@
+Client: 127.0.0.1:53088
+At: 24/05/2016 09:08:46
+System.Data.SqlTypes.SqlNullValueException: Les données sont null. Cette méthode ou propriété ne peut pas être appelée sur des valeurs Null.
+   à MySql.Data.MySqlClient.MySqlDataReader.GetFieldValue(Int32 index, Boolean checkNull)
+   à MySql.Data.MySqlClient.MySqlDataReader.GetInt32(Int32 i)
+   à Symbioz.Auth.Records.AccountsProvider.GetAccountFromDb(String ndc) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Records\AccountsProvider.cs:ligne 76
+   à Symbioz.Auth.Handlers.ConnectionHandler.HandleIdentificationMessage(IdentificationMessage message, AuthClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Handlers\ConnectionHandler.cs:ligne 30

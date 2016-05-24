@@ -1,0 +1,5 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Helper\obj\Debug\Shader.Helper.csprojResolveAssemblyReference.cache

@@ -1,0 +1,10 @@
+Client: 127.0.0.1:53452
+At: 24/05/2016 09:44:12
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Parties.PartyMember.GetPartyMemberInformations() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Parties\PartyMember.cs:ligne 43
+   à Symbioz.World.Models.Character.RefreshGroupInformations() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 762
+   à Symbioz.World.Models.Character.RefreshStats() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 690
+   à Symbioz.World.Models.Character.SetAlign(AlignmentSideEnum align) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 270
+   à Symbioz.Providers.NpcsRepliesProvider.Align(WorldClient client, NpcReplyRecord reply) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\Maps\NpcsRepliesProvider.cs:ligne 117
+   à Symbioz.Providers.NpcsRepliesProvider.Handle(WorldClient client, List`1 records) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\Maps\NpcsRepliesProvider.cs:ligne 40
+   à Symbioz.World.Handlers.NpcsHandler.HandleNpcDialogReply(NpcDialogReplyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\NpcsHandler.cs:ligne 27

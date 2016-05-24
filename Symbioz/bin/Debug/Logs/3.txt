@@ -1,0 +1,9 @@
+Client: 127.0.0.1:53315
+At: 24/05/2016 09:15:08
+MySql.Data.MySqlClient.MySqlException (0x80004005): There is already an open DataReader associated with this Connection which must be closed first.
+   à MySql.Data.MySqlClient.ExceptionInterceptor.Throw(Exception exception)
+   à MySql.Data.MySqlClient.MySqlConnection.Ping()
+   à Symbioz.Core.AuthDatabaseProvider.CheckConnectionState() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\Sql\AuthDatabaseProvider.cs:ligne 24
+   à Symbioz.Core.AuthDatabaseProvider.get_Connection() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\Sql\AuthDatabaseProvider.cs:ligne 36
+   à Symbioz.Auth.Records.AccountsProvider.GetAccountFromDb(String ndc) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Records\AccountsProvider.cs:ligne 66
+   à Symbioz.Auth.Handlers.ConnectionHandler.HandleIdentificationMessage(IdentificationMessage message, AuthClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Handlers\ConnectionHandler.cs:ligne 30

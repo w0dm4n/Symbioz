@@ -1,0 +1,4 @@
+c:\Users\Freak\documents\visual studio 2013\Projects\Shader\Shader.SSync\bin\Debug\Shader.SSync.dll
+c:\Users\Freak\documents\visual studio 2013\Projects\Shader\Shader.SSync\bin\Debug\Shader.SSync.pdb
+c:\Users\Freak\documents\visual studio 2013\Projects\Shader\Shader.SSync\obj\Debug\Shader.SSync.dll
+c:\Users\Freak\documents\visual studio 2013\Projects\Shader\Shader.SSync\obj\Debug\Shader.SSync.pdb

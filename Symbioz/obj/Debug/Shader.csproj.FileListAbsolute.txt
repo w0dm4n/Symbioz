@@ -1,0 +1,15 @@
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\bin\Debug\Shader.exe.config
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\bin\Debug\Shader.exe
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\bin\Debug\Shader.pdb
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\obj\Debug\Shader.csprojResolveAssemblyReference.cache
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\obj\Debug\Shader.exe
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\obj\Debug\Shader.pdb
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\bin\Debug\Shader.SSync.dll
+c:\users\freak\documents\visual studio 2013\Projects\Shader\Shader\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\MySql.Data.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.ORM.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.ORM.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Protocol.pdb

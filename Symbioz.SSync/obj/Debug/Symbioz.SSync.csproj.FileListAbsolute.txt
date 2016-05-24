@@ -1,0 +1,27 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.SSync\bin\Debug\Layout.Accordion.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\bin\Debug\Layout.Accordion.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb

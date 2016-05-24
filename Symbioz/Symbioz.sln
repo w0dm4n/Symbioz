@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz", "Symbioz.csproj", "{AE8A5A03-8B44-46F6-979E-8D95375E130F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz.D2O", "..\Symbioz.D2O\Symbioz.D2O.csproj", "{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz.Helper", "..\Symbioz.Helper\Symbioz.Helper.csproj", "{2CCBC690-C698-4ACB-8CE4-D6705381EE39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz.ORM", "..\Symbioz.ORM\Symbioz.ORM.csproj", "{9F6F94A0-AE78-4B35-92AE-E7B76220712D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz.Protocol", "..\Symbioz.Protocol\Symbioz.Protocol.csproj", "{39B9C0C2-5634-4833-B4B3-A6EB116BBE08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbioz.SSync", "..\Symbioz.SSync\Symbioz.SSync.csproj", "{F50C55E3-F391-4F07-9FA6-BE040EE131AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE8A5A03-8B44-46F6-979E-8D95375E130F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE8A5A03-8B44-46F6-979E-8D95375E130F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE8A5A03-8B44-46F6-979E-8D95375E130F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE8A5A03-8B44-46F6-979E-8D95375E130F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CCBC690-C698-4ACB-8CE4-D6705381EE39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CCBC690-C698-4ACB-8CE4-D6705381EE39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CCBC690-C698-4ACB-8CE4-D6705381EE39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CCBC690-C698-4ACB-8CE4-D6705381EE39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6F94A0-AE78-4B35-92AE-E7B76220712D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6F94A0-AE78-4B35-92AE-E7B76220712D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6F94A0-AE78-4B35-92AE-E7B76220712D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6F94A0-AE78-4B35-92AE-E7B76220712D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B9C0C2-5634-4833-B4B3-A6EB116BBE08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B9C0C2-5634-4833-B4B3-A6EB116BBE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B9C0C2-5634-4833-B4B3-A6EB116BBE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B9C0C2-5634-4833-B4B3-A6EB116BBE08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F50C55E3-F391-4F07-9FA6-BE040EE131AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F50C55E3-F391-4F07-9FA6-BE040EE131AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F50C55E3-F391-4F07-9FA6-BE040EE131AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F50C55E3-F391-4F07-9FA6-BE040EE131AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

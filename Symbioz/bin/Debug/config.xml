@@ -1,0 +1,26 @@
+<!-- Symbioz Configuration -->
+<Configuration>
+  <CyclicSaveInterval>80</CyclicSaveInterval>
+  <DatabaseHost>127.0.0.1</DatabaseHost>
+  <DatabaseUser>root</DatabaseUser>
+  <DatabasePassword></DatabasePassword>
+  <DatabaseName>Symbioz</DatabaseName>
+  <ServerId>22</ServerId>
+  <AuthPort>443</AuthPort>
+  <WorldPort>5555</WorldPort>
+  <StartLevel>1</StartLevel>
+  <StartMapId>54172969</StartMapId>
+  <StartCellId>300</StartCellId>
+  <DutyMapId>99091983</DutyMapId>
+  <DutyCellId>300</DutyCellId>
+  <StartKamas>0</StartKamas>
+  <WelcomeMessage>beta Heroique</WelcomeMessage>
+  <ShowProtocolMessages>True</ShowProtocolMessages>
+  <KamasDropRatio>1</KamasDropRatio>
+  <ExperienceRatio>30</ExperienceRatio>
+  <StartBankKamas>0</StartBankKamas>
+  <Host>127.0.0.1</Host>
+  <IsCustomHost>False</IsCustomHost>
+  <RealHost />
+  <SafeRun>False</SafeRun>
+</Configuration>

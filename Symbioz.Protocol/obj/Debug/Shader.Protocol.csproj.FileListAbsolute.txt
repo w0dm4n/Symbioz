@@ -1,0 +1,5 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Protocol\obj\Debug\Shader.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.Protocol\obj\Debug\Shader.Protocol.pdb

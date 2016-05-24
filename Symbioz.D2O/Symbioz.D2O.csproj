@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{798CDD3E-FB86-42E9-AD56-FE784B86A4C7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shader.D2O</RootNamespace>
+    <AssemblyName>Shader.D2O</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CacheAttribute.cs" />
+    <Compile Include="Classes\AbuseReasons.cs" />
+    <Compile Include="Classes\Achievement.cs" />
+    <Compile Include="Classes\AchievementCategory.cs" />
+    <Compile Include="Classes\AchievementObjective.cs" />
+    <Compile Include="Classes\AchievementReward.cs" />
+    <Compile Include="Classes\AlignmentBalance.cs" />
+    <Compile Include="Classes\AlignmentEffect.cs" />
+    <Compile Include="Classes\AlignmentGift.cs" />
+    <Compile Include="Classes\AlignmentOrder.cs" />
+    <Compile Include="Classes\AlignmentRank.cs" />
+    <Compile Include="Classes\AlignmentRankJntGift.cs" />
+    <Compile Include="Classes\AlignmentSide.cs" />
+    <Compile Include="Classes\AlignmentTitle.cs" />
+    <Compile Include="Classes\AlmanaxCalendar.cs" />
+    <Compile Include="Classes\Appearance.cs" />
+    <Compile Include="Classes\Area.cs" />
+    <Compile Include="Classes\Breed.cs" />
+    <Compile Include="Classes\BreedRole.cs" />
+    <Compile Include="Classes\CensoredContent.cs" />
+    <Compile Include="Classes\CensoredWord.cs" />
+    <Compile Include="Classes\Challenge.cs" />
+    <Compile Include="Classes\Characteristic.cs" />
+    <Compile Include="Classes\CharacteristicCategory.cs" />
+    <Compile Include="Classes\ChatChannel.cs" />
+    <Compile Include="Classes\Comic.cs" />
+    <Compile Include="Classes\Companion.cs" />
+    <Compile Include="Classes\CompanionCharacteristic.cs" />
+    <Compile Include="Classes\CompanionSpell.cs" />
+    <Compile Include="Classes\CreatureBoneOverride.cs" />
+    <Compile Include="Classes\CreatureBoneType.cs" />
+    <Compile Include="Classes\ID2OClass.cs" />
+    <Compile Include="Classes\Document.cs" />
+    <Compile Include="Classes\Dungeon.cs" />
+    <Compile Include="Classes\Effect.cs" />
+    <Compile Include="Classes\EmblemBackground.cs" />
+    <Compile Include="Classes\EmblemSymbol.cs" />
+    <Compile Include="Classes\EmblemSymbolCategory.cs" />
+    <Compile Include="Classes\Emoticon.cs" />
+    <Compile Include="Classes\ExternalNotification.cs" />
+    <Compile Include="Classes\Head.cs" />
+    <Compile Include="Classes\Hint.cs" />
+    <Compile Include="Classes\HintCategory.cs" />
+    <Compile Include="Classes\House.cs" />
+    <Compile Include="Classes\Idol.cs" />
+    <Compile Include="Classes\Incarnation.cs" />
+    <Compile Include="Classes\IncarnationLevel.cs" />
+    <Compile Include="Classes\InfoMessage.cs" />
+    <Compile Include="Classes\Interactive.cs" />
+    <Compile Include="Classes\ItemSet.cs" />
+    <Compile Include="Classes\ItemType.cs" />
+    <Compile Include="Classes\Job.cs" />
+    <Compile Include="Classes\LegendaryTreasureHunt.cs" />
+    <Compile Include="Classes\LivingObjectSkinJntMood.cs" />
+    <Compile Include="Classes\MapCoordinates.cs" />
+    <Compile Include="Classes\MapPosition.cs" />
+    <Compile Include="Classes\MapReference.cs" />
+    <Compile Include="Classes\MapScrollAction.cs" />
+    <Compile Include="Classes\Monster.cs" />
+    <Compile Include="Classes\MonsterMiniBoss.cs" />
+    <Compile Include="Classes\MonsterRace.cs" />
+    <Compile Include="Classes\MonsterSuperRace.cs" />
+    <Compile Include="Classes\Month.cs" />
+    <Compile Include="Classes\Mount.cs" />
+    <Compile Include="Classes\MountBehavior.cs" />
+    <Compile Include="Classes\MountBone.cs" />
+    <Compile Include="Classes\Notification.cs" />
+    <Compile Include="Classes\Npc.cs" />
+    <Compile Include="Classes\NpcAction.cs" />
+    <Compile Include="Classes\NpcMessage.cs" />
+    <Compile Include="Classes\OptionalFeature.cs" />
+    <Compile Include="Classes\Ornament.cs" />
+    <Compile Include="Classes\Pack.cs" />
+    <Compile Include="Classes\Pet.cs" />
+    <Compile Include="Classes\Phoenix.cs" />
+    <Compile Include="Classes\Playlist.cs" />
+    <Compile Include="Classes\PointOfInterest.cs" />
+    <Compile Include="Classes\PointOfInterestCategory.cs" />
+    <Compile Include="Classes\PresetIcon.cs" />
+    <Compile Include="Classes\Quest.cs" />
+    <Compile Include="Classes\QuestCategory.cs" />
+    <Compile Include="Classes\QuestObjectiveDiscoverMap.cs" />
+    <Compile Include="Classes\QuestObjectiveType.cs" />
+    <Compile Include="Classes\QuestStep.cs" />
+    <Compile Include="Classes\QuestStepRewards.cs" />
+    <Compile Include="Classes\RankName.cs" />
+    <Compile Include="Classes\Recipe.cs" />
+    <Compile Include="Classes\RideFood.cs" />
+    <Compile Include="Classes\Server.cs" />
+    <Compile Include="Classes\ServerCommunity.cs" />
+    <Compile Include="Classes\ServerGameType.cs" />
+    <Compile Include="Classes\ServerPopulation.cs" />
+    <Compile Include="Classes\Skill.cs" />
+    <Compile Include="Classes\SkillName.cs" />
+    <Compile Include="Classes\SkinMapping.cs" />
+    <Compile Include="Classes\SkinPosition.cs" />
+    <Compile Include="Classes\Smiley.cs" />
+    <Compile Include="Classes\SoundBones.cs" />
+    <Compile Include="Classes\SoundUi.cs" />
+    <Compile Include="Classes\SoundUiHook.cs" />
+    <Compile Include="Classes\SpeakingItemsTrigger.cs" />
+    <Compile Include="Classes\SpeakingItemText.cs" />
+    <Compile Include="Classes\Spell.cs" />
+    <Compile Include="Classes\SpellBomb.cs" />
+    <Compile Include="Classes\SpellLevel.cs" />
+    <Compile Include="Classes\SpellPair.cs" />
+    <Compile Include="Classes\SpellState.cs" />
+    <Compile Include="Classes\SpellType.cs" />
+    <Compile Include="Classes\StealthBones.cs" />
+    <Compile Include="Classes\SubArea.cs" />
+    <Compile Include="Classes\SuperArea.cs" />
+    <Compile Include="Classes\TaxCollectorFirstname.cs" />
+    <Compile Include="Classes\TaxCollectorName.cs" />
+    <Compile Include="Classes\Tips.cs" />
+    <Compile Include="Classes\Title.cs" />
+    <Compile Include="Classes\TitleCategory.cs" />
+    <Compile Include="Classes\TypeAction.cs" />
+    <Compile Include="Classes\Url.cs" />
+    <Compile Include="Classes\VeteranReward.cs" />
+    <Compile Include="Classes\Waypoint.cs" />
+    <Compile Include="Classes\Weapon.cs" />
+    <Compile Include="Classes\WorldMap.cs" />
+    <Compile Include="D2OActivator.cs" />
+    <Compile Include="D2OSynchroniser.cs" />
+    <Compile Include="D2OSyncQuery.cs" />
+    <Compile Include="InternalClasses\AmbientSound.cs" />
+    <Compile Include="InternalClasses\AnimFunMonsterData.cs" />
+    <Compile Include="InternalClasses\AnimFunNpcData.cs" />
+    <Compile Include="InternalClasses\BreedRoleByBreed.cs" />
+    <Compile Include="InternalClasses\EffectInstanceDice.cs" />
+    <Compile Include="InternalClasses\ID2OInternalClass.cs" />
+    <Compile Include="InternalClasses\MonsterDrop.cs" />
+    <Compile Include="InternalClasses\MonsterGrade.cs" />
+    <Compile Include="InternalClasses\PlaylistSound.cs" />
+    <Compile Include="InternalClasses\Point.cs" />
+    <Compile Include="InternalClasses\Rectangle.cs" />
+    <Compile Include="InternalClasses\TransformData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Symbioz.Helper\Symbioz.Helper.csproj">
+      <Project>{2ccbc690-c698-4acb-8ce4-d6705381ee39}</Project>
+      <Name>Symbioz.Helper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symbioz.Protocol\Symbioz.Protocol.csproj">
+      <Project>{39b9c0c2-5634-4833-b4b3-a6eb116bbe08}</Project>
+      <Name>Symbioz.Protocol</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

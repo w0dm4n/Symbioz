@@ -1,0 +1,5 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\bin\Release\Entropy.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\bin\Release\Entropy.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\obj\Release\Entropy.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\obj\Release\Entropy.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\obj\Release\Entropy.Protocol.pdb

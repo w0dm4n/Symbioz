@@ -1,0 +1,9 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\obj\Debug\Shader.D2O.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.D2O.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\obj\Debug\Shader.D2O.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\bin\Debug\Shader.D2O.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader.D2O\obj\Debug\Shader.D2O.dll

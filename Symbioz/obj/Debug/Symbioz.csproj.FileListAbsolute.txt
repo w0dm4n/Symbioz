@@ -1,0 +1,169 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.exe.config
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\obj\Debug\Shader.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\obj\Debug\Shader.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\MySql.Data.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.ORM.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.SSync.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.ORM.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Shader\Shader\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\MySql.Data.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\MySql.Data.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SWF\bugreport.swf
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SWF\forcedbugreport.swf
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SWF\whoareyou.swf
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Agress.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Buff.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Damages.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Heal.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Summon.xml
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Teleport.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Agress.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Buff.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Damages.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Heal.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Summon.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Teleport.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Freak\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+E:\Save Avant Restore\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe.config
+E:\Save Avant Restore\SymbiozRepo\Symbioz\obj\Debug\Symbioz.exe
+E:\Save Avant Restore\SymbiozRepo\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Agress.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Buff.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Damages.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Heal.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Summon.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\SpellCategories\Teleport.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Agress.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Buff.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Damages.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Heal.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Summon.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\SpellCategories\Teleport.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\SymbiozRepos\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Skinz\Desktop\SymbiozRepos\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Skinz\Desktop\SymbiozRepos\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.xml

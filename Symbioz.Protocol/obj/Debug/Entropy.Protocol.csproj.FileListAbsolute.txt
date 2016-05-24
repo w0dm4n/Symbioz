@@ -1,0 +1,14 @@
+C:\Users\Freak\Desktop\Entropy.Protocol\bin\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Desktop\Entropy.Protocol\bin\Debug\Entropy.Protocol.pdb
+C:\Users\Freak\Desktop\Entropy.Protocol\obj\Debug\Entropy.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Desktop\Entropy.Protocol\obj\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Desktop\Entropy.Protocol\obj\Debug\Entropy.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\bin\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\bin\Debug\Entropy.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\obj\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\entropysilver\Entropy 2.22\Entropy.Protocol\obj\Debug\Entropy.Protocol.pdb
+C:\Users\Freak\Desktop\EntropyRework\Entropy.Protocol\bin\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Desktop\EntropyRework\Entropy.Protocol\bin\Debug\Entropy.Protocol.pdb
+C:\Users\Freak\Desktop\EntropyRework\Entropy.Protocol\obj\Debug\Entropy.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Desktop\EntropyRework\Entropy.Protocol\obj\Debug\Entropy.Protocol.dll
+C:\Users\Freak\Desktop\EntropyRework\Entropy.Protocol\obj\Debug\Entropy.Protocol.pdb

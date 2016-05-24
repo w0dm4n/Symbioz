@@ -1,0 +1,36 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\obj\Debug\Symbioz.D2O.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\obj\Debug\Shader.D2O.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\obj\Debug\Shader.D2O.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.D2O.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.D2O.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.D2O.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.D2O.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Helper.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Helper.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\obj\Debug\Symbioz.D2O.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\obj\Debug\Shader.D2O.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.D2O\obj\Debug\Shader.D2O.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.D2O.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.D2O.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Helper.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Helper.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\bin\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\obj\Debug\Symbioz.D2O.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\obj\Debug\Shader.D2O.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.D2O\obj\Debug\Shader.D2O.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.D2O.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.D2O.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Helper.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Protocol.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Helper.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\bin\Debug\Shader.Protocol.pdb
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\obj\Debug\Symbioz.D2O.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\obj\Debug\Shader.D2O.dll
+C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.D2O\obj\Debug\Shader.D2O.pdb

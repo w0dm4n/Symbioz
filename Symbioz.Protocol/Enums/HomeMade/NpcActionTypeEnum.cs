@@ -1,0 +1,17 @@
+using System;
+namespace Symbioz.Enums
+{
+	public enum NpcActionTypeEnum
+	{
+		ACTION_BUY_SELL = 1,
+		ACTION_EXCHANGE = 2,
+		ACTION_TALK = 3,
+		ACTION_DROP_COLLECT_PET = 4,
+		ACTION_SELL = 5,
+		ACTION_BUY = 6,
+		ACTION_RESURRECT_PET,
+		ACTION_TRADE_MOUNT,
+		ACTION_VIEW_HOUSES,
+		ACTION_VIEW_PADDOCK
+	}
+}

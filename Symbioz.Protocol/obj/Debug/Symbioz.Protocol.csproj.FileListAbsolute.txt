@@ -1,0 +1,25 @@
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Freak\Documents\Visual Studio 2013\Projects\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\Dofus\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Matspyder\Desktop\Symbioz-master\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Skinz\Desktop\SymbiozRepo\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
