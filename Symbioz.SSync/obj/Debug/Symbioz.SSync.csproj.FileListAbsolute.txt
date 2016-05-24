@@ -25,3 +25,8 @@ C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\bin\D
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
