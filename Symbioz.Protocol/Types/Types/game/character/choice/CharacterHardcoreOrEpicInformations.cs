@@ -35,7 +35,7 @@ public override short TypeId
     get { return Id; }
 }
 
-public sbyte deathState;
+        public byte deathState;
         public ushort deathCount;
         public byte deathMaxLevel;
         
@@ -44,7 +44,7 @@ public CharacterHardcoreOrEpicInformations()
 {
 }
 
-public CharacterHardcoreOrEpicInformations(uint id, byte level, string name, Types.EntityLook entityLook, sbyte breed, bool sex, sbyte deathState, ushort deathCount, byte deathMaxLevel)
+public CharacterHardcoreOrEpicInformations(uint id, byte level, string name, Types.EntityLook entityLook, sbyte breed, bool sex, byte deathState, ushort deathCount, byte deathMaxLevel)
          : base(id, level, name, entityLook, breed, sex)
         {
             this.deathState = deathState;
@@ -57,7 +57,7 @@ public override void Serialize(ICustomDataOutput writer)
 {
 
 base.Serialize(writer);
-            writer.WriteSByte(deathState);
+            writer.WriteByte(deathState);
             writer.WriteVarUhShort(deathCount);
             writer.WriteByte(deathMaxLevel);
             
@@ -67,8 +67,8 @@ base.Serialize(writer);
 public override void Deserialize(ICustomDataInput reader)
 {
 
-base.Deserialize(reader);
-            deathState = reader.ReadSByte();
+            base.Deserialize(reader);
+            deathState = reader.ReadByte();
             if (deathState < 0)
                 throw new Exception("Forbidden value on deathState = " + deathState + ", it doesn't respect the following condition : deathState < 0");
             deathCount = reader.ReadVarUhShort();

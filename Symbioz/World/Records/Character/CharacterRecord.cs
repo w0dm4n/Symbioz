@@ -91,13 +91,20 @@ namespace Symbioz.World.Records
         public ushort ArenaFightCount;
         [Update]
         public bool PvPEnable;
+        [Update]
+        public short Energy;
+        [Update]
+        public byte deathMaxLevel;
+        [Update]
+        public ushort deathCount;
 
         public CharacterRecord(int id, string name, int accountid, string look, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
             int ornamentid, sbyte alignside, sbyte alignvalue, sbyte aligngrade, uint characterpower, ushort statspoints,
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
-            ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount,bool pvpEnlable)
+            ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount,bool pvpEnlable,
+            short Energy, byte deathMaxLevel, ushort deathCount)
         {
             this.Id = id;
             this.Name = name;
@@ -134,6 +141,9 @@ namespace Symbioz.World.Records
             this.ArenaVictoryCount = arenaVictoryCount;
             this.ArenaFightCount = arenaFightsCount;
             this.PvPEnable = pvpEnlable;
+            this.Energy = Energy;
+            this.deathCount = deathCount;
+            this.deathMaxLevel = deathMaxLevel;
         }
         [BeforeSave]
         public static void BeforeSave()
@@ -151,13 +161,21 @@ namespace Symbioz.World.Records
         {
             return new CharacterBaseInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex);
         }
+        public CharacterHardcoreOrEpicInformations GetHardcoreOrEpicInformations()
+        {
+            byte death = 0;
+
+            if (this.Energy == 0)
+                death = 1;
+            return new CharacterHardcoreOrEpicInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex, death, this.deathCount, this.deathMaxLevel);
+        }
         public static CharacterRecord Default(string name, int accountid, string look, sbyte breed, bool sex)
         {
             return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, 1, breed, sex,
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 1, 0);
         }
         public static bool CheckCharacterNameExist(string name)
         {

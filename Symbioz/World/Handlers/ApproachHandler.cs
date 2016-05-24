@@ -43,7 +43,10 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleCharacterList(CharactersListRequestMessage message, WorldClient client)
         {
-            client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
+            if (ConfigurationManager.Instance.ServerId == 22)
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            else
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
         }
         [MessageHandler]
         public static void HandleCharacterNameSuggestion(CharacterNameSuggestionRequestMessage message, WorldClient client)
@@ -114,7 +117,10 @@ namespace Symbioz.World.Handlers
             BidShopItemRecord.RemoveAll(message.characterId);
             Logger.Log("Character " + deletedCharacter.Name + " deleted");
 
-            client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false));
+            if (ConfigurationManager.Instance.ServerId == 22)
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            else
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false));
         }
 
         static void ProcessSelection(WorldClient client)
