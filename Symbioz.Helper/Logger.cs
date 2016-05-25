@@ -9,23 +9,12 @@ namespace Symbioz
 {
     public class Logger
     {
-        static void Logo()
-        {
-            Init(@"_______ __   __ _______ ______  _____  _____  ______", false);
-            Init2(@"|______   \_/   |  |  | |_____]   |   |     |  ____/", false);
-            Init(@"______|    |    |  |  | |_____] __|__ |_____| /_____",false);
-
-        }
         public const string LogSymbol = "))";
 
         public static void OnStartup()
         {
             Console.Title = "Symbioz";
-            Logo();
             Logger.Init2("Version " + ConstantsRepertory.VERSION);
-            Logger.NewLine();
-            Logger.Init2("Written by Skinz");
-            Logger.Init2("Contributor(s): Matspyder");
             Logger.NewLine();
         }
         public static void NewLine()
