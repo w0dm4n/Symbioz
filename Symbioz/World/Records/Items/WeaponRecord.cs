@@ -1,6 +1,7 @@
 ﻿using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.ORM;
+using Symbioz.Helper;
 using Symbioz.World.Models;
 using Symbioz.World.Records.Spells;
 using System;
@@ -82,6 +83,47 @@ namespace Symbioz.World.Records.Items
             }
             return results;
         }
+
+        public ObjectItem GenerateRandomObjectItem()
+        {
+            return new ObjectItem(63, (ushort)Id, GenerateRandomEffect(), CharacterItemRecord.PopNextUID(), 1);
+        }
+
+        public List<ObjectEffect> GenerateRandomEffect()
+        {
+            List<ObjectEffect> result = new List<ObjectEffect>();
+            foreach (var eff in RealEffects.ObjectEffects)
+            {
+                if (WeaponRecord.WeaponsDamagesEffects.Contains((EffectsEnum)eff.actionId))
+                {
+                    result.Add(new ObjectEffectDice(eff.actionId, eff.diceNum, eff.diceSide, eff.diceConst));
+                    continue;
+                }
+                if (eff.diceSide == 0 && eff.diceConst == 0)
+                {
+                    result.Add(new ObjectEffectInteger(eff.actionId, eff.diceNum));
+                }
+                else if (eff.diceConst != 0)
+                {
+                    result.Add(new ObjectEffectInteger(eff.actionId, eff.diceConst));
+
+                }
+                else
+                {
+                    if (eff.diceNum > eff.diceSide)
+                    {
+                        result.Add(new ObjectEffectInteger(eff.actionId, (ushort)eff.diceNum));
+                    }
+                    else
+                    {
+                        int value = (short)new AsyncRandom().Next(eff.diceNum, eff.diceSide + 1);
+                        result.Add(new ObjectEffectInteger(eff.actionId, (ushort)value));
+                    }
+                }
+            }
+            return result;
+        }
+
         public static WeaponRecord GetWeapon(ushort id)
         {
             return Weapons.Find(x => x.Id == id);

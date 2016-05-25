@@ -447,6 +447,12 @@ namespace Symbioz.World.Handlers
             client.Character.Inventory.Add(ushort.Parse(value), 1);
             client.Send(new ObtainedItemMessage(ushort.Parse(value), 1));
         }
+        [InGameCommand("weapon", ServerRoleEnum.MODERATOR)]
+        public static void AddWeapon(string value, WorldClient client)
+        {
+            client.Character.Inventory.AddWeapon(ushort.Parse(value), 1);
+            client.Send(new ObtainedItemMessage(ushort.Parse(value), 1));
+        }
         [InGameCommand("ornament", ServerRoleEnum.MODERATOR)]
         public static void AddOrnamentCommand(string value, WorldClient client)
         {

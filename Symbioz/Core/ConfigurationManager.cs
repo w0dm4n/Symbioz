@@ -108,6 +108,8 @@ namespace Symbioz.Core
 
         public int ExperienceRatio { get; set; }
 
+        public int ItemsDropRatio { get; set; }
+
         public int StartBankKamas { get; set; }
 
         public string Host { get; set; }
@@ -140,6 +142,7 @@ namespace Symbioz.Core
             config.ShowProtocolMessages = true;
             config.KamasDropRatio = 1;
             config.ExperienceRatio = 1;
+            config.ItemsDropRatio = 1;
             config.StartBankKamas = 0;
             config.SafeRun = false;
             return config;

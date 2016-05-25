@@ -13,15 +13,18 @@ namespace Symbioz.World.Models.Items
     {
         public void Init(CharacterItemRecord item)
         {
-            switch (item.GetTemplate().Type)
+            if (item.GetTemplate() != null)
             {
-                case ItemTypeEnum.LIVING_OBJECTS:
-                    break;
-                case ItemTypeEnum.MOUNT_CERTIFICATE:
-                    break;
-                case ItemTypeEnum.SOUL_STONE:
-                    InitializeSoulStone(item);
-                    break;
+                switch (item.GetTemplate().Type)
+                {
+                    case ItemTypeEnum.LIVING_OBJECTS:
+                        break;
+                    case ItemTypeEnum.MOUNT_CERTIFICATE:
+                        break;
+                    case ItemTypeEnum.SOUL_STONE:
+                        InitializeSoulStone(item);
+                        break;
+                }
             }
         }
 

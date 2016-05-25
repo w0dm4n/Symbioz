@@ -106,8 +106,7 @@ namespace Symbioz.Providers.FightResults
                 foreach (var item in template.Drops.FindAll(x => x.ProspectingLock <= prospectingSum))
                 {
                     int D = random.Next(0, 201);
-                    double dropchancePercent = item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.StatsRecord.Prospecting / 100;
-
+                    double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.StatsRecord.Prospecting / 100) / 3) * ConfigurationManager.Instance.ItemsDropRatio);
 
                     if (D <= dropchancePercent)
                     {
@@ -125,7 +124,6 @@ namespace Symbioz.Providers.FightResults
                             alreadyDropped.Quantity++;
                     }
                 }
-
 
                 #endregion
             }

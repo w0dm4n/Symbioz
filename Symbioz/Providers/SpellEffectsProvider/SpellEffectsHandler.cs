@@ -39,7 +39,7 @@ namespace Symbioz.Providers
             var handler = Handlers.FirstOrDefault(x => x.Key == effect.BaseEffect.EffectType);
             if (handler.Value != null)
             {
-                handler.Value(fighter, record, effect,affecteds, castcellid);
+               handler.Value(fighter, record, effect,affecteds, castcellid);
             }
             else
             {

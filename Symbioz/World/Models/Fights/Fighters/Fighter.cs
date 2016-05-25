@@ -350,7 +350,6 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public virtual bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
         {
-
             SpellLevelRecord spellLevl = GetSpellLevel(spellid);
 
             if (!IsPlaying)
@@ -414,11 +413,10 @@ namespace Symbioz.World.Models.Fights.Fighters
                 HandleSpellEffects(spellLevl, cellid, critical);
             }
             #endregion
-
-            FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
-            GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spellLevl.ApCost);
-            Fight.CheckFightEnd();
-
+        
+           FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
+           GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spellLevl.ApCost);
+           Fight.CheckFightEnd();
             if (Fight.Ended)
                 return true;
             RefreshStats();

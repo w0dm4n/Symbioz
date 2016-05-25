@@ -18,6 +18,7 @@
   <ShowProtocolMessages>True</ShowProtocolMessages>
   <KamasDropRatio>1</KamasDropRatio>
   <ExperienceRatio>10</ExperienceRatio>
+  <ItemsDropRatio>1</ItemsDropRatio>
   <StartBankKamas>0</StartBankKamas>
   <Host>127.0.0.1</Host>
   <IsCustomHost>False</IsCustomHost>

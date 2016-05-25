@@ -71,7 +71,6 @@ namespace Symbioz.World.Records
                 else if (eff.diceConst != 0)
                 {
                     result.Add(new ObjectEffectInteger(eff.actionId, eff.diceConst));
-      
                 }
                 else
                 {
