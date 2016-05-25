@@ -143,7 +143,7 @@ namespace Symbioz.World.Models
         public void OnConnectedNotifications()
         {
             Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new string[0]));
-            Client.Character.Reply(ConfigurationManager.Instance.WelcomeMessage, System.Drawing.Color.BlueViolet);
+            Client.Character.Reply(ConfigurationManager.Instance.WelcomeMessage, System.Drawing.Color.GhostWhite);
             BidShopsHandler.AddEventualBidShopGains(Client);
         }
         public void RefreshArenasInfos()

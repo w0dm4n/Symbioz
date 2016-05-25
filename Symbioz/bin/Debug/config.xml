@@ -1,6 +1,6 @@
 <!-- Symbioz Configuration -->
 <Configuration>
-  <CyclicSaveInterval>80</CyclicSaveInterval>
+  <CyclicSaveInterval>250</CyclicSaveInterval>
   <DatabaseHost>127.0.0.1</DatabaseHost>
   <DatabaseUser>root</DatabaseUser>
   <DatabasePassword></DatabasePassword>
@@ -9,15 +9,15 @@
   <AuthPort>443</AuthPort>
   <WorldPort>5555</WorldPort>
   <StartLevel>1</StartLevel>
-  <StartMapId>54172969</StartMapId>
-  <StartCellId>300</StartCellId>
+  <StartMapId>154010883</StartMapId>
+  <StartCellId>370</StartCellId>
   <DutyMapId>99091983</DutyMapId>
   <DutyCellId>300</DutyCellId>
   <StartKamas>0</StartKamas>
-  <WelcomeMessage>Beta heroique</WelcomeMessage>
+  <WelcomeMessage>Bienvenue sur le serveur de test héroique</WelcomeMessage>
   <ShowProtocolMessages>True</ShowProtocolMessages>
   <KamasDropRatio>1</KamasDropRatio>
-  <ExperienceRatio>30</ExperienceRatio>
+  <ExperienceRatio>10</ExperienceRatio>
   <StartBankKamas>0</StartBankKamas>
   <Host>127.0.0.1</Host>
   <IsCustomHost>False</IsCustomHost>
