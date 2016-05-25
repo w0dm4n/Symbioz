@@ -178,7 +178,17 @@ namespace Symbioz.World.Models.Fights.Fighters
                     EndTurn();
                 Fight.CheckFightEnd(); 
                 Fight.Send(new GameFightLeaveMessage(ContextualId));
-        
+                if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)//Heroique
+                {
+                    if (Core.ConfigurationManager.Instance.ServerId == 22)
+                    {
+                        Client.Character.Record.deathCount++;
+                        if (Client.Character.Record.deathMaxLevel < Client.Character.Record.Level)
+                            Client.Character.Record.deathMaxLevel = Client.Character.Record.Level;
+                        Client.Character.Record.Energy = 0;
+                        Client.Character.Look = ContextActorLook.Parse("{24}");
+                    }
+                }
                 if (Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
                     Fight.ShowFightResults(Fight.GetFightResults(GetOposedTeam().TeamColor), Client);
                 if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PVP_ARENA)

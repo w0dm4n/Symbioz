@@ -15,6 +15,7 @@ using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Guilds;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -96,6 +97,35 @@ namespace Symbioz.World.Handlers
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
+            ProcessSelection(client);
+        }
+        [MessageHandler]
+        public static void HandleCharacterReplayRequest(CharacterReplayRequestMessage message, WorldClient client)
+        {
+            CharacterRecord replayCharacter = CharacterRecord.GetCharacterRecordById(message.characterId);
+
+            if (replayCharacter == null)
+                return;
+            CharacterItemRecord.RemoveAll(message.characterId);
+            GeneralShortcutRecord.RemoveAll(message.characterId);
+            CharacterSpellRecord.RemoveAll(message.characterId);
+            CharacterJobRecord.RemoveAll(message.characterId);
+            BidShopGainRecord.RemoveAll(message.characterId);
+            replayCharacter.Energy = 10000;
+            replayCharacter.Level = ConfigurationManager.Instance.StartLevel;
+            replayCharacter.MapId = ConfigurationManager.Instance.StartMapId;
+            replayCharacter.CellId = ConfigurationManager.Instance.StartCellId;
+            replayCharacter.SpellPoints = ConfigurationManager.Instance.StartLevel;
+            replayCharacter.StatsPoints = ConfigurationManager.Instance.StartLevel;
+            replayCharacter.StatsPoints *= 5;
+            replayCharacter.Kamas = ConfigurationManager.Instance.StartKamas;
+            replayCharacter.Honor = 0;
+            replayCharacter.AlignmentValue = 0;
+            client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
+            //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
+            //replayCharacter.Look = look;
+            //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
         }
         [MessageHandler]

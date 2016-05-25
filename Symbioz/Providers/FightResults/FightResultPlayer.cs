@@ -14,6 +14,7 @@ using Symbioz.World.Models.Monsters;
 using Symbioz.World.Records;
 using Symbioz.Providers.FightResults.Exp;
 using Symbioz.World.Models.Fights.FightsTypes;
+using Symbioz.World.Models;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -33,15 +34,44 @@ namespace Symbioz.Providers.FightResults
             if (fighter.Fight is FightPvM && winner == fighter.Team.TeamColor)
             {
                 GeneratePVMLoot();
+                if (ConfigurationManager.Instance.ServerId == 22)
+                {
+                    // heroique drop item
+                }
+            }
+            else if (fighter.Fight is FightPvM && winner != fighter.Team.TeamColor)
+            {
+                if (ConfigurationManager.Instance.ServerId == 22)
+                {
+                    WorldClient client = (Fighter as CharacterFighter).Client;
+                    client.Character.Record.deathCount++;
+                    if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
+                        client.Character.Record.deathMaxLevel = client.Character.Record.Level;
+                    client.Character.Record.Energy = 0;
+                    client.Character.Look = ContextActorLook.Parse("{24}");
+                }
             }
             if (fighter.Fight is FightArena && winner == fighter.Team.TeamColor)
             {
                 GenerateArenaLoot();
             }
-           
-            // if (fighter.Fight is FightAgression && winner == fighter.Team.TeamColor)
+
+            if (fighter.Fight is FightAgression && winner == fighter.Team.TeamColor)//WINNER
             {
                 // add honor
+                if (ConfigurationManager.Instance.ServerId == 22)
+                {
+                    // heroique drop item
+                }
+            }
+            else if (fighter.Fight is FightAgression && winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)//LOOSER
+            {
+                WorldClient client = (Fighter as CharacterFighter).Client;
+                client.Character.Record.deathCount++;
+                if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
+                    client.Character.Record.deathMaxLevel = client.Character.Record.Level;
+                client.Character.Record.Energy = 0;
+                client.Character.Look = ContextActorLook.Parse("{24}");
             }
         }
         public override FightResultListEntry GetEntry()

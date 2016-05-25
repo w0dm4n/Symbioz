@@ -271,6 +271,29 @@ namespace Symbioz.World.Handlers
             client.Character.Teleport(int.Parse(value));
             client.Character.Reply("Vous avez été téléporté");
         }
+        [InGameCommand("ngo", ServerRoleEnum.MODERATOR)]
+        public static void NgoCommand(string value, WorldClient client)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+                target.Character.Teleport(client.Character.Record.MapId);
+            else
+                client.Character.ReplyError("Le client n'existe pas.");
+        }
+        [InGameCommand("gon", ServerRoleEnum.MODERATOR)]
+        public static void GonCommand(string value, WorldClient client)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+                client.Character.Teleport(target.Character.Record.MapId);
+            else
+                client.Character.ReplyError("Le client n'existe pas.");
+        }
+        [InGameCommand("morph", ServerRoleEnum.MODERATOR)]
+        public static void MorphCommand(string value, WorldClient client)
+        {
+            Look("{" + int.Parse(value) + "}", client);
+        }
         [InGameCommand("debugmap", ServerRoleEnum.ANIMATOR)]
         public static void DebugMapCommand(string value, WorldClient client)
         {

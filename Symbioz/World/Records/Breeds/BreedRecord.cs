@@ -152,17 +152,26 @@ namespace Symbioz.World.Records
             }
             List<int> futureColors = new List<int>();
             int index = 1;
-            foreach (var color in colors)
+            if (colors == null)
             {
-                if (color == -1)
+                futureColors.Add(GetDefaultBreedColor(breed.Id, sex, 1));
+                futureColors.Add(GetDefaultBreedColor(breed.Id, sex, 2));
+                futureColors.Add(GetDefaultBreedColor(breed.Id, sex, 3));
+            }
+            else
+            {
+                foreach (var color in colors)
                 {
-                    futureColors.Add(GetDefaultBreedColor(breed.Id, sex, index));
+                    if (color == -1)
+                    {
+                        futureColors.Add(GetDefaultBreedColor(breed.Id, sex, index));
+                    }
+                    else
+                    {
+                        futureColors.Add(color);
+                    }
+                    index++;
                 }
-                else
-                {
-                    futureColors.Add(color);
-                }
-                index++;
             }
             result.indexedColors = ContextActorLook.GetDofusColors(futureColors);
             result.AddSkin((ushort)HeadRecord.GetSkinFromCosmeticId(cosmeticid));

@@ -38,7 +38,7 @@ namespace Symbioz.World.Handlers
             client.Send(new MapComplementaryInformationsDataMessage(client.Character.SubAreaId, message.mapId, new List<HouseInformations>(),
                client.Character.Map.Instance.GetActors(), client.Character.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
                 new List<MapObstacle>(), client.Character.Map.Instance.Fights));
-
+            //TODO
             client.Character.Map.Instance.ShowFightsCount(client);
             client.Character.CheckMapTip(message.mapId);
             client.Character.Map.Instance.AddClient(client);
