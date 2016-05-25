@@ -26,7 +26,6 @@ namespace Symbioz
         static void Main(string[] args)
         {
 
-            Console.WriteLine("Coucou !");
             Logger.OnStartup();
 
             Startup.Initialize();

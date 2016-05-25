@@ -184,3 +184,6 @@ C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\D
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\YAXLib.xml
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
