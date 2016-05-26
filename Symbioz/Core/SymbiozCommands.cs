@@ -60,7 +60,7 @@ namespace Symbioz.Core
                 command.Value();
             }
             else
-                Logger.Init2(input + " n'est pas une commande de SymbiozEmu");
+                Logger.Init2(string.Format("La commande \"{0}\" n'existe pas !", input));
 
         }
         internal static void Shutdown()
@@ -112,8 +112,8 @@ namespace Symbioz.Core
             Logger.Init2("Version: " + ConstantsRepertory.VERSION);
             Logger.NewLine();
             Logger.Init2("Dofus Version ) " + ConstantsRepertory.DOFUS_REQUIRED_VERSION);
-            Logger.Init2("Clients connecteds on AuthServer: " + ServersManager.GetAuthConnectedCount());
-            Logger.Init2("Clients connecteds on WorldServer: " + ServersManager.GetWorldConnectedCount());
+            Logger.Init2("Clients on AuthServer: " + ServersManager.GetAuthConnectedCount());
+            Logger.Init2("Clients on WorldServer: " + ServersManager.GetWorldConnectedCount());
             Logger.Init2("Total: " + ServersManager.GetConnectedCounts());
         }
         public static void Offline()
@@ -124,15 +124,15 @@ namespace Symbioz.Core
             {
                 var client = WorldServer.Instance.WorldClients[i];
                 if (client.Account.Role != ServerRoleEnum.FONDATOR)
-                    client.Disconnect(1000,"Le serveur est desormais inaccessible");
+                    client.Disconnect(1000,"Le serveur est desormais inaccessible.");
             }
-            Logger.World("Le serveur a été passé hors ligne");
+            Logger.World("Le serveur est désormais hors-ligne");
 
         }
         public static void Online()
         {
             WorldServer.Instance.SetServerState(ServerStatusEnum.ONLINE);
-            Logger.World("Le serveur est a présent en ligne");
+            Logger.World("Le serveur est désormais en ligne");
         }
     }
   

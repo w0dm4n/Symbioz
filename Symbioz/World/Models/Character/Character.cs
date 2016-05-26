@@ -681,6 +681,10 @@ namespace Symbioz.World.Models
         {
             Reply("[Error] " + value, Color.Red, false, true);
         }
+        public void ReplyInConsole(string content, ConsoleMessageTypeEnum type = ConsoleMessageTypeEnum.CONSOLE_TEXT_MESSAGE)
+        {
+            this.Client.Send(new ConsoleMessage((sbyte)type, content));
+        }
         /// <summary>
         /// CharacterCharacteristicsInformations
         /// </summary>

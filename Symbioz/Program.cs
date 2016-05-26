@@ -31,7 +31,7 @@ namespace Symbioz
             Startup.Initialize();
 
             if (ConfigurationManager.Instance.SafeRun)
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; // Safe Run
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
            
             Startup.StartServers();
 

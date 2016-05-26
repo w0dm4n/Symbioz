@@ -19,6 +19,7 @@ namespace Symbioz.World.Handlers
         {
             CommandsHandler.Handle(CommandsHandler.CommandsPrefix + message.content, client);
         }
+
         [MessageHandler]
         public static void HandleAdminQuietCommand(AdminQuietCommandMessage message, WorldClient client)
         {
