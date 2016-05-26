@@ -49,3 +49,11 @@ C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\b
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Symbioz.ORM.csprojResolveAssemblyReference.cache
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.dll
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\Debug\Shader.ORM.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\Debug\Shader.ORM.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\Debug\MySql.Data.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\Debug\Shader.Helper.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\Debug\Shader.Helper.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Symbioz.ORM.csprojResolveAssemblyReference.cache
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.pdb

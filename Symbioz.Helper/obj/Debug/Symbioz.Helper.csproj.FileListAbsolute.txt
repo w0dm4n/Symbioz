@@ -33,3 +33,8 @@ C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helpe
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
 C:\Users\utilisateur\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb

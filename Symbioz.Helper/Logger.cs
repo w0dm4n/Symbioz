@@ -15,7 +15,6 @@ namespace Symbioz
         {
             Console.Title = "Symbioz";
             Logger.Init2("Version " + ConstantsRepertory.VERSION);
-            Logger.NewLine();
         }
         public static void NewLine()
         {
