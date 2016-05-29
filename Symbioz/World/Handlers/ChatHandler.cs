@@ -38,7 +38,7 @@ namespace Symbioz.World.Handlers
             if (handler.Value != null)
                 handler.Value(client, message);
             else
-                client.Character.Reply("Ce chat n'est pas géré");
+                client.Character.Reply("Impossible d'envoyer votre message.");
         }
         [MessageHandler]
         public static void HandleChatSmileyRequest(ChatSmileyRequestMessage message, WorldClient client)
@@ -54,7 +54,8 @@ namespace Symbioz.World.Handlers
         public static void HandleChatMultiClient(ChatClientMultiMessage message, WorldClient client)
         {
             if (message.content.StartsWith(CommandsHandler.CommandsPrefix))
-                CommandsHandler.Handle(message.content, client);
+                if(!string.IsNullOrEmpty(message.content))
+                    CommandsHandler.Handle(message.content, client);
             else
                 Handle(client, message.content, (ChatActivableChannelsEnum)message.channel);
         }
@@ -88,7 +89,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("Le personnage n'éxiste pas ou n'est pas connecté");
+                client.Character.Reply("Le personnage n'existe pas ou n'est pas connecté");
             }
         }
         public static void SendAnnounceMessage(string value, Color color)

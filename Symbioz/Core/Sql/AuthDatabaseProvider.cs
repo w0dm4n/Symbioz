@@ -43,6 +43,7 @@ namespace Symbioz.Core
             string query = "UPDATE " + table + " SET " + colum + "='" + value + "' WHERE " + where + "='" + wherevalue + "'";
             Execute(query);
         }
+
         public static void Insert(string tablename,List<string> fields,List<string> values)
         {
             string fieldsStr = fields.ToSplitedString();
@@ -56,10 +57,12 @@ namespace Symbioz.Core
             Execute(query);
            
         }
+
         public static void Delete(string tablename,object where,string werefield = "Id")
         {
             Execute(string.Format("DELETE FROM {0} WHERE {1}={2}",tablename,werefield,where));
         }
+
         public static void Execute(string query)
         {
             CheckConnectionState();
@@ -81,6 +84,7 @@ namespace Symbioz.Core
                 Logger.Error("Unable to execute query " + query + " SqlConnection cannot be oppened");
             }
         }
+
         public static void Clean(IEnumerable<string> tables)
         {
             string query;
@@ -91,6 +95,7 @@ namespace Symbioz.Core
                 Logger.Init2(table + " deleted...");
             } 
         }
+
         public static string SelectData(string table, string where, string wherevalue, string resultcolum)
         {
             CheckConnectionState();
@@ -104,7 +109,6 @@ namespace Symbioz.Core
             }
             dataReader.Close();
             return result;
-
         }
     }
 }

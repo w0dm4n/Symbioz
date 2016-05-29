@@ -17,7 +17,10 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleAdminCommandMessage(AdminCommandMessage message, WorldClient client)
         {
-            CommandsHandler.Handle(CommandsHandler.CommandsPrefix + message.content, client);
+            if (!string.IsNullOrEmpty(message.content))
+            {
+                CommandsHandler.Handle(CommandsHandler.CommandsPrefix + message.content, client);
+            }
         }
 
         [MessageHandler]

@@ -17,6 +17,7 @@ namespace Symbioz.Core
                 return "[UNKNOWN_TEXT_ID_" + id + "]";
             else return str;
         }
+
         private static D2IFile D2IFile { get; set; }
 
         [StartupInvoke("D2I File",StartupInvokeType.Base)]

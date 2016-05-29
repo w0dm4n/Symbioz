@@ -41,7 +41,7 @@ namespace Symbioz.ORM
                 field.GetCustomAttribute(typeof(IgnoreAttribute), false) == null &&
                 !field.IsStatic).ToArray();
 
-            this.m_methods = typeof(T).GetMethods().Where(method => method.IsStatic && 
+            this.m_methods = typeof(T).GetMethods().Where(method => method.IsStatic &&
                 method.GetParameters().Length == 1 &&
                 method.GetParameters()[0].ParameterType == typeof(string)).ToArray();
 
@@ -60,14 +60,12 @@ namespace Symbioz.ORM
             {
                 var obj = new object[this.m_fields.Length];
                 for (var i = 0; i < this.m_fields.Length; i++)
+                {
                     obj[i] = this.m_reader[i];
+                }
 
                 this.VerifyFieldsType(obj);
-
-                
-                    this.m_elements.Add((T)Activator.CreateInstance(typeof(T), obj));
-                
-               
+                this.m_elements.Add((T)Activator.CreateInstance(typeof(T), obj));
             }
             this.m_reader.Close();
         }
@@ -76,7 +74,7 @@ namespace Symbioz.ORM
         {
             this.ReadTable(connection, string.Format("SELECT * FROM `{0}` WHERE 1", this.m_tableName));
         }
-        /// <param name="condition">WHERE {0}</param>
+
         public void Read(MySqlConnection connection, string condition)
         {
             this.ReadTable(connection, string.Format("SELECT * FROM `{0}` WHERE {1}", this.m_tableName, condition));
@@ -161,11 +159,11 @@ namespace Symbioz.ORM
                 }
 
                 try { obj[i] = Convert.ChangeType(obj[i], this.m_fields[i].FieldType); }
-                catch 
-                { 
+                catch
+                {
                     string exeption = string.Format("Unknown constructor for '{0}', ({1})", this.m_fields[i].FieldType.Name, this.m_fields[i].Name);
                     Console.WriteLine(exeption);
-                    throw new Exception(exeption); 
+                    throw new Exception(exeption);
                 }
             }
         }

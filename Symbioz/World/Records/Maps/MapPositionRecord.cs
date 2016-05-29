@@ -20,7 +20,7 @@ namespace Symbioz.World.Records.Maps
         public int Capabilities;
         public string Name;
 
-        public MapPositionRecord(int mapId,int x,int y,bool outdoor,int capabilities,string name)
+        public MapPositionRecord(int mapId, int x, int y, bool outdoor, int capabilities, string name)
         {
             this.MapId = mapId;
             this.X = x;
@@ -32,9 +32,10 @@ namespace Symbioz.World.Records.Maps
 
         public static Point GetMapPosition(int mapId)
         {
-           var position= MapsPositions.Find(x => x.MapId == mapId);
+           var position = MapsPositions.Find(x => x.MapId == mapId);
            return new Point(position.X, position.Y);
         }
+
         public static string GetMapName(int mapId)
         {
             return MapsPositions.Find(x => x.MapId == mapId).Name;

@@ -43,7 +43,7 @@ namespace Symbioz.World.Models.Exchanges
             var item = Client.Character.Inventory.GetItem(uid);
             if (item == null)
             {
-                Client.Character.ReplyError("Impossible, cet item n'éxiste pas");
+                Client.Character.ReplyError("Impossible, cet item n'existe pas");
                 return;
             }
             if (item.Quantity < quantity)

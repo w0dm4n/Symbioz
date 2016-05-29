@@ -18,8 +18,13 @@ namespace Symbioz.World.Records
     public class MapRecord : ITable
     {
         public static List<MapRecord> Maps = new List<MapRecord>();
+
         [Ignore]
         public MapInstance Instance;
+
+        [Ignore]
+        public List<MapTriggerRecord> Triggers = new List<MapTriggerRecord>();
+
         [Primary]
         public int Id;
         public int SubAreaId;
@@ -31,10 +36,16 @@ namespace Symbioz.World.Records
         public List<short> BlueCells;
         public List<short> RedCells;
         public bool DugeonMap { get { return DungeonRecord.IsDungeonMap(this.Id); } }
-
         public bool HaveZaap { get { return Zaap != null; } }
-        public InteractiveRecord Zaap { get { return InteractiveRecord.GetInteractivesOnMap(Id).Find(x => x.ElementTypeId == 16);
-        } }
+
+        public InteractiveRecord Zaap
+        {
+            get
+            {
+                return InteractiveRecord.GetInteractivesOnMap(Id).Find(x => x.ElementTypeId == 16);
+            }
+        }
+
         public Point Position { get { return MapPositionRecord.GetMapPosition(Id); } }
 
         public string Name { get { return MapPositionRecord.GetMapName(Id); } }
@@ -51,14 +62,17 @@ namespace Symbioz.World.Records
             this.BlueCells = bluecells;
             this.RedCells = redcells;
         }
+
         public bool Walkable(short cellid)
         {
             return WalkableCells.Contains(cellid);
         }
+
         public short RandomWalkableCell()
         {
             return WalkableCells.Random<short>();
         }
+
         public short CloseCell(short cellid)
         {
             var cells = ShapesProvider.GetSquare(cellid, false);
@@ -69,6 +83,7 @@ namespace Symbioz.World.Records
             }
             return 0;
         }
+
         public static ushort GetSubAreaId(int mapid)
         {
             var map = GetMap(mapid);
@@ -77,6 +92,7 @@ namespace Symbioz.World.Records
             else
                 return 0;
         }
+
         public bool IsValid()
         {
             if (WalkableCells.Count() == 0)
@@ -87,24 +103,53 @@ namespace Symbioz.World.Records
                 return false;
             return true;
         }
+
         public static List<int> GetSubAreaMaps(int subareaid)
         {
             return Maps.FindAll(x => x.SubAreaId == subareaid).ConvertAll<int>(x => x.Id);
         }
+
         public static MapRecord GetMap(int id)
         {
             return Maps.Find(x => x.Id == id);
         }
+
         public static List<MapRecord> GetMapWithoutPlacementCells()
         {
             return Maps.FindAll(x => x.BlueCells.Count == 0 || x.RedCells.Count == 0);
         }
-        [StartupInvoke("Map Instances", StartupInvokeType.Others)]
+
+        public bool HasTriggerOnCell(int cellId)
+        {
+            bool hasTrigger = false;
+            if(this.Triggers.FirstOrDefault(x => x.BaseCellId == cellId) != null)
+            {
+                hasTrigger = true;
+            }
+            return hasTrigger;
+        }
+
+        public MapTriggerRecord GetTrigger(int cellId)
+        {
+            return this.Triggers.FirstOrDefault(x => x.BaseCellId == cellId);
+        }
+
+        public void LoadMapTriggers()
+        {
+            var mapTriggers = MapTriggerRecord.MapsTriggers.Where(x => x.BaseMapId == this.Id);
+            if(mapTriggers != null)
+            {
+                this.Triggers = mapTriggers.ToList();
+            }
+        }
+
+        [StartupInvoke("MapInstances", StartupInvokeType.Others)]
         public static void CreateInstances()
         {
-            foreach (var record in Maps)
+            foreach (var mapRecord in Maps)
             {
-                record.Instance = new MapInstance(record);
+                mapRecord.LoadMapTriggers();
+                mapRecord.Instance = new MapInstance(mapRecord);
             }
         }
     }

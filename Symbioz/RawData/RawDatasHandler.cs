@@ -85,7 +85,6 @@ namespace Symbioz.RawData
                 
                 Logger.Log(bj);
             }
-
         }
     }
 }

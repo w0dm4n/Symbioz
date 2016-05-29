@@ -25,20 +25,16 @@ namespace Symbioz
     {
         static void Main(string[] args)
         {
-
             Logger.OnStartup();
-
             Startup.Initialize();
 
             if (ConfigurationManager.Instance.SafeRun)
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
            
             Startup.StartServers();
-
             new Thread(new ThreadStart(SymbiozCommands.HandleCommands)).Start();
-
-          
         }
+
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             SaveTask.Save();

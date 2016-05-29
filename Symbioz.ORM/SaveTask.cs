@@ -134,10 +134,12 @@ namespace Symbioz.ORM
 
             method.Invoke(field.GetValue(null), new object[] { element });
         }
+
         private static void _timer_Elapsed(object sender, ElapsedEventArgs e)
         { 
             Save(); 
         }
+
         public static void Save()
         {
             Stopwatch w = Stopwatch.StartNew();

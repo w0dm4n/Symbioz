@@ -24,7 +24,8 @@ namespace Symbioz.World
         public const short MoveCellsCount = 3;
 
         static System.Timers.Timer m_timer { get; set; }
-  //      [StartupInvoke(StartupInvokeType.Cyclics)]
+
+        //[StartupInvoke(StartupInvokeType.Cyclics)]
         public static void Start()
         {
             m_timer = new System.Timers.Timer(MoveInstanceInterval); // pourquoi j'ai eut la flemme d'ajouter la réference system.timers? u_u
@@ -32,6 +33,7 @@ namespace Symbioz.World
             m_timer.Start();
             
         }
+
         static void m_timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             foreach (var map in MapRecord.Maps)
@@ -46,6 +48,7 @@ namespace Symbioz.World
             }
 
         }
+
         static void MoveGroup(MapRecord map,MonsterGroup group)
         {
 
@@ -69,6 +72,7 @@ namespace Symbioz.World
                 Logger.Error("Unable to move group" + group.MonsterGroupId + " on map " + map.Id + ", wrong path");
 
         }
+
         /// <summary>
         /// Thread de sleep a virer, plutot un cooldownAction qui renvoit vers MoveGroup()
         /// </summary>

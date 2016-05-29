@@ -30,11 +30,13 @@ namespace Symbioz.Core
             _database.UseProvider();
 
         }
+
         [StartupInvoke(StartupInvokeType.Sql)]
         public static void Load()
         {
             _database.LoadTables(GetTypes());
         }
+
         public static void Disconnect()
         {
             _database.CloseProvider();

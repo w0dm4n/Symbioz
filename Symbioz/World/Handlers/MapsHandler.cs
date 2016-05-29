@@ -44,26 +44,32 @@ namespace Symbioz.World.Handlers
             client.Character.Map.Instance.AddClient(client);
             client.Character.RefreshMap();
         }
+
         [MessageHandler]
         public static void HandleMapMovement(GameMapMovementRequestMessage message, WorldClient client)
         {
             sbyte direction = PathParser.GetDirection(message.keyMovements.Last());
             short cellid = PathParser.ReadCell(message.keyMovements.Last());
-            if (client.Character.IsFighting)
+            if (client.Character.Map.Id == message.mapId)
             {
-                client.Character.FighterInstance.Move(message.keyMovements.ToList(), cellid, direction);
-            }
-            else
-            {
-                if (client.Character.Busy)
-                    return;
-                client.Character.Look.UnsetAura();
-                client.Character.RefreshOnMapInstance();
-                client.Character.Record.Direction = direction;
-                client.Character.MovedCell = cellid;
-                client.Character.SendMap(new GameMapMovementMessage(message.keyMovements, client.Character.Id));
+                if (client.Character.IsFighting)
+                {
+                    client.Character.FighterInstance.Move(message.keyMovements.ToList(), cellid, direction);
+                }
+                else
+                {
+                    if (client.Character.Busy)
+                        return;
+
+                    client.Character.Look.UnsetAura();
+                    client.Character.RefreshOnMapInstance();
+                    client.Character.Record.Direction = direction;
+                    client.Character.MovedCell = cellid;
+                    client.Character.SendMap(new GameMapMovementMessage(message.keyMovements, client.Character.Id));
+                }
             }
         }
+
         [MessageHandler]
         public static void HandleMapMovementCancel(GameMapMovementCancelMessage message, WorldClient client)
         {
@@ -74,12 +80,23 @@ namespace Symbioz.World.Handlers
             }
             client.Character.Record.CellId = (short)message.cellId;
         }
+
         [MessageHandler]
         public static void HandleMapMovementConfirm(GameMapMovementConfirmMessage message, WorldClient client)
         {
             client.Character.Record.CellId = client.Character.MovedCell;
             client.Character.MovedCell = 0;
+
+            if(client.Character.Map.HasTriggerOnCell(client.Character.Record.CellId))
+            {
+                var currentTrigger = client.Character.Map.GetTrigger(client.Character.Record.CellId);
+                if(currentTrigger != null)
+                {
+                    client.Character.Teleport(currentTrigger.NextMapId, (short)currentTrigger.NextCellId);
+                }
+            }
         }
+
         [MessageHandler]
         public static void HandleChangeMap(ChangeMapMessage message, WorldClient client)
         {
@@ -110,7 +127,7 @@ namespace Symbioz.World.Handlers
                 }
                 else
                 {
-                    client.Character.NotificationError("This map cannot be founded");
+                    client.Character.NotificationError("Impossible de charger cette carte.");
                 }
             }
             else
@@ -118,7 +135,7 @@ namespace Symbioz.World.Handlers
                 scrollType = MapScrollActionRecord.GetScrollTypeFromCell(client.Character.Record.CellId);
                 if (scrollType == MapScrollType.UNDEFINED)
                 {
-                    client.Character.NotificationError("Unknown Map Scroll Action...");
+                    client.Character.NotificationError("Erreur : 'MapScrollAction'");
                 }
                 else
                 {
@@ -133,17 +150,19 @@ namespace Symbioz.World.Handlers
                     }
                     else
                     {
-                        client.Character.NotificationError("This map cannot be founded");
+                        client.Character.NotificationError("Impossible de charger cette carte.");
                     }
                 }
             }
         }
+
         [MessageHandler]
         public static void HandleGameMapChangeOriantation(GameMapChangeOrientationRequestMessage message, WorldClient client)
         {
             client.Character.Record.Direction = message.direction;
             client.Character.SendMap(new GameMapChangeOrientationMessage(new ActorOrientation(client.Character.Id, message.direction)));
         }
+
         [MessageHandler]
         public static void HandleTeleportRequestMessage(TeleportRequestMessage message, WorldClient client)
         {
@@ -159,7 +178,9 @@ namespace Symbioz.World.Handlers
                 else
                     return;
             }
+
             client.Character.Teleport(message.mapId, (short)InteractiveRecord.GetTeleporterCellId(message.mapId, (TeleporterTypeEnum)message.teleporterType));
+
             switch ((TeleporterTypeEnum)message.teleporterType)
             {
                 case TeleporterTypeEnum.TELEPORTER_ZAAP:
@@ -171,15 +192,18 @@ namespace Symbioz.World.Handlers
                 case TeleporterTypeEnum.TELEPORTER_PRISM:
                     break;
             }
+
             client.Character.LeaveDialog();
-            client.Character.Reply("Vous avez été téleporté");
+            client.Character.Reply("Vous avez été téleporté.");
         }
+
         [MessageHandler]
         public static void HandleMapNotFound(ErrorMapNotFoundMessage message, WorldClient client)
         {
-            client.Character.Reply("Cette carte (" + message.mapId + ") n'éxiste pas...");
+            client.Character.Reply("Cette carte (" + message.mapId + ") n'existe pas ...");
             client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);
         }
+
         [MessageHandler]
         public static void HandleEmotePlay(EmotePlayRequestMessage message, WorldClient client)
         {
@@ -195,6 +219,7 @@ namespace Symbioz.World.Handlers
                 client.Character.SendMap(new EmotePlayMessage(message.emoteId, 12, client.Character.Id, client.Account.Id));
             }
         }
+
         [MessageHandler]
         public static void HandleCautiousMapMovement(GameCautiousMapMovementRequestMessage message, WorldClient client)
         {
@@ -213,6 +238,7 @@ namespace Symbioz.World.Handlers
             client.Character.MovedCell = cellid;
             client.Character.SendMap(new GameCautiousMapMovementMessage(message.keyMovements, client.Character.Id));
         }
+
         public static void SendCurrentMapMessage(WorldClient client, int mapid)
         {
             client.Send(new CurrentMapMessage(mapid, MapKey));

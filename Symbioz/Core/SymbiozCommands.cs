@@ -24,10 +24,12 @@ namespace Symbioz.Core
     class SymbiozCommands
     {
         public static Dictionary<string, Action> commands = new Dictionary<string, Action>();
+
         public static int Count()
         {
             return commands.Count();
         }
+
         [StartupInvoke(StartupInvokeType.Internal)]
         public static void LoadCommands()
         {
@@ -42,6 +44,7 @@ namespace Symbioz.Core
             commands.Add("maxco", MaxCo);
             commands.Add("shutdown", Shutdown);
         }
+
         public static void HandleCommands()
         {
             while (true)
@@ -63,6 +66,7 @@ namespace Symbioz.Core
                 Logger.Init2(string.Format("La commande \"{0}\" n'existe pas !", input));
 
         }
+
         internal static void Shutdown()
         {
             SaveTask.Save();
@@ -70,6 +74,7 @@ namespace Symbioz.Core
             Thread.Sleep(4000);
             Environment.Exit(0);
         }
+
         internal static void MaxCo()
         {
             Logger.Init2("Max client connected on this Instance = " + WorldServer.Instance.InstanceMaxConnected);
@@ -83,6 +88,7 @@ namespace Symbioz.Core
             Logger.Init("RawDatas Reloaded");
            
         }
+
         internal static void RawList()
         {
             Logger.Init("Loaded RawDatas :");
@@ -91,6 +97,7 @@ namespace Symbioz.Core
                 Logger.Init2(string.Format("- Name: {0} Size: {1}", raw.Key, raw.Value.Length));
             }
         }
+
         internal static void Restore()
         {
             AuthDatabaseProvider.Clean(new string[] { "Characters", "CharactersItems", "CharactersJobs",
@@ -99,6 +106,7 @@ namespace Symbioz.Core
             System.Threading.Thread.Sleep(2000);
             Environment.Exit(0);
         }
+
         internal static void HelpRequest()
         {
             Logger.Init("Commands :");
@@ -107,6 +115,7 @@ namespace Symbioz.Core
                 Logger.Init2("-" + item.Key);
             }
         }
+
         internal static void Infos()
         {
             Logger.Init2("Version: " + ConstantsRepertory.VERSION);
@@ -116,6 +125,7 @@ namespace Symbioz.Core
             Logger.Init2("Clients on WorldServer: " + ServersManager.GetWorldConnectedCount());
             Logger.Init2("Total: " + ServersManager.GetConnectedCounts());
         }
+
         public static void Offline()
         {
             WorldServer.Instance.SetServerState(ServerStatusEnum.NOJOIN);
@@ -129,6 +139,7 @@ namespace Symbioz.Core
             Logger.World("Le serveur est désormais hors-ligne");
 
         }
+
         public static void Online()
         {
             WorldServer.Instance.SetServerState(ServerStatusEnum.ONLINE);

@@ -166,7 +166,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("Le personnage n'éxiste pas ou n'est pas connécté.");
+                client.Character.Reply("Le personnage n'existe pas ou n'est pas connécté.");
             }
         }
         [MessageHandler]

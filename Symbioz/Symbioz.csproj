@@ -79,9 +79,9 @@
     <Compile Include="Auth\Records\BanIpRecord.cs" />
     <Compile Include="Core\ConfigurationManager.cs" />
     <Compile Include="Core\InternalExtensions.cs" />
-    <Compile Include="Core\Sql\WorldDatabaseProvider.cs" />
+    <Compile Include="Core\SQL\WorldDatabaseProvider.cs" />
     <Compile Include="Core\LangManager.cs" />
-    <Compile Include="Core\Sql\AuthDatabaseProvider.cs" />
+    <Compile Include="Core\SQL\AuthDatabaseProvider.cs" />
     <Compile Include="Core\SymbiozCommands.cs" />
     <Compile Include="Core\Startup\Startup.cs" />
     <Compile Include="Core\Startup\StartupInvokeAttribute.cs" />
@@ -321,6 +321,7 @@
     <Compile Include="World\Records\Items\WeaponRecord.cs" />
     <Compile Include="World\Records\Maps\MapPositionRecord.cs" />
     <Compile Include="World\Records\Maps\MapScrollActionRecord.cs" />
+    <Compile Include="World\Records\Maps\MapTriggerRecord.cs" />
     <Compile Include="World\Records\Monsters\DungeonRecord.cs" />
     <Compile Include="World\Records\Spells\BombWallRecord.cs" />
     <Compile Include="World\Records\Spells\CharacterSpellRecord.cs" />
@@ -339,7 +340,7 @@
     <Compile Include="World\Records\Character\JobRecord.cs" />
     <Compile Include="World\Records\Maps\MapElementRecord.cs" />
     <Compile Include="World\Records\Maps\MapRecord.cs" />
-    <Compile Include="Core\Sql\BeforeSaveAttribute.cs" />
+    <Compile Include="Core\SQL\BeforeSaveAttribute.cs" />
     <Compile Include="World\Records\Maps\MapTipRecord.cs" />
     <Compile Include="World\Records\Monsters\MapNoSpawnRecord.cs" />
     <Compile Include="World\Records\Monsters\MonsterDropRecord.cs" />
