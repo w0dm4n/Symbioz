@@ -91,7 +91,7 @@ namespace Symbioz.Providers
         }
         static void Talk(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
         {
-            if (action == null)
+            if (action == null || client.Character.Restrictions.cantMove == true)
             {
                 client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
                 return;

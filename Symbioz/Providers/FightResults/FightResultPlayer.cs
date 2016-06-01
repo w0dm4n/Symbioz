@@ -50,10 +50,10 @@ namespace Symbioz.Providers.FightResults
                     client.Character.Record.Energy = 0;
                     client.Character.Look = ContextActorLook.Parse("{24}");
                     client.Character.Restrictions.cantChat = true;
-                    client.Character.Restrictions.cantRun = true;
                     client.Character.Restrictions.cantMove = true;
                     client.Character.Restrictions.cantSpeakToNPC = true;
-                    client.Character.Reply("Vous etes mort !", false, false);
+                    client.Character.Restrictions.cantExchange = true;
+                    client.Character.Reply("Vous êtes mort !", false, false);
                 }
             }
             if (fighter.Fight is FightArena && winner == fighter.Team.TeamColor)

@@ -645,7 +645,7 @@ namespace Symbioz.World.Models
             }
             else
             {
-                Reply("Vous ne possedez pas asser de kamas");
+                Reply("Vous ne possedez pas assez de kamas");
                 return false;
             }
 

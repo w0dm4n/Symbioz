@@ -15,12 +15,9 @@ using System.Timers;
 
 namespace Symbioz.World
 {
-    /// <summary>
-    /// A refaire, baclé :3
-    /// </summary>
     class CyclicMobsMovementTask
     {
-        public const short MoveInstanceInterval = 20000; // pourquoi les noms de constantes ne sont-il pas en majuscules ? u_u
+        public const short MoveInstanceInterval = 20000;
         public const short MoveCellsCount = 3;
 
         static System.Timers.Timer m_timer { get; set; }
@@ -28,7 +25,7 @@ namespace Symbioz.World
         //[StartupInvoke(StartupInvokeType.Cyclics)]
         public static void Start()
         {
-            m_timer = new System.Timers.Timer(MoveInstanceInterval); // pourquoi j'ai eut la flemme d'ajouter la réference system.timers? u_u
+            m_timer = new System.Timers.Timer(MoveInstanceInterval);
             m_timer.Elapsed += m_timer_Elapsed;
             m_timer.Start();
             

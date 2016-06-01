@@ -50,24 +50,21 @@ namespace Symbioz.World.Handlers
         {
             sbyte direction = PathParser.GetDirection(message.keyMovements.Last());
             short cellid = PathParser.ReadCell(message.keyMovements.Last());
-            if (client.Character.Map.Id == message.mapId)
+            if (client.Character.IsFighting)
+                client.Character.FighterInstance.Move(message.keyMovements.ToList(), cellid, direction);
+            else
             {
-                if (client.Character.IsFighting)
+                if (client.Character.Busy || client.Character.Restrictions.cantMove == true)
+                    return;
+                if (client.Character.Map.Id == message.mapId)
                 {
-                    client.Character.FighterInstance.Move(message.keyMovements.ToList(), cellid, direction);
-                }
-                else
-                {
-                    if (client.Character.Busy)
-                        return;
-
                     client.Character.Look.UnsetAura();
                     client.Character.RefreshOnMapInstance();
                     client.Character.Record.Direction = direction;
                     client.Character.MovedCell = cellid;
                     client.Character.SendMap(new GameMapMovementMessage(message.keyMovements, client.Character.Id));
                 }
-            }
+             }
         }
 
         [MessageHandler]

@@ -38,6 +38,16 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible car le joueur est occupé.");
                 return;
             }
+            else if (target.Character.Restrictions.cantExchange == true)
+            {
+                client.Character.Reply("Impossible car le joueur est mort.");
+                return;
+            }
+            else if (client.Character.Restrictions.cantExchange == true)
+            {
+                client.Character.Reply("Impossible car vous êtes mort.");
+                return;
+            }
             target.Character.PlayerTradeInstance = new PlayerTradeExchange(target, client);
             client.Character.PlayerTradeInstance = new PlayerTradeExchange(client, target);
             client.Character.PlayerTradeInstance.Ask();
