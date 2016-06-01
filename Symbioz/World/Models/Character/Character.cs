@@ -210,6 +210,49 @@ namespace Symbioz.World.Models
             method.Invoke(field.GetValue(null), new object[] { element });
         }
 
+        public void ClearSave()
+        {
+            try
+            {
+                var types = _removeElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+                    lock (_removeElements)
+                        elements = _removeElements[type];
+                    lock (_removeElements)
+                        _removeElements[type] = _removeElements[type].Skip(elements.Count).ToList();
+                }
+
+                types = _newElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+
+                    lock (_newElements)
+                        elements = _newElements[type];
+                    lock (_newElements)
+                        _newElements[type] = _newElements[type].Skip(elements.Count).ToList();
+                }
+
+                types = _updateElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+                    lock (_updateElements)
+                        elements = _updateElements[type];
+                    lock (_updateElements)
+                    {
+                        var attribute = (TableAttribute)type.GetCustomAttribute(typeof(TableAttribute));
+
+                        if (attribute != null && !attribute.letInUpdateField)
+                            _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
+                    }
+                }
+            }
+            catch (Exception e) { Logger.Error("[CLEAR SAVE CHARACTER " + this.Record.Name + "]" + e.Message); }
+        }
+
         public void Save()
         {
             try

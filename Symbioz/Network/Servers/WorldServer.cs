@@ -69,6 +69,10 @@ namespace Symbioz.Network.Servers
         {
             WorldClients.ForEach(x => x.Send(message));
         }
+        public void ClearAllOnlineCharacters()
+        {
+            GetAllClientsOnline().ForEach(x => x.Character.ClearSave());
+        }
         public void SendToOnlineCharacters(Message message)
         {
             GetAllClientsOnline().ForEach(x => x.Send(message));

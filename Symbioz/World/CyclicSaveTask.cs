@@ -26,11 +26,12 @@ namespace Symbioz.World
 
         static void Cache_OnSaveStarted()
         {
-           // Logger.Init("Saving WorldServer...");
+           Logger.Init("Sauvegarde en cours ...");
             if (WorldServer.Instance.ServerState != ServerStatusEnum.ONLINE)
                 return;
             WorldServer.Instance.SetServerState(ServerStatusEnum.SAVING);
             WorldServer.Instance.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 164, new string[0]));
+            WorldServer.Instance.ClearAllOnlineCharacters();
             InitializeSave();
         }
         static void Cache_OnSaveEnded(int elapsed)
