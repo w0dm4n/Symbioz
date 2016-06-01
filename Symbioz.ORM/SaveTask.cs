@@ -148,7 +148,6 @@ namespace Symbioz.ORM
             _timer.Stop();  
             try
             {
-               
                 var types = _removeElements.Keys.ToList();
                 foreach (var type in types)
                 {
@@ -177,6 +176,7 @@ namespace Symbioz.ORM
 
                     try
                     {
+                        Console.WriteLine(elements[0]);
                         var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, elements.ToArray());
                     }
                     catch (Exception e) { Logger.Error(e.ToString()); }
@@ -192,7 +192,6 @@ namespace Symbioz.ORM
                     List<ITable> elements;
                     lock (_updateElements)
                         elements = _updateElements[type];
-
                     try
                     {
                         var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, elements.ToArray());
@@ -207,12 +206,9 @@ namespace Symbioz.ORM
                             _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
                     }
                 }
-
-               
                 _timer.Start();
                 if (OnSaveEnded != null)
                     OnSaveEnded(w.Elapsed.Seconds);
-
             }
             catch (Exception e) { Logger.Error("[SAVING WORLD] " + e.Message); }
         }

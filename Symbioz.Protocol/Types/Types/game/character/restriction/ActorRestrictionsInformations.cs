@@ -35,7 +35,8 @@ public virtual short TypeId
     get { return Id; }
 }
 
-public bool cantBeAggressed;
+        public bool isMuted;
+        public bool cantBeAggressed;
         public bool cantBeChallenged;
         public bool cantTrade;
         public bool cantBeAttackedByMutant;
@@ -62,8 +63,9 @@ public ActorRestrictionsInformations()
 {
 }
 
-public ActorRestrictionsInformations(bool cantBeAggressed, bool cantBeChallenged, bool cantTrade, bool cantBeAttackedByMutant, bool cantRun, bool forceSlowWalk, bool cantMinimize, bool cantMove, bool cantAggress, bool cantChallenge, bool cantExchange, bool cantAttack, bool cantChat, bool cantBeMerchant, bool cantUseObject, bool cantUseTaxCollector, bool cantUseInteractive, bool cantSpeakToNPC, bool cantChangeZone, bool cantAttackMonster, bool cantWalk8Directions)
+public ActorRestrictionsInformations(bool cantBeAggressed, bool cantBeChallenged, bool cantTrade, bool cantBeAttackedByMutant, bool cantRun, bool forceSlowWalk, bool cantMinimize, bool cantMove, bool cantAggress, bool cantChallenge, bool cantExchange, bool cantAttack, bool cantChat, bool cantBeMerchant, bool cantUseObject, bool cantUseTaxCollector, bool cantUseInteractive, bool cantSpeakToNPC, bool cantChangeZone, bool cantAttackMonster, bool cantWalk8Directions, bool isMuted)
         {
+            this.isMuted = isMuted;
             this.cantBeAggressed = cantBeAggressed;
             this.cantBeChallenged = cantBeChallenged;
             this.cantTrade = cantTrade;

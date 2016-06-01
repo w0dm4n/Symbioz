@@ -35,7 +35,7 @@ namespace Symbioz.World
         }
         static void Cache_OnSaveEnded(int elapsed)
         {
-            Logger.Init2("World Saved (" + elapsed + ")s");
+            Logger.Init2("Sauvegarde terminé (" + elapsed + ")s");
             if (WorldServer.Instance.ServerState != ServerStatusEnum.SAVING)
                 return;
            
@@ -47,7 +47,6 @@ namespace Symbioz.World
             var a = Assembly.GetAssembly(typeof(CyclicSaveTask));
             foreach (var type in a.GetTypes())
             {
-             
                 if (type.GetInterface("ITable") != null)
                 {
                     foreach (var method in type.GetMethods())

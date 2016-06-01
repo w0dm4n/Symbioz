@@ -11,7 +11,7 @@ namespace Symbioz.World.Models
     {
         public static ActorRestrictionsInformations GetDefaultRestrictions()
         {
-            return new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false);
+            return new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false, false);
         }
     }
 }

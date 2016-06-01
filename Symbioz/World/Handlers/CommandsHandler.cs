@@ -260,8 +260,14 @@ namespace Symbioz.World.Handlers
         [InGameCommand("go", ServerRoleEnum.MODERATOR)]
         public static void GoCommand(string value, WorldClient client)
         {
-            client.Character.Teleport(int.Parse(value));
-            client.Character.Reply("Vous avez été téléporté");
+            var cmd = value.Split(' ').ToList();
+            if (cmd.Count == 2)
+            {
+                client.Character.Teleport(int.Parse(cmd[0]), short.Parse(cmd[1]));
+                client.Character.Reply("Vous avez été téléporté");
+            }
+            else
+                client.Character.Reply("Syntaxe incorrecte");
         }
 
         [InGameCommand("ngo", ServerRoleEnum.MODERATOR)]
@@ -314,23 +320,41 @@ namespace Symbioz.World.Handlers
             client.Character.RefreshOnMapInstance();
         }
 
-      /*  [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
+      [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
         public static void OverCalcCommand(string value, WorldClient client)
         {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             TrySendRaw(client, value, "overcalc");
         }
 
         [InGameCommand("shutdown", ServerRoleEnum.FONDATOR)]
         public static void KillCommand(string value, WorldClient client)
         {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             TrySendRaw(client, value, "shutdown");
         }
         [InGameCommand("hibernate", ServerRoleEnum.FONDATOR)]
         public static void HibernateCommand(string value, WorldClient client)
         {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             TrySendRaw(client, value, "hibernate");
         }
-        */
+
         [InGameCommand("notif",ServerRoleEnum.ANIMATOR)]
         public static void Notif(string value,WorldClient client)
         {
@@ -357,6 +381,11 @@ namespace Symbioz.World.Handlers
         public static void BanCommand(string value, WorldClient client)
         {
             var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             if (target != null)
             {
                 AccountsProvider.Ban(target.Account.Username);
@@ -372,6 +401,11 @@ namespace Symbioz.World.Handlers
         public static void KickCommand(string value, WorldClient client)
         {
             var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             if (target != null)
             {
                 target.Disconnect(0, "Vous avez été kické par " + client.Character.Record.Name);
@@ -551,6 +585,11 @@ namespace Symbioz.World.Handlers
         public static void BanIpCommand(string value,WorldClient client)
         {
             var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target.Account.Role == ServerRoleEnum.FONDATOR)
+            {
+                client.Character.Reply("Impossible sur un administrateur");
+                return;
+            }
             if (target != null)
             {
                 AccountsProvider.BanIp(target.SSyncClient.Ip.Split(':')[0]);
@@ -558,7 +597,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("Le joueur n'existe pas ou n'est pas connécté");
+                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
             }
         }
 
@@ -583,6 +622,40 @@ namespace Symbioz.World.Handlers
             else if (client.Character.HasAlliance)
                 client.Send(new AllianceCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_ERROR_ALREADY_IN_GUILD));
         }
+
+        [InGameCommand("mute", ServerRoleEnum.MODERATOR)]
+        public static void MutePlayer(string value, WorldClient client)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+            {
+                if (target.Character.Record.Name == client.Character.Record.Name)
+                    client.Character.Reply("Impossible de s'auto-mute");
+                else if (target.Account.Role == ServerRoleEnum.FONDATOR)
+                    client.Character.Reply("Impossible de mute un administrateur");
+                else
+                {
+                    target.Character.Restrictions.isMuted = true;
+                    client.Character.Reply("Le joueur a bien été mute.");
+                }
+            }
+            else
+                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+        }
+
+        [InGameCommand("unmute", ServerRoleEnum.MODERATOR)]
+        public static void UnMutePlayer(string value, WorldClient client)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null && target.Character.Restrictions.isMuted == true
+                && !(target.Character.Restrictions.isMuted = false))
+                    client.Character.Reply("Le joueur a bien été unmute.");
+            else if (target == null)
+                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+            else
+                client.Character.Reply("Le joueur n'est pas mute.");
+        }
+
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)

@@ -54,14 +54,25 @@ namespace Symbioz.World.Handlers
         public static void HandleChatMultiClient(ChatClientMultiMessage message, WorldClient client)
         {
             if (message.content.StartsWith(CommandsHandler.CommandsPrefix))
-                if(!string.IsNullOrEmpty(message.content))
-                    CommandsHandler.Handle(message.content, client);
+                CommandsHandler.Handle(message.content, client);
             else
-                Handle(client, message.content, (ChatActivableChannelsEnum)message.channel);
+            {
+                if (client.Character.Restrictions.cantChat == true)
+                    client.Character.Reply("Impossible d'écrire dans ce canal !");
+                else if (client.Character.Restrictions.isMuted == true)
+                    client.Character.Reply("Vous avez été muté, impossible d'envoyer votre message.");
+                else
+                    Handle(client, message.content, (ChatActivableChannelsEnum)message.channel);
+            }
         }
         [MessageHandler]
         public static void ChatClientPrivate(ChatClientPrivateMessage message, WorldClient client)
         {
+            if (client.Character.Restrictions.isMuted == true)
+            {
+                client.Character.Reply("Vous avez été muté, impossible d'envoyer votre message.");
+                return;
+            }
             if (message.receiver == client.Character.Record.Name)
                 return;
             var target = WorldServer.Instance.GetOnlineClient(message.receiver);
@@ -122,10 +133,10 @@ namespace Symbioz.World.Handlers
                 client.Character.FighterInstance.Fight.Send(chatMessage);
             else
             {
-                if (!client.Character.Map.Instance.Muted)
-                    client.Character.SendMap(chatMessage);
-                else
+                if (client.Character.Map.Instance.Muted && client.Account.Role == 0)
                     client.Character.Reply("Impossible d'envoyer le message, la map a été mute.");
+                else
+                    client.Character.SendMap(chatMessage);   
             }
 
         }
