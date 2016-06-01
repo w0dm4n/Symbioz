@@ -61,7 +61,7 @@ namespace Symbioz.Providers
            
             }
             else
-                client.Character.NotificationError("Cet hotel de vente n'est pas encore disponible!");
+                client.Character.NotificationError("Hôtel de vente non disponible !");
         }
 
         static void Sell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
@@ -80,7 +80,7 @@ namespace Symbioz.Providers
        
             }
             else
-                client.Character.Reply("Cet hotel de vente n'est pas encore disponible!");
+                client.Character.Reply("Hôtel de vente non disponible !");
         }
         static void BuySell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
         {
@@ -93,7 +93,7 @@ namespace Symbioz.Providers
         {
             if (action == null)
             {
-                client.Character.Reply("Ce PNJ n'est pas apte a parler.");
+                client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
                 return;
             }
             ushort messageId =ushort.Parse(action.OptionalValue1);

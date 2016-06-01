@@ -66,7 +66,7 @@ namespace Symbioz.Providers
                 }
                 else
                 {
-                    client.Character.NotificationError((EffectsEnum)effect.actionId + " is not handled");
+                    client.Character.NotificationError((EffectsEnum)effect.actionId + " n'est pas encore disponible !");
                 }
             }
             return remove;

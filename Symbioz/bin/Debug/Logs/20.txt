@@ -1,0 +1,4 @@
+Client: 127.0.0.1:54518
+At: 01/06/2016 03:09:12
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Handlers.MapsHandler.HandleMapMovement(GameMapMovementRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\MapsHandler.cs:ligne 53

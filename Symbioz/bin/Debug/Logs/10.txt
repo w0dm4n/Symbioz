@@ -1,0 +1,8 @@
+Client: 127.0.0.1:53784
+At: 25/05/2016 17:42:41
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Inventory.RemoveItemSkin(CharacterItemRecord record, ItemRecord template) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 132
+   à Symbioz.World.Models.Inventory.UnequipItem(CharacterItemRecord item, Byte newposition, ItemRecord template, UInt32 quantity) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 369
+   à Symbioz.World.Models.Inventory.EquipWeapon(CharacterItemRecord item, WeaponRecord template, Byte newposition, UInt32 quantity) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 339
+   à Symbioz.World.Models.Inventory.MoveItem(UInt32 uid, Byte newposition, UInt32 quantity) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 447
+   à Symbioz.World.Handlers.InventoryHandler.HandleObjectSetPosition(ObjectSetPositionMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\InventoryHandler.cs:ligne 48

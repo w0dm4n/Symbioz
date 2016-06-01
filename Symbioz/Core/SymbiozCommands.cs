@@ -63,7 +63,10 @@ namespace Symbioz.Core
                 command.Value();
             }
             else
-                Logger.Init2(string.Format("La commande \"{0}\" n'existe pas !", input));
+            {
+                   if (!(String.IsNullOrEmpty(input)))
+                    Logger.Init2(string.Format("La commande \"{0}\" n'existe pas !", input));
+            }
 
         }
 

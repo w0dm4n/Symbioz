@@ -29,7 +29,7 @@ namespace Symbioz.World.Handlers
             if (client.Character.Map == null)
             {
                 client.Character.TeleportToSpawnPoint();
-                client.Character.NotificationError("Unknown Map...(" + message.mapId + ")");
+                client.Character.NotificationError("Map inconnu ...(" + message.mapId + ")");
                 return;
             }
             client.Character.Map.Instance.SyncMonsters();

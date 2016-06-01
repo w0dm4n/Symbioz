@@ -343,7 +343,6 @@ namespace Symbioz.World.Models
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
-               // AddItemSkin(item, template);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
 
             }
@@ -352,7 +351,6 @@ namespace Symbioz.World.Models
                 var items = ItemCut.Cut(item, quantity, newposition);
                 Add(items.newItem);
                 ItemEffectsProvider.AddEffects(Character.Client, items.BaseItem.GetEffects());
-                //AddItemSkin(item, template);
             }
             Character.RefreshGroupInformations();
 
@@ -366,7 +364,8 @@ namespace Symbioz.World.Models
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
-                RemoveItemSkin(item, template);
+                if (template != null)
+                    RemoveItemSkin(item, template);
             }
             else
             {
@@ -393,7 +392,6 @@ namespace Symbioz.World.Models
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
-                //RemoveItemSkin(item, template);
             }
             else
             {
@@ -402,7 +400,6 @@ namespace Symbioz.World.Models
                     existing.Quantity += quantity;
                     RemoveItem(item.UID, item.Quantity);
                     ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
-                    //RemoveItemSkin(item, template);
                 }
                 else
                 {
@@ -465,6 +462,7 @@ namespace Symbioz.World.Models
             Character.RefreshStats();
             Refresh();
         }
+
         public void RemoveItem(uint id, uint quantity, bool refresh = true)
         {
             var item = GetItem(id);
@@ -489,8 +487,8 @@ namespace Symbioz.World.Models
             if (refresh)
                 Refresh();
             Character.RefreshShortcuts();
-
         }
+
         public List<ObjectItem> ConvertAllObjectItems()
         {
             return Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());

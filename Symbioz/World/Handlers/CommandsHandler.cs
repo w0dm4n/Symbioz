@@ -95,7 +95,9 @@ namespace Symbioz.World.Handlers
                     var com_ = Commands.ToList().Find(x => x.Key.Value == cominfo.Split('.')[1]);
                     if (com_.Key == null)
                     {
-                        client.Character.Reply("La commande " + cominfo.Split('.')[1] + " n'existe pas !");
+                        var cmd = cominfo.Split('.')[1];
+                        if (!(String.IsNullOrEmpty(cmd)))
+                            client.Character.Reply("La commande " + cmd + " n'existe pas !");
                         return;
                     }
 
@@ -119,7 +121,7 @@ namespace Symbioz.World.Handlers
                                 }
                                 catch (Exception ex)
                                 {
-                                    client.Character.NotificationError("Unable to execute command : " + ex.InnerException.Message);
+                                    client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
                                 }
                             }
                             else
@@ -130,7 +132,7 @@ namespace Symbioz.World.Handlers
                                 }
                                 catch (Exception ex)
                                 {
-                                    client.Character.NotificationError("Unable to execute command : " + ex.InnerException.Message);
+                                    client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
                                 }
                             }
                             break;
@@ -225,13 +227,13 @@ namespace Symbioz.World.Handlers
         [InGameCommand("infos", ServerRoleEnum.PLAYER)]
         public static void InfosCommand(string value, WorldClient client)
         {
-            client.Character.Reply("Il y a " + WorldServer.Instance.WorldClients.Count() + " client(s) connécté(s). Maximum de l'instance: " + WorldServer.Instance.InstanceMaxConnected);
+            client.Character.Reply("Il y a " + WorldServer.Instance.WorldClients.Count() + " client(s) actuellement connecté(s). <br/>Record : " + WorldServer.Instance.InstanceMaxConnected);
         }
 
         [InGameCommand("clist", ServerRoleEnum.ADMINISTRATOR)]
         public static void ClientsListCommand(string value, WorldClient client)
         {
-            client.Character.Reply("Client(s) connécté(s) :", true);
+            client.Character.Reply("Client(s) connecté(s) :", true);
             foreach (var c in WorldServer.Instance.GetAllClientsOnline())
             {
                 if (c.Character != null)
@@ -312,7 +314,7 @@ namespace Symbioz.World.Handlers
             client.Character.RefreshOnMapInstance();
         }
 
-        [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
+      /*  [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
         public static void OverCalcCommand(string value, WorldClient client)
         {
             TrySendRaw(client, value, "overcalc");
@@ -328,7 +330,7 @@ namespace Symbioz.World.Handlers
         {
             TrySendRaw(client, value, "hibernate");
         }
-
+        */
         [InGameCommand("notif",ServerRoleEnum.ANIMATOR)]
         public static void Notif(string value,WorldClient client)
         {
@@ -402,7 +404,7 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("baleine", ServerRoleEnum.PLAYER)]
+        /*[InGameCommand("baleine", ServerRoleEnum.PLAYER)]
         public static void BaleineCommand(string value, WorldClient client)
         {
             client.Character.Teleport(140510209, 314);
@@ -429,7 +431,7 @@ namespace Symbioz.World.Handlers
         {
             client.Character.Teleport(ConfigurationManager.Instance.DutyMapId, ConfigurationManager.Instance.DutyCellId);
         }
-
+        */
         [InGameCommand("item", ServerRoleEnum.MODERATOR)]
         public static void AddItemCommand(string value, WorldClient client)
         {
@@ -541,7 +543,7 @@ namespace Symbioz.World.Handlers
             else
             {
                 client.Character.Map.Instance.Muted = true;
-                client.Character.Reply("Les joueurs en peuvent désormais plus parler sur cette carte");
+                client.Character.Reply("Les joueurs ne peuvent désormais plus parler sur cette carte");
             }
         }
 
@@ -594,7 +596,7 @@ namespace Symbioz.World.Handlers
                 client.Character.ShowNotification("Raw " + rawname + " sended");
             }
             else
-                client.Character.NotificationError("Le client " + targetname + " n'existe pas ou n'est pas connécté.");
+                client.Character.NotificationError("Le client " + targetname + " n'existe pas ou n'est pas connecté.");
         }
     }
 }

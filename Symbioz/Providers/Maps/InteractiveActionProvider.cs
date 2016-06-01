@@ -143,7 +143,7 @@ namespace Symbioz.Provider
                 }
             }
             else
-                client.Character.Reply("[Interactives] Unable to handle (" +ele.ActionType + ")",System.Drawing.Color.Red);
+                client.Character.Reply("[Interactives] Impossible de traiter (" +ele.ActionType + ")",System.Drawing.Color.Red);
         }
     }
 }
