@@ -94,6 +94,7 @@ namespace Symbioz.World.Handlers
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
             client.Character.Record.AddElement();
+            client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");

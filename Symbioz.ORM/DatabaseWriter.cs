@@ -95,8 +95,15 @@ namespace Symbioz.ORM
             {
                 var command = string.Format(ADD_ELEMENTS, this.m_tableName, element);
 
-                this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
-                this.m_command.ExecuteNonQuery();
+                try
+                {
+                    this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
+                    this.m_command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    
+                }
             }
         }
         private void UpdateElements(ITable[] elements)
@@ -108,8 +115,15 @@ namespace Symbioz.ORM
                     var values = this.m_fields.ConvertAll<string>(field => string.Format("{0} = {1}", field.Name, this.GetFieldValue(field, element)));
                     var command = string.Format(UPDATE_ELEMENTS, this.m_tableName, string.Join(", ", values), this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
 
-                    this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
-                    this.m_command.ExecuteNonQuery();
+                    try
+                    {
+                        this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
+                        this.m_command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                       
+                    }
                 }
             }
         }
@@ -121,8 +135,15 @@ namespace Symbioz.ORM
                 {
                     var command = string.Format(REMOVE_ELEMENTS, this.m_tableName, this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
                     var sw = System.Diagnostics.Stopwatch.StartNew();
-                    this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
-                    this.m_command.ExecuteNonQuery();
+                    try
+                    {
+                        this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
+                        this.m_command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        
+                    }
                 }
             }
         }

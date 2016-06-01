@@ -137,7 +137,7 @@ namespace Symbioz.Core
             {
                 var client = WorldServer.Instance.WorldClients[i];
                 if (client.Account.Role != ServerRoleEnum.FONDATOR)
-                    client.Disconnect(1000,"Le serveur est desormais inaccessible.");
+                    client.Disconnect(1000, "Le serveur est desormais inaccessible.");
             }
             Logger.World("Le serveur est désormais hors-ligne");
 

@@ -68,6 +68,7 @@ namespace Symbioz.World.Models.Exchanges
             else
                 Client.Character.RemoveKamas(amount);
             SaveTask.UpdateElement(Client.Account.Informations);
+            Client.Character.UpdateElement(Client.Account.Informations);
         }
         public override void AddItemToPanel(CharacterItemRecord obj, uint quantity)
         {
@@ -80,6 +81,7 @@ namespace Symbioz.World.Models.Exchanges
                 {
                     existing.Quantity += quantity;
                     SaveTask.UpdateElement(existing);
+                    Client.Character.UpdateElement(existing);
                     Client.Character.Inventory.RemoveItem(obj.UID,obj.Quantity);
                     Client.Send(new StorageObjectUpdateMessage(existing.GetObjectItem()));
                     return;
@@ -89,6 +91,7 @@ namespace Symbioz.World.Models.Exchanges
                     var newBankItem = obj.GetBankItem(Client.Account.Id);
                     Client.Send(new StorageObjectUpdateMessage(newBankItem.GetObjectItem()));
                     SaveTask.AddElement(newBankItem);
+                    Client.Character.AddElement(newBankItem);
                     Client.Character.Inventory.RemoveItem(obj.UID, obj.Quantity);
                     return;
                 }
@@ -102,6 +105,7 @@ namespace Symbioz.World.Models.Exchanges
                     Client.Send(new StorageObjectUpdateMessage(existing.GetObjectItem())); 
                     Client.Character.Inventory.RemoveItem(obj.UID, quantity);
                     SaveTask.UpdateElement(existing);
+                    Client.Character.UpdateElement(existing);
                     return;
                 }
                 else
@@ -110,6 +114,7 @@ namespace Symbioz.World.Models.Exchanges
                     addedItem.Quantity = (uint)quantity;
                     Client.Send(new StorageObjectUpdateMessage(addedItem.GetObjectItem()));
                     SaveTask.AddElement(addedItem.GetBankItem(Client.Account.Id));
+                    Client.Character.AddElement(addedItem.GetBankItem(Client.Account.Id));
                     Client.Character.Inventory.RemoveItem(obj.UID, quantity);
                     return;
                 }
@@ -123,11 +128,13 @@ namespace Symbioz.World.Models.Exchanges
             if (obj.Quantity == (uint)-quantity)
             {
                 SaveTask.RemoveElement(obj);
+                Client.Character.RemoveElement(obj);
                 var existing = Client.Character.Inventory.Items.ExistingItem(obj);
                 if (existing != null)
                 {
                     existing.Quantity += (uint)-quantity;
                     SaveTask.UpdateElement(existing);
+                    Client.Character.UpdateElement(existing);
                     Client.Character.Inventory.Refresh();
                 }
                 else
@@ -141,6 +148,7 @@ namespace Symbioz.World.Models.Exchanges
             {
                 obj.Quantity = (uint)(obj.Quantity + quantity);
                 SaveTask.UpdateElement(obj);
+                Client.Character.UpdateElement(obj);
                 Client.Character.Inventory.Add(obj,(uint)-quantity);
                 Client.Send(new StorageObjectUpdateMessage(obj.GetObjectItem()));
             }

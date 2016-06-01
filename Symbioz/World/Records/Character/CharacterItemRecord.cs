@@ -3,6 +3,7 @@ using Symbioz.Enums;
 using Symbioz.ORM;
 using Symbioz.Providers;
 using Symbioz.World.Records;
+using Symbioz.Network.Servers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,18 +81,22 @@ namespace Symbioz.World.Models
             this.m_realEffect.RemoveAll(x => x.actionId == (ushort)effect);
             this.Effects = EffectsToString(m_realEffect);
             SaveTask.UpdateElement(this);
+            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
+
         }
         public void RemoveAllEffects()
         {
             m_realEffect.Clear();
             this.Effects = string.Empty;
             SaveTask.UpdateElement(this);
+            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
         }
         public void SetEffects(List<ObjectEffect> effects)
         {
             this.m_realEffect = effects;
             this.Effects = EffectsToString(m_realEffect);
             SaveTask.UpdateElement(this);
+            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
         }
         public T GetFirstEffect<T>(EffectsEnum effect) where T : ObjectEffect
         {
@@ -109,6 +114,7 @@ namespace Symbioz.World.Models
             this.m_realEffect.AddRange(effects);
             this.Effects = EffectsToString(m_realEffect);
             SaveTask.UpdateElement(this);
+            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
         }
         public List<ObjectEffect> GetEffects()
         {
@@ -129,6 +135,7 @@ namespace Symbioz.World.Models
         public static void RemoveAll(int characterid)
         {
             GetCharacterItems(characterid).ForEach(x => SaveTask.RemoveElement(x));
+            GetCharacterItems(characterid).ForEach(x => WorldServer.Instance.GetOnlineClient(characterid).Character.RemoveElement(x));
         }
         public static CharacterItemRecord GetItemByUID(uint uid)
         {

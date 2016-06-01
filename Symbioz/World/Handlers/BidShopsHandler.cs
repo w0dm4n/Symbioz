@@ -68,6 +68,7 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Banque : + " + gain.ItemPrice + " Kamas (vente de " + gain.ItemQuantity + "  <b>[" + itemname + "]</b> hors jeu).");
                 gain.RemoveElement();
                 client.Account.Informations.UpdateElement();
+                client.Character.UpdateElement(client.Account.Informations);
             }
         }
     }

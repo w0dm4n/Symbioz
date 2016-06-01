@@ -92,6 +92,7 @@ namespace Symbioz.World.Records.Guilds
                 this.Rights = rights;
             }
             SaveTask.UpdateElement(modifier);
+            changer.Character.UpdateElement(modifier);
         }
         public bool HasRight(GuildRightsBitEnum right)
         {

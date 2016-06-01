@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Symbioz.Network.Servers;
 
 namespace Symbioz.World.Records
 {
@@ -42,7 +43,9 @@ namespace Symbioz.World.Records
 
         public static void AddBidShopGain(BidShopItemRecord selledItem)
         {
-            SaveTask.AddElement(new BidShopGainRecord(PopNextUID(), selledItem.OwnerId, selledItem.GID, selledItem.Quantity, selledItem.Price));
+            var bidShopRecord = new BidShopGainRecord(PopNextUID(), selledItem.OwnerId, selledItem.GID, selledItem.Quantity, selledItem.Price);
+            SaveTask.AddElement(bidShopRecord);
+            WorldServer.Instance.GetOnlineClient(selledItem.OwnerId).Character.AddElement(bidShopRecord);
         }
         public static void RemoveAll(int characterid)
         {

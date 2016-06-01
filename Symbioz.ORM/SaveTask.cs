@@ -176,7 +176,6 @@ namespace Symbioz.ORM
 
                     try
                     {
-                        Console.WriteLine(elements[0]);
                         var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, elements.ToArray());
                     }
                     catch (Exception e) { Logger.Error(e.ToString()); }

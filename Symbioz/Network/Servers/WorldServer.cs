@@ -79,6 +79,8 @@ namespace Symbioz.Network.Servers
         }
         public void RemoveClient(WorldClient client)
         {
+            if (client != null && client.Character != null)
+                client.Character.Save();
             WorldClients.Remove(client);
             Logger.World("Client Disconnected!");
         }

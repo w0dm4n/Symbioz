@@ -29,11 +29,15 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Symbioz.World.Models
 {
     public class Character : IDisposable
     {
+        public Dictionary<Type, List<ITable>> _newElements = new Dictionary<Type, List<ITable>>();
+        public Dictionary<Type, List<ITable>> _updateElements = new Dictionary<Type, List<ITable>>();
+        public Dictionary<Type, List<ITable>> _removeElements = new Dictionary<Type, List<ITable>>();
         public int Id { get { return Record.Id; } }
         public bool IsNew = false;
         public ushort SubAreaId { get; set; }
@@ -85,6 +89,192 @@ namespace Symbioz.World.Models
                 return (int)(StatsRecord.Strength + StatsRecord.Intelligence + StatsRecord.Agility +
                     StatsRecord.Chance + StatsRecord.Initiative * (CurrentStats.LifePoints / StatsRecord.LifePoints));
             }
+        }
+
+        public void AddElement(ITable element, bool addtolist = true)
+        {
+            lock (_newElements)
+            {
+                if (_newElements.ContainsKey(element.GetType()))
+                {
+                    if (!_newElements[element.GetType()].Contains(element))
+                        _newElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _newElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+            if (addtolist)
+            {
+                #region Add value into array
+                var field = GetCache(element);
+                if (field == null)
+                {
+                    Logger.Error("Unable to add record value to the list, static list field wasnt finded");
+                    return;
+                }
+
+                var method = field.FieldType.GetMethod("Add");
+                if (method == null)
+                {
+                    Console.WriteLine("Unable to add record value to the list, add method wasnt finded");
+                    return;
+                }
+
+                method.Invoke(field.GetValue(null), new object[] { element });
+                #endregion
+            }
+        }
+
+        public void UpdateElement(ITable element)
+        {
+            lock (_updateElements)
+            {
+                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                    return;
+
+                if (_updateElements.ContainsKey(element.GetType()))
+                {
+                    if (!_updateElements[element.GetType()].Contains(element))
+                        _updateElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _updateElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+        }
+
+        public void RemoveElement(ITable element, bool removefromlist = true)
+        {
+            if (element == null)
+                return;
+            lock (_removeElements)
+            {
+                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                {
+                    RemoveFromList(element);
+                    _newElements[element.GetType()].Remove(element);
+                    return;
+                }
+
+                if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
+                    _updateElements[element.GetType()].Remove(element);
+
+                if (_removeElements.ContainsKey(element.GetType()))
+                {
+                    if (!_removeElements[element.GetType()].Contains(element))
+                        _removeElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _removeElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+            if (removefromlist)
+            {
+                RemoveFromList(element);
+            }
+        }
+
+        private static FieldInfo GetCache(ITable table)
+        {
+            var attribute = table.GetType().GetCustomAttribute(typeof(TableAttribute), false);
+            if (attribute == null)
+                return null;
+
+            var field = table.GetType().GetFields().FirstOrDefault(x => x.Name.ToLower() == (attribute as TableAttribute).tableName.ToLower());
+            if (field == null || !field.IsStatic || !field.FieldType.IsGenericType)
+                return null;
+
+            return field;
+        }
+
+        static void RemoveFromList(ITable element)
+        {
+            var field = GetCache(element);
+            if (field == null)
+            {
+                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                return;
+            }
+
+            var method = field.FieldType.GetMethod("Remove");
+            if (method == null)
+            {
+                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                return;
+            }
+
+            method.Invoke(field.GetValue(null), new object[] { element });
+        }
+
+        public void Save()
+        {
+            try
+            {
+                var types = _removeElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+                    lock (_removeElements)
+                        elements = _removeElements[type];
+
+                    try
+                    {
+                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Remove, elements.ToArray());
+                    }
+                    catch (Exception e) { Logger.Error(e.Message); }
+
+                    lock (_removeElements)
+                        _removeElements[type] = _removeElements[type].Skip(elements.Count).ToList();
+
+                }
+
+                types = _newElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+
+                    lock (_newElements)
+                        elements = _newElements[type];
+
+                    try
+                    {
+                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, elements.ToArray());
+                    }
+                    catch (Exception e) { Logger.Error(e.ToString()); }
+
+                    lock (_newElements)
+                        _newElements[type] = _newElements[type].Skip(elements.Count).ToList();
+
+                }
+
+                types = _updateElements.Keys.ToList();
+                foreach (var type in types)
+                {
+                    List<ITable> elements;
+                    lock (_updateElements)
+                        elements = _updateElements[type];
+                    try
+                    {
+                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, elements.ToArray());
+                    }
+                    catch (Exception e) { Logger.Error(e.ToString()); }
+
+                    lock (_updateElements)
+                    {
+                        var attribute = (TableAttribute)type.GetCustomAttribute(typeof(TableAttribute));
+
+                        if (attribute != null && !attribute.letInUpdateField)
+                            _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
+                    }
+                }
+                this.Reply("Votre personnage a été sauvegardé avec succès.");
+                Console.WriteLine(")) Character " + this.Record.Name + " was saved !");
+            }
+            catch (Exception e) { Logger.Error("[SAVING CHARACTER " + this.Record.Name + "]" + e.Message); }
         }
 
         public PlayerStatus PlayerStatus;
@@ -306,8 +496,12 @@ namespace Symbioz.World.Models
         {
             foreach (var spell in BreedSpellRecord.GetBreedSpellsForLevel(Record.Level, Record.Breed, Spells.ConvertAll<short>(x => (short)x.spellId)))
             {
-                SaveTask.AddElement(new CharacterSpellRecord(CharacterSpellRecord.CharactersSpells.PopNextId<CharacterSpellRecord>(x => x.Id), Id, spell.spellId, 1));
-                SaveTask.AddElement(new SpellShortcutRecord(SpellShortcutRecord.SpellsShortcuts.PopNextId<SpellShortcutRecord>(x => x.Id), Id, (ushort)spell.spellId, SpellShortcutRecord.GetFreeSlotId(Id)));
+                var spellRecord = new CharacterSpellRecord(CharacterSpellRecord.CharactersSpells.PopNextId<CharacterSpellRecord>(x => x.Id), Id, spell.spellId, 1);
+                var shortcutRecord = new SpellShortcutRecord(SpellShortcutRecord.SpellsShortcuts.PopNextId<SpellShortcutRecord>(x => x.Id), Id, (ushort)spell.spellId, SpellShortcutRecord.GetFreeSlotId(Id));
+                SaveTask.AddElement(spellRecord);
+                SaveTask.AddElement(shortcutRecord);
+                this.AddElement(spellRecord);
+                this.AddElement(shortcutRecord);
             }
             if (sendpackets)
             {
@@ -477,6 +671,7 @@ namespace Symbioz.World.Models
             else
                 job.JobExp += amount;
             SaveTask.UpdateElement(job);
+            this.UpdateElement(job);
             RefreshJobs();
         }
         public void OpenPaddock()
@@ -754,6 +949,8 @@ namespace Symbioz.World.Models
             Record.Look = Look.ConvertToString();
             SaveTask.UpdateElement(Record);
             SaveTask.UpdateElement(StatsRecord);
+            this.UpdateElement(Record);
+            this.UpdateElement(StatsRecord);
             Inventory.InitializeForSaveTask();
         }
 

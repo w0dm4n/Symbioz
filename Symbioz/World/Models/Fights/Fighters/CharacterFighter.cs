@@ -219,7 +219,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 HasLeft = true;
                 Die();
                 AknowlegeAndLeave();
-                Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnécté!"));
+                Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté!"));
             }
 
 

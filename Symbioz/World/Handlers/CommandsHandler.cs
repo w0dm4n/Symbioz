@@ -10,6 +10,7 @@ using Symbioz.Enums;
 using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Servers;
+using Symbioz.ORM;
 using Symbioz.Providers.Maps;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Fights.Marks;
@@ -654,6 +655,17 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
             else
                 client.Character.Reply("Le joueur n'est pas mute.");
+        }
+        [InGameCommand("save", ServerRoleEnum.PLAYER)]
+        public static void SavePlayer(string value, WorldClient client)
+        {
+            client.Character.Save();
+        }
+
+        [InGameCommand("saveworld", ServerRoleEnum.MODERATOR)]
+        public static void SaveWorld(string value, WorldClient client)
+        {
+            SaveTask.Save();
         }
 
         #endregion

@@ -6,6 +6,7 @@ using Symbioz.Helper;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Symbioz.Network.Servers;
 
 namespace Symbioz.World.Records
 {
@@ -31,6 +32,7 @@ namespace Symbioz.World.Records
         public static void RemoveAll(int characterid)
         {
             SpellsShortcuts.FindAll(x => x.CharacterId == characterid).ForEach(x => SaveTask.RemoveElement(x));
+            SpellsShortcuts.FindAll(x => x.CharacterId == characterid).ForEach(x => WorldServer.Instance.GetOnlineClient(characterid).Character.RemoveElement(x));
         }
         public static List<ShortcutSpell> GetCharacterShortcuts(int characterid)
         {
@@ -43,6 +45,7 @@ namespace Symbioz.World.Records
         public static void RemoveShortcut(int characterid, sbyte slot)
         {
             SaveTask.RemoveElement(GetShorcut(characterid, slot));
+            WorldServer.Instance.GetOnlineClient(characterid).Character.RemoveElement(GetShorcut(characterid, slot));
         }
         public static void SwapSortcut(int characterid,sbyte firstslot,sbyte secondslot)
         {
@@ -70,7 +73,9 @@ namespace Symbioz.World.Records
             var existing = GetShorcut(characterid, slotid);
             if (existing != null)
                 RemoveShortcut(existing.CharacterId, existing.SlotId);
-            SaveTask.AddElement(new SpellShortcutRecord(SpellsShortcuts.PopNextId<SpellShortcutRecord>(x=>x.Id), characterid, spellid, slotid));
+            var shortcut = new SpellShortcutRecord(SpellsShortcuts.PopNextId<SpellShortcutRecord>(x => x.Id), characterid, spellid, slotid);
+            SaveTask.AddElement(shortcut);
+            WorldServer.Instance.GetOnlineClient(characterid).Character.UpdateElement(shortcut);
         }
         public static sbyte GetFreeSlotId(int characterid)
         {

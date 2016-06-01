@@ -74,12 +74,16 @@ namespace Symbioz.World.Models
             {
                 Items.Add(item);
                 if (!CharacterItemRecord.CharactersItems.Contains(item))
+                {
                     SaveTask.AddElement(item);
+                    Character.AddElement(item);
+                }
             }
             else
             {
                 existingItem.Quantity += item.Quantity;
                 SaveTask.UpdateElement(existingItem);
+                this.Character.UpdateElement(existingItem);
             }
             if (refresh)
             {
@@ -273,11 +277,13 @@ namespace Symbioz.World.Models
             {
                 UnequipItem(equiped, 63, equiped.GetTemplate(), quantity);
                 SaveTask.UpdateElement(equiped);
+                this.Character.UpdateElement(equiped);
             }
             if (item.Quantity == 1)
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
+                this.Character.UpdateElement(item);
                 AddItemSkin(item, template);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
 
@@ -338,11 +344,13 @@ namespace Symbioz.World.Models
             {
                 UnequipItem(equiped, 63, equiped.GetTemplate(), quantity);
                 SaveTask.UpdateElement(equiped);
+                this.Character.UpdateElement(equiped);
             }
             if (item.Quantity == 1)
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
+                this.Character.UpdateElement(item);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
 
             }
@@ -363,6 +371,7 @@ namespace Symbioz.World.Models
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
+                this.Character.UpdateElement(item);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                 if (template != null)
                     RemoveItemSkin(item, template);
@@ -391,6 +400,7 @@ namespace Symbioz.World.Models
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item);
+                this.Character.UpdateElement(item);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
             }
             else
@@ -476,6 +486,7 @@ namespace Symbioz.World.Models
             {
                 Items.Remove(item);
                 SaveTask.RemoveElement(item);
+                Character.RemoveElement(item);
                 CharacterItemRecord.CharactersItems.Remove(item);
                 Character.Client.Send(new ObjectDeletedMessage(item.UID));
             }
@@ -483,6 +494,7 @@ namespace Symbioz.World.Models
             {
                 item.Quantity -= (uint)quantity;
                 SaveTask.UpdateElement(item);
+                this.Character.UpdateElement(item);
             }
             if (refresh)
                 Refresh();
@@ -533,6 +545,7 @@ namespace Symbioz.World.Models
         public void InitializeForSaveTask()
         {
             Items.ForEach(x => SaveTask.UpdateElement(x));
+            Items.ForEach(x => this.Character.UpdateElement(x));
         }
         public void Refresh()
         {
