@@ -10,13 +10,13 @@ Target Server Type    : MYSQL
 Target Server Version : 50520
 File Encoding         : 65001
 
-Date: 2016-05-25 14:15:45
+Date: 2016-06-02 00:54:08
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for monstersdrops
+-- Table structure for `monstersdrops`
 -- ----------------------------
 DROP TABLE IF EXISTS `monstersdrops`;
 CREATE TABLE `monstersdrops` (

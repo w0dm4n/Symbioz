@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Symbioz.Network.Servers;
 
 namespace Symbioz.World.Models.Fights.Fighters
 {
@@ -375,6 +376,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
             {
+                short[] portal = new short[0];
                 UsingWeapon = true;
                 bool result = UseWeapon(cellid);
                 UsingWeapon = false;
@@ -395,26 +397,44 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.Fight.TryStartSequence(this.ContextualId, 1);
             FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
 
-            short[] portals = new short[0];// WHAT THE FUCK
+            short[] portals = new short[0];
 
             this.Fight.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
             this.SpellHistory.Add(spellLevl, targetId);
 
             #region EffectHandler
-
-            if (CustomSpellEffectsProvider.Exist(spellid))
+            if (WorldServer.Instance.GetOnlineClient(targetId) != null)
             {
-                Fight.TryStartSequence(ContextualId, 1);
-                CustomSpellEffectsProvider.Handle(spellid, spellLevl.Effects, this);
-                Fight.TryEndSequence(1, 0);
+                if (!WorldServer.Instance.GetOnlineClient(targetId).Character.isGod)
+                {
+                    if (CustomSpellEffectsProvider.Exist(spellid))
+                    {
+                        Fight.TryStartSequence(ContextualId, 1);
+                        CustomSpellEffectsProvider.Handle(spellid, spellLevl.Effects, this);
+                        Fight.TryEndSequence(1, 0);
+                    }
+                    else
+                    {
+                        HandleSpellEffects(spellLevl, cellid, critical);
+                    }
+                }
             }
             else
             {
-                HandleSpellEffects(spellLevl, cellid, critical);
+                if (CustomSpellEffectsProvider.Exist(spellid))
+                {
+                    Fight.TryStartSequence(ContextualId, 1);
+                    CustomSpellEffectsProvider.Handle(spellid, spellLevl.Effects, this);
+                    Fight.TryEndSequence(1, 0);
+                }
+                else
+                {
+                    HandleSpellEffects(spellLevl, cellid, critical);
+                }
             }
             #endregion
-        
-           FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
+
+            FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
            GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spellLevl.ApCost);
            Fight.CheckFightEnd();
             if (Fight.Ended)

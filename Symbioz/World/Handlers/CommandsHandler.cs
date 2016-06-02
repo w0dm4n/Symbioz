@@ -122,7 +122,8 @@ namespace Symbioz.World.Handlers
                                 }
                                 catch (Exception ex)
                                 {
-                                    client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
+                                    if (client.Character.isDebugging == true)
+                                        client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
                                 }
                             }
                             else
@@ -133,7 +134,8 @@ namespace Symbioz.World.Handlers
                                 }
                                 catch (Exception ex)
                                 {
-                                    client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
+                                    if (client.Character.isDebugging == true)
+                                        client.Character.NotificationError("Impossible d'éxecuter la commande : " + ex.InnerException.Message);
                                 }
                             }
                             break;
@@ -460,13 +462,13 @@ namespace Symbioz.World.Handlers
             client.Character.Teleport(131597312, 460);
             client.Character.ShowNotification("Bienvenu a l'énutrosor, cette zone est en cours de debug...");
         }
-
-        [InGameCommand("dutyfree", ServerRoleEnum.PLAYER)]
+        */
+        [InGameCommand("dutyfree", ServerRoleEnum.MODERATOR)]
         public static void DutyFreeCommand(string value, WorldClient client)
         {
             client.Character.Teleport(ConfigurationManager.Instance.DutyMapId, ConfigurationManager.Instance.DutyCellId);
         }
-        */
+        
         [InGameCommand("item", ServerRoleEnum.MODERATOR)]
         public static void AddItemCommand(string value, WorldClient client)
         {
@@ -522,7 +524,11 @@ namespace Symbioz.World.Handlers
         [InGameCommand("spawn",ServerRoleEnum.MODERATOR)]
         public static void SpawnCommand(string value,WorldClient client)
         {
-           // client.Character.Map.Instance.MonstersGroups.Add(new MonsterGroup(MonsterGroup.START_ID+value, monsters,client.Character.Record.CellId));
+          /*  MonsterSpawnMapRecord monster = new MonsterSpawnMapRecord(100000 + 100, ushort.Parse(value), client.Character.Record.MapId, 100);
+            List<MonsterSpawnMapRecord> list = new List<MonsterSpawnMapRecord>();
+
+            list.Add(monster);
+           client.Character.Map.Instance.MonstersGroups.Add(new MonsterGroup(100, list, 100));*/
         }
 
         [InGameCommand("walkable", ServerRoleEnum.FONDATOR)]
@@ -644,6 +650,27 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
         }
 
+        [InGameCommand("god", ServerRoleEnum.FONDATOR)]
+        public static void SetAsGod(string value, WorldClient client)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+            {
+                if (target.Character.isGod == false)
+                {
+                    target.Character.isGod = true;
+                    client.Character.Reply(value + " est maintenant divin !");
+                }
+                else if (target.Character.isGod == true)
+                {
+                    target.Character.isGod = false;
+                    client.Character.Reply(value + " est redevenu mortel !");
+                }
+            }
+            else
+                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+        }
+
         [InGameCommand("unmute", ServerRoleEnum.MODERATOR)]
         public static void UnMutePlayer(string value, WorldClient client)
         {
@@ -659,7 +686,10 @@ namespace Symbioz.World.Handlers
         [InGameCommand("save", ServerRoleEnum.PLAYER)]
         public static void SavePlayer(string value, WorldClient client)
         {
-            client.Character.Save();
+            if (client.Character.IsFighting)
+                client.Character.Reply("Impossible de sauvegarder votre personnage en combat !");
+            else
+                client.Character.Save();
         }
 
         [InGameCommand("saveworld", ServerRoleEnum.MODERATOR)]
@@ -668,6 +698,20 @@ namespace Symbioz.World.Handlers
             SaveTask.Save();
         }
 
+        [InGameCommand("debug", ServerRoleEnum.MODERATOR)]
+        public static void IsDebugging(string value, WorldClient client)
+        {
+            if (client.Character.isDebugging == false)
+            {
+                client.Character.Reply("Mode debug ON");
+                client.Character.isDebugging = true;
+            }
+            else if (client.Character.isDebugging == true)
+            {
+                client.Character.Reply("Mode debug OFF");
+                client.Character.isDebugging = false;
+            }
+        }
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)

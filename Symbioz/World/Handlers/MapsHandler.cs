@@ -132,7 +132,8 @@ namespace Symbioz.World.Handlers
                 scrollType = MapScrollActionRecord.GetScrollTypeFromCell(client.Character.Record.CellId);
                 if (scrollType == MapScrollType.UNDEFINED)
                 {
-                    client.Character.NotificationError("Erreur : 'MapScrollAction'");
+                    if (client.Character.isDebugging)
+                        client.Character.NotificationError("Erreur : 'MapScrollAction'");
                 }
                 else
                 {

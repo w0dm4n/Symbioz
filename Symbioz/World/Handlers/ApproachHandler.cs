@@ -93,11 +93,11 @@ namespace Symbioz.World.Handlers
             client.Character.IsNew = true;
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
-            client.Character.Record.AddElement();
             client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
+            client.Character.Save();
             ProcessSelection(client);
         }
         [MessageHandler]

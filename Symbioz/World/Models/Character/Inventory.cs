@@ -160,6 +160,38 @@ namespace Symbioz.World.Models
 
             }
         }
+
+        void RemoveWeaponSkin(CharacterItemRecord record, WeaponRecord template)
+        {
+            if (template.AppearenceId != 0)
+            {
+                switch (template.Type)
+                {
+                    case ItemTypeEnum.PET:
+                        Character.Look.subentities.RemoveAll(x => x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
+                        return;
+                    case ItemTypeEnum.PETSMOUNT:
+                        Character.Look = Character.Look.RiderToCharacter();
+                        break;
+                    default:
+                        if (record.ContainEffect(EffectsEnum.Eff_Mimicry))
+                        {
+                            ObjectEffectInteger mimicryEffect = record.GetFirstEffect<ObjectEffectInteger>(EffectsEnum.Eff_Mimicry);
+                            ushort mimicryAppId = (ushort)ItemRecord.GetItem(mimicryEffect.value).AppearanceId;
+
+                            Character.Look.RemoveSkin(mimicryAppId);
+                        }
+                        else
+                        {
+                            Character.Look.RemoveSkin((ushort)template.AppearenceId);
+                        }
+                        break;
+                }
+
+            }
+        }
+
+
         void AddItemSkin(CharacterItemRecord record, ItemRecord template)
         {
             if (template.AppearanceId != 0)
@@ -183,6 +215,37 @@ namespace Symbioz.World.Models
                         else
                         {
                             Character.Look.AddSkin((ushort)template.AppearanceId);
+                        }
+                        break;
+                }
+            }
+
+        }
+
+
+        void AddWeaponSkin(CharacterItemRecord record, WeaponRecord template)
+        {
+            if (template.AppearenceId != 0)
+            {
+                switch (template.Type)
+                {
+                    case ItemTypeEnum.PET:
+                        Character.Look.subentities.Add(new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET,
+                       0, ContextActorLook.SimpleBonesLook((ushort)template.AppearenceId, PET_SIZE).ToEntityLook()));
+                        return;
+                    case ItemTypeEnum.PETSMOUNT:
+                        Character.Look = Character.Look.CharacterToRider((ushort)template.AppearenceId, new List<ushort>(), Character.Look.indexedColors.Take(3).ToList(), 100);
+                        return;
+                    default:
+                        if (record.ContainEffect(EffectsEnum.Eff_Mimicry))
+                        {
+                            var mimicryEffect = record.GetFirstEffect<ObjectEffectInteger>(EffectsEnum.Eff_Mimicry);
+                            var mimicryAppId = (ushort)ItemRecord.GetItem(mimicryEffect.value).AppearanceId;
+                            Character.Look.AddSkin(mimicryAppId);
+                        }
+                        else
+                        {
+                            Character.Look.AddSkin((ushort)template.AppearenceId);
                         }
                         break;
                 }
@@ -333,10 +396,10 @@ namespace Symbioz.World.Models
             if ((CharacterInventoryPositionEnum)newposition == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)
             {
                 var shield = GetItemByPosition(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD);
-                if (WeaponRecord.GetWeapon(item.GID).TwoHanded)
+                if (shield != null && template.TwoHanded)
                 {
-                    //Character.Reply("Vous devez enlevé votre bouclier pour équiper votre arme.");
-                    //return;
+                    Character.Reply("Vous devez enlevé votre bouclier pour équiper votre arme.");
+                    return;
                 }
             }
             var equiped = EquipedItem(newposition);
@@ -352,13 +415,14 @@ namespace Symbioz.World.Models
                 SaveTask.UpdateElement(item);
                 this.Character.UpdateElement(item);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
-
+                AddWeaponSkin(item, template);
             }
             else
             {
                 var items = ItemCut.Cut(item, quantity, newposition);
                 Add(items.newItem);
                 ItemEffectsProvider.AddEffects(Character.Client, items.BaseItem.GetEffects());
+                AddWeaponSkin(item, template);
             }
             Character.RefreshGroupInformations();
 
@@ -385,10 +449,6 @@ namespace Symbioz.World.Models
                     ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                     RemoveItemSkin(item, template);
                 }
-                else
-                {
-                    Character.NotificationError("Spamming ItemMove!");
-                }
             }
             Character.RefreshGroupInformations();
         }
@@ -402,6 +462,8 @@ namespace Symbioz.World.Models
                 SaveTask.UpdateElement(item);
                 this.Character.UpdateElement(item);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
+                if (template != null)
+                    RemoveWeaponSkin(item, template);
             }
             else
             {
@@ -410,10 +472,7 @@ namespace Symbioz.World.Models
                     existing.Quantity += quantity;
                     RemoveItem(item.UID, item.Quantity);
                     ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
-                }
-                else
-                {
-                    Character.NotificationError("Spamming ItemMove!");
+                    RemoveWeaponSkin(item, template);
                 }
             }
             Character.RefreshGroupInformations();

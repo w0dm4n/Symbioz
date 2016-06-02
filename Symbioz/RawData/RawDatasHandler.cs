@@ -57,7 +57,7 @@ namespace Symbioz.RawData
                 new BugReportRecord(message.Value).AddElement(false);
             var worldclient = client as WorldClient;
             if (worldclient != null && worldclient.Character != null)
-             worldclient.Character.ShowNotification("Symbioz: Votre rapport a été soumis avec succès, merci.");
+             worldclient.Character.ShowNotification("Votre rapport d'erreur a été soumis avec succès, merci.");
         }
 
         [RawHandlerAttribute(WhoAreYouMessage.Id)]

@@ -30,7 +30,8 @@ namespace Symbioz.Providers
         {
             if (records.Count == 0)
             {
-                client.Character.NotificationError("No Reply action finded for this npc...");
+                if (client.Character.isDebugging)
+                    client.Character.NotificationError("No Reply action finded for this npc...");
                 return;
             }
             foreach (var record in records)
@@ -38,7 +39,7 @@ namespace Symbioz.Providers
                 var handler = NpcReplyActions.FirstOrDefault(x => x.Key == record.ActionType);
                 if (handler.Value != null)
                     handler.Value(client, record);
-                else
+                else if (client.Character.isDebugging)
                     client.Character.Reply("No reply action finded for this npc... with action " + record.ActionType);
             }
 
@@ -77,10 +78,7 @@ namespace Symbioz.Providers
                 client.Character.Reply("Vous avez perdu 1 " + itemName);
             }
             else
-            {
-                client.Character.NotificationError("Unable to delete  item " + itemName + " ... you do not have one, Teleporting to SpawnPoint");
-                client.Character.TeleportToSpawnPoint();
-            }
+                client.Character.NotificationError("Impossible de supprimer l'item : " + itemName + " car vous ne le possédez pas.");
         }
         static void Reset(WorldClient client,NpcReplyRecord reply)
         {

@@ -1,0 +1,15 @@
+Client: 127.0.0.1:61870
+At: 02/06/2016 02:48:06
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Fights.Fighters.MonsterFighter.GetInitiative() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\MonsterFighter.cs:ligne 108
+   à Symbioz.World.Models.Fights.TimeLine.<>c.<Sort>b__9_0(Fighter x) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\TimeLine.cs:ligne 33
+   à System.Linq.EnumerableSorter`2.ComputeKeys(TElement[] elements, Int32 count)
+   à System.Linq.EnumerableSorter`1.Sort(TElement[] elements, Int32 count)
+   à System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
+   à System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   à System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   à Symbioz.World.Models.Fights.TimeLine.Sort() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\TimeLine.cs:ligne 33
+   à Symbioz.World.Models.Fights.TimeLine.GenerateTimeLine(Boolean sort) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\TimeLine.cs:ligne 86
+   à Symbioz.World.Models.Fights.Fight.StartFight() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 149
+   à Symbioz.World.Models.Fights.Fighters.CharacterFighter.ToogleReady(Boolean ready) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\CharacterFighter.cs:ligne 253
+   à Symbioz.World.Handlers.FightPreparationHandler.HandleFightReady(GameFightReadyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightPreparationHandler.cs:ligne 138

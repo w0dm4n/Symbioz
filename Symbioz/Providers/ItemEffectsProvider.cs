@@ -81,7 +81,8 @@ namespace Symbioz.Provider
             }
             else
             {
-                client.Character.Reply((EffectsEnum)effect.actionId + " is not handled");
+                if (client.Character.isDebugging)
+                    client.Character.Reply((EffectsEnum)effect.actionId + " is not handled");
             }
         }
         static void NeutralDamagesBonus(WorldClient client, short value)

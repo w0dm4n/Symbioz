@@ -97,8 +97,6 @@ namespace Symbioz.Providers.FightResults
             FightLoot.objects.Add(FightArena.ARENA_ITEM_ID);
             FightLoot.objects.Add((ushort)itemQt);
             client.Character.Inventory.Add(FightArena.ARENA_ITEM_ID, itemQt);
-
-
             
             if (client.Character.Record.Level != 200)
             {
@@ -112,6 +110,15 @@ namespace Symbioz.Providers.FightResults
             }
 
         }
+
+        public static bool InArray(int[] array, int type)
+        {
+            foreach (var value in array)
+                if (value == type)
+                    return (true);
+            return (false);
+        }
+
         public void GeneratePVMLoot()
         {
             if ((Fighter as CharacterFighter).HasLeft)
@@ -164,15 +171,40 @@ namespace Symbioz.Providers.FightResults
             }
 
             #endregion
-
             client.Character.AddKamas((int)FightLoot.kamas);
-
+            var weapon_dropped = 0;
+            var item_dropped = 0;
             foreach (var item in m_drops)
             {
-                FightLoot.objects.Add(item.GID);
-                FightLoot.objects.Add((ushort)item.Quantity);
-                client.Character.Inventory.Add(item.GID, item.Quantity, false, false);
-            }
+                ItemRecord template = ItemRecord.GetItem(item.GID);
+                int[] TypeInventoryId = new int[] { 11, 9, 10, 1, 17, 16, 23, 82, 151, 18};
+                if (template != null)
+                {
+                    if (InArray(TypeInventoryId, template.TypeId))
+                    {
+                        if (item_dropped < 2)
+                        {
+                            FightLoot.objects.Add(item.GID);
+                            FightLoot.objects.Add(1);
+                            client.Character.Inventory.Add(item.GID, 1, false, false);
+                            item_dropped++;
+                        }
+                    }
+                    else
+                    {
+                        FightLoot.objects.Add(item.GID);
+                        FightLoot.objects.Add(1);
+                        client.Character.Inventory.Add(item.GID, 1, false, false);
+                    }
+                }
+                else if (weapon_dropped == 0)
+                {
+                    FightLoot.objects.Add(item.GID);
+                    FightLoot.objects.Add(1);
+                    client.Character.Inventory.AddWeapon(item.GID, 1, false, false);
+                    weapon_dropped++;
+                }
+             }
 
             #region Experience Provider
             List<MonsterData> monsters = new List<MonsterData>();

@@ -39,7 +39,8 @@ namespace Symbioz.Providers.Conditions
                 }
                 else
                 {
-                    client.Character.ShowNotification("Unknown condition indentifier: " + conditionIndentifier + ". Skeeping condition");
+                    if (client.Character.isDebugging == true)
+                        client.Character.ShowNotification("Unknown condition indentifier: " + conditionIndentifier + ". Skeeping condition");
                     return true;
                 }
             }

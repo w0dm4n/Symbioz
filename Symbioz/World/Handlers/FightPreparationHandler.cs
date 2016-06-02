@@ -85,6 +85,7 @@ namespace Symbioz.World.Handlers
             }
             if (!client.Character.Map.IsValid())
             {
+                if (client.Character.isDebugging)
                 client.Character.Reply("Unable to start placement,this map is not valid");
                 return;
             }
@@ -101,7 +102,8 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.NotificationError("Unable to fight, MonsterGroup dosent exist...");
+                if (client.Character.isDebugging)
+                    client.Character.NotificationError("Unable to fight, MonsterGroup dosent exist...");
             }
         }
         [MessageHandler]
@@ -152,7 +154,7 @@ namespace Symbioz.World.Handlers
             }
             catch
             {
-                client.Character.NotificationError("Error while leaving fight...");
+                client.Character.NotificationError("Une erreur est survenue en essayant de quitter le combat !");
             }
         }
         [MessageHandler]

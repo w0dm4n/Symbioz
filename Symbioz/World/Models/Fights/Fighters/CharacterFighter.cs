@@ -157,7 +157,7 @@ namespace Symbioz.World.Models.Fights.Fighters
 
                 if (HasLeft)
                 {
-                    Client.Character.NotificationError("You already left the fight");
+                    Client.Character.NotificationError("Vous avez déjà quitter le combat !");
                     return;
                 }
 
@@ -219,7 +219,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 HasLeft = true;
                 Die();
                 AknowlegeAndLeave();
-                Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté!"));
+                Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté !"));
             }
 
 
@@ -322,6 +322,15 @@ namespace Symbioz.World.Models.Fights.Fighters
         public override bool UseWeapon(short cellid)
         {
             var target = Fight.GetFighter(cellid);
+            if (Client.Character.isGod == true)
+            {
+                if (target != null)
+                {
+                    target.TakeDamages(new TakenDamages(25000, ElementType.Earth), this.ContextualId);
+                    Fight.CheckFightEnd();
+                    return true;
+                }
+            }
             CharacterItemRecord weapon = Client.Character.Inventory.GetEquipedWeapon();
             if (weapon == null)
             {
@@ -329,6 +338,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 return true;
             }
             WeaponRecord template = WeaponRecord.GetWeapon(weapon.GID);
+             
             FightSpellCastCriticalEnum critical = RollCriticalDice(template);
             Fight.TryStartSequence(this.ContextualId, 2);
             int targetId = target != null ? target.ContextualId : 0;

@@ -36,11 +36,11 @@ namespace Symbioz.Providers
                 var action = NpcActionsRecord.GetNpcAction(npc.Id, actionType);
                 if (action != null)
                     handler.Value(client, npc, action);
-                else
+                else if (client.Character.isDebugging)
                     client.Character.NotificationError("Unable to find npc action record (" + clientnpcactionid + ") for Npc " + npc.Id);
 
             }
-            else
+            else if (client.Character.isDebugging)
             {
                 client.Character.NotificationError("Unable to find npc generic action handler (" + clientnpcactionid + ") for Npc " + npc.Id);
             }

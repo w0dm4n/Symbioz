@@ -113,8 +113,6 @@ namespace Symbioz.World.Models.Fights.Fighters
             base.StartTurn();
             Brain.StartPlay();
             base.EndTurn();
-
-
         }
         public List<SpellRecord> GetSpellsByCategory(SpellCategoryEnum category)
         {

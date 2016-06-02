@@ -11,6 +11,7 @@ using Symbioz.Enums;
 using Symbioz.World.Records.Spells;
 using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.Helper;
+using Symbioz.Network.Servers;
 
 namespace Symbioz.Providers
 {
@@ -43,7 +44,9 @@ namespace Symbioz.Providers
             }
             else
             {
-                fighter.Fight.Reply(effect.BaseEffect.EffectType + " is not handled...");
+                if (WorldServer.Instance.GetOnlineClient(fighter.Fight.Id) != null  &&
+                    WorldServer.Instance.GetOnlineClient(fighter.Fight.Id).Character.isDebugging)
+                    fighter.Fight.Reply(effect.BaseEffect.EffectType + " is not handled...");
             }
         }
         public static short GetRandom(ExtendedSpellEffect record)

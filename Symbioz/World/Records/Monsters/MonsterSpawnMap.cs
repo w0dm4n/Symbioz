@@ -18,6 +18,8 @@ namespace Symbioz.World.Records.Monsters
         public int MapId;
         public sbyte Probability;
         [Ignore]
+
+    
         public sbyte ActualGrade;
         public MonsterSpawnMapRecord(int id, ushort monsterid,int mapid, sbyte probability)
         {
