@@ -45,7 +45,7 @@ public uint memberId;
 public GuildChangeMemberParametersMessage()
 {
 }
-
+    
 public GuildChangeMemberParametersMessage(uint memberId, ushort rank, sbyte experienceGivenPercent, uint rights)
         {
             this.memberId = memberId;

@@ -116,9 +116,10 @@ namespace Symbioz.World.Records
             PlayableBreedEnum.Pandawa,
             PlayableBreedEnum.Steamer,
             PlayableBreedEnum.Xelor,
-            PlayableBreedEnum.Pandawa
-      
-		};
+            PlayableBreedEnum.Pandawa,
+            PlayableBreedEnum.Roublard
+
+        };
         static int GetDefaultBreedColor(int breedid, bool sex, int colorindex)
         {
             var breed = Breeds.Find(x => x.Id == breedid);

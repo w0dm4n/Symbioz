@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using Symbioz.World.Models.Succes;
 
 namespace Symbioz.World.Models
 {
@@ -58,7 +59,7 @@ namespace Symbioz.World.Models
         public List<SpellItem> Spells { get { return CharacterSpellRecord.GetCharacterSpells(Id); } }
         public List<ShortcutSpell> SpellsShortcuts { get { return SpellShortcutRecord.GetCharacterShortcuts(Id); } }
         public List<Shortcut> GeneralShortcuts { get { return GeneralShortcutRecord.GetCharacterShortcuts(Id); } }
-
+        public List<SuccesRewards> SuccesShortcuts = new List<SuccesRewards>();
         public PartyMember PartyMember;
 
         #region Exchanges
@@ -1046,6 +1047,35 @@ namespace Symbioz.World.Models
                 }
                 return false;
             }
+        }
+
+        public void SendMessage(string message)
+        {
+            Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new string[] { message }));
+        }
+        public List<string> GetSuccess()
+        {
+            if (Record.Succes == null)
+            {
+                return new List<string>();
+            }
+            else
+
+                return Record.Succes.Split(',').ToList();
+        }
+        public bool HasSucces(int Id)
+        {
+            if (GetSuccess().Contains(Id.ToString()))
+                return true;
+            else
+                return false;
+        }
+        public void AddAchievements(string id)
+        {
+            if (Record.Succes == null)
+                Record.Succes = id;
+            else
+                Record.Succes += "," + id;
         }
     }
 }
