@@ -53,7 +53,7 @@ namespace Symbioz.World.Handlers
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             else
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
-            Boolean reco = false;
+            bool reco = false;
             Character areco = null;
             foreach (CharacterRecord c in client.Characters)
             {
@@ -183,12 +183,15 @@ namespace Symbioz.World.Handlers
 
         static void ProcessSelection(WorldClient client)
         {
-            if (ConfigurationManager.Instance.ServerId == 22)
-                client.Send(new CharacterSelectedSuccessMessage(new CharacterHardcoreOrEpicInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex, client.Character.Record.Energy == 0 ? (byte)0 : (byte)1, (ushort)client.Character.Record.DeathCount, (byte)client.Character.Record.DeathMaxLevel), false));
-            else
-                client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
+            client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
             StatsRecord.InitializeCharacter(client.Character);
 
+            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+            {
+                client.Send(new CharacterCapabilitiesMessage(4095));
+                client.Send(new CharacterLoadingCompleteMessage());
+                return;
+            }
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
             client.Character.RefreshEmotes();
@@ -209,15 +212,16 @@ namespace Symbioz.World.Handlers
         {
             client.Send(new GameContextDestroyMessage());
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
-            client.Character.RefreshStats();
             if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
             {
-                client.Character.FighterInstance = null;
-               // client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
-               // client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                //client.Character.FighterInstance = null;
+                MapsHandler.SendCurrentMapMessage(client, client.Character.Map.Id);
+                client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
+                 client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                return;
             }
-            //else
-                client.Character.Teleport(client.Character.Record.MapId);
+            client.Character.RefreshStats();
+            client.Character.Teleport(client.Character.Record.MapId);
             #region Dofus Cinematic
             if (client.Character.IsNew)
             {
