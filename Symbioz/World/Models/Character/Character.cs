@@ -605,7 +605,7 @@ namespace Symbioz.World.Models
         {
             if (level <= Record.Level)
             {
-                Client.Character.NotificationError("Level must be higher then " + Record.Level);
+                Client.Character.NotificationError("Le niveau doit être plus haut que " + Record.Level);
                 return;
             }
             AddXp(ExperienceRecord.GetExperienceForLevel(level) - Record.Exp, false);
@@ -878,7 +878,7 @@ namespace Symbioz.World.Models
                 Inventory.Refresh();
             }
             if (shownotif)
-                Reply("Vous avez obtenu " + amount + "k");
+                Reply("Vous avez obtenu " + amount + " kama(s).");
         }
         public bool RemoveKamas(int amount, bool shownotif = false)
         {
@@ -887,12 +887,12 @@ namespace Symbioz.World.Models
                 Record.Kamas -= amount;
                 Inventory.Refresh();
                 if (shownotif)
-                    Reply("Vous avez perdu " + amount + "k");
+                    Reply("Vous avez perdu " + amount + " kama(s).");
                 return true;
             }
             else
             {
-                Reply("Vous ne possedez pas assez de kamas");
+                Reply("Vous ne possédez pas assez de kamas");
                 return false;
             }
 
@@ -926,7 +926,7 @@ namespace Symbioz.World.Models
         }
         public void ReplyError(object value)
         {
-            Reply("[Error] " + value, Color.Red, false, true);
+            Reply("[Erreur] " + value, Color.Red, false, true);
         }
         public void ReplyInConsole(string content, ConsoleMessageTypeEnum type = ConsoleMessageTypeEnum.CONSOLE_TEXT_MESSAGE)
         {
