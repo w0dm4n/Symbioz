@@ -813,8 +813,6 @@ namespace Symbioz.World.Models
         }
         public void RejoinMap(bool spawnjoin, bool winner)
         {
-
-
             Client.Send(new GameContextDestroyMessage());
             Client.Send(new GameContextCreateMessage(1));
             if (winner && FighterInstance.Fight.Map.DugeonMap)
@@ -828,13 +826,14 @@ namespace Symbioz.World.Models
             FighterInstance = null;
             if (spawnjoin && !winner)
             {
-                if (Client.Character.Record.SpawnPointMapId != -1)
+                Client.Character.Teleport(Client.Character.Record.MapId, Client.Character.Record.CellId);
+                /*if (Client.Character.Record.SpawnPointMapId != -1)
                 {
                     MapsHandler.SendCurrentMapMessage(Client, Client.Character.Record.SpawnPointMapId);
                     Record.CellId = (short)InteractiveRecord.GetTeleporterCellId(Client.Character.Record.SpawnPointMapId, TeleporterTypeEnum.TELEPORTER_ZAAP);
                 }
                 else
-                    Client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);
+                    Client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);*/
             }
             else
                 MapsHandler.SendCurrentMapMessage(Client, Client.Character.Record.MapId);

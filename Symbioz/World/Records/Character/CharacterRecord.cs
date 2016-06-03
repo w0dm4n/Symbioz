@@ -180,7 +180,7 @@ namespace Symbioz.World.Records
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 1, 0);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1);
         }
         public static bool CheckCharacterNameExist(string name)
         {

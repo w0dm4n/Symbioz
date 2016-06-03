@@ -718,6 +718,10 @@ namespace Symbioz.World.Models.Fights.Fighters
             {
                 OnMoved(arg2 as List<short>);
             }
+            if (eventtype == FighterEventType.AFTER_DIED)
+            {
+                Logger.Log("Je suis mort !");
+            }
             bool result = false;
             var buffs = Buffs.FindAll(x => x.EventType == eventtype && x.Delay == 0);
             foreach (var buff in buffs)

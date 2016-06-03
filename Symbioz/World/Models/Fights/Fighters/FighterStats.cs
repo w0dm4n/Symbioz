@@ -37,10 +37,12 @@ namespace Symbioz.World.Models
 
         public int ErodedLife { get; set; }
 
-        public FighterStats(StatsRecord record, bool summoned = false, int summonerid = 0)
+        public FighterStats(StatsRecord record, bool summoned = false, int summonerid = 0, BasicStats current = null)
         {
             this.RealStats = record.Clone();
             this.Stats = RealStats.Clone();
+            if (current != null)
+             this.Stats.LifePoints = (short)current.LifePoints;
             this.ShieldPoints = 0;
             this.ErosionPercentage = 0;
             this.ErodedLife = 0;

@@ -118,11 +118,11 @@ namespace Symbioz.World.Handlers
             client.Character.IsNew = true;
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
-            client.Character.Record.AddElement();
             client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
+            client.Character.Save();
             ProcessSelection(client);
         }
         [MessageHandler]
@@ -148,7 +148,9 @@ namespace Symbioz.World.Handlers
             replayCharacter.Honor = 0;
             replayCharacter.AlignmentValue = 0;
             client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
-            client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
+            //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
+            //replayCharacter.Look = look;
+            //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
         }
@@ -208,7 +210,6 @@ namespace Symbioz.World.Handlers
             client.Character.OnConnectedNotifications();
             client.Send(new CharacterCapabilitiesMessage(4095));
             client.Send(new CharacterLoadingCompleteMessage());
-
         }
 
         [MessageHandler]

@@ -45,7 +45,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             ContextualId = Client.Character.Id;
             FighterLook = Client.Character.Look.CloneContextActorLook();
             RealFighterLook = FighterLook.CloneContextActorLook();
-            FighterStats = new FighterStats(Client.Character.StatsRecord);
+            FighterStats = new FighterStats(Client.Character.StatsRecord, false, 0, Client.Character.CurrentStats);
 
             FighterInformations = new GameFightCharacterInformations(ContextualId, FighterLook.ToEntityLook(),
                 new EntityDispositionInformations(CellId, Direction), (sbyte)Team.TeamColor,
@@ -146,33 +146,30 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             if (this.disconnect)
                 return;
-            if (!Fight.Started)
+            if (!Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PvM && Fight.FightType != FightTypeEnum.FIGHT_TYPE_AGRESSION)
             {
                 RemoveCompanion();
                 Fight.Send(new GameFightRemoveTeamMemberMessage((short)Fight.Id, Team.Id, ContextualId));
                 if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
-                Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, ContextualId);
+                    Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, ContextualId);
                 Team.RemoveFighter(this);
                 Fight.CheckFightEnd();
                 Client.Character.RejoinMap(Fight.SpawnJoin, false);
             }
             else
             {
-
+                Client.Character.CurrentStats.LifePoints = 0;
                 if (HasLeft)
                 {
                     Client.Character.NotificationError("Vous avez déjà quitter le combat !");
                     return;
                 }
-
                 RemoveCompanion();
                 if (!Dead)
                     Die();
                 HasLeft = true;
                 Fight.Synchronizer.Start(AknowlegeAndLeave);
-              
             }
-
         }
         public void AknowlegeAndLeave()
         {
@@ -200,7 +197,6 @@ namespace Symbioz.World.Models.Fights.Fighters
                     Client.Send(new GameRolePlayArenaRegistrationStatusMessage(false, (sbyte)PvpArenaStepEnum.ARENA_STEP_UNREGISTER, ArenaProvider.FIGHTERS_PER_TEAM));
                 }
                 Client.Character.RejoinMap(Fight.SpawnJoin, false);
-                
             }
             catch { }
 
@@ -329,7 +325,6 @@ namespace Symbioz.World.Models.Fights.Fighters
             FighterStats.Stats.ActionPoints -= spell.ApCost;
             RefreshStats();
             Fight.TryEndSequence(2, 0);
-
             Fight.CheckFightEnd();
         }
         public override bool UseWeapon(short cellid)

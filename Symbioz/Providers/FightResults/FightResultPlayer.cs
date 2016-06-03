@@ -54,6 +54,7 @@ namespace Symbioz.Providers.FightResults
                     client.Character.Restrictions.cantMove = true;
                     client.Character.Restrictions.cantSpeakToNPC = true;
                     client.Character.Restrictions.cantExchange = true;
+                    client.Character.Restrictions.cantAttackMonster = true;
                     client.Character.Reply("Vous êtes mort !", false, false);
                 }
             }
@@ -82,7 +83,6 @@ namespace Symbioz.Providers.FightResults
             {
                 CharactersDisconnected.remove(client.Character.Record.Name);
                 client.Character.AddElement(client.Character.Record);
-                client.Character.Save();
                 WorldServer.Instance.WorldClients.Remove(client);
             }
         }
@@ -104,14 +104,14 @@ namespace Symbioz.Providers.FightResults
             FightLoot.objects.Add(FightArena.ARENA_ITEM_ID);
             FightLoot.objects.Add((ushort)itemQt);
             client.Character.Inventory.Add(FightArena.ARENA_ITEM_ID, itemQt);
-            
+
             if (client.Character.Record.Level != 200)
             {
                 var experienceForNextLevel = ExperienceRecord.GetExperienceForLevel((uint)client.Character.Record.Level + 1);
                 var experienceForLevel = ExperienceRecord.GetExperienceForLevel(client.Character.Record.Level);
                 int earnedXp = (int)((double)(experienceForNextLevel - (double)experienceForLevel) / (double)15);
 
-                var expdatas = new FightResultExperienceData(true, true, true,true,false, false, false, client.Character.Record.Exp, experienceForLevel, experienceForNextLevel, earnedXp, 0, 0, 0);
+                var expdatas = new FightResultExperienceData(true, true, true, true, false, false, false, client.Character.Record.Exp, experienceForLevel, experienceForNextLevel, earnedXp, 0, 0, 0);
                 AdditionalDatas.Add(expdatas);
                 client.Character.AddXp((ulong)earnedXp);
             }
@@ -184,7 +184,7 @@ namespace Symbioz.Providers.FightResults
             foreach (var item in m_drops)
             {
                 ItemRecord template = ItemRecord.GetItem(item.GID);
-                int[] TypeInventoryId = new int[] { 11, 9, 10, 1, 17, 16, 23, 82, 151, 18};
+                int[] TypeInventoryId = new int[] { 11, 9, 10, 1, 17, 16, 23, 82, 151, 18 };
                 if (template != null)
                 {
                     if (InArray(TypeInventoryId, template.TypeId))
@@ -211,7 +211,7 @@ namespace Symbioz.Providers.FightResults
                     client.Character.Inventory.AddWeapon(item.GID, 1, false, false);
                     weapon_dropped++;
                 }
-             }
+            }
 
             #region Experience Provider
             List<MonsterData> monsters = new List<MonsterData>();

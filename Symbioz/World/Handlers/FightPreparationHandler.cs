@@ -86,7 +86,7 @@ namespace Symbioz.World.Handlers
             if (!client.Character.Map.IsValid())
             {
                 if (client.Character.isDebugging)
-                client.Character.Reply("Unable to start placement,this map is not valid");
+                    client.Character.Reply("Unable to start placement, this map is not valid");
                 return;
             }
             var group = client.Character.Map.Instance.GetMapMonsterGroup(message.monsterGroupId);
@@ -128,6 +128,11 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleFightJoin(GameFightJoinRequestMessage message, WorldClient client)
         {
+            if (client.Character.Restrictions.cantAttackMonster == true)
+            {
+                client.Character.Reply("Impossible de rejoindre un combat en étant mort !");
+                return;
+            }
             var fight = FightProvider.Instance.GetFight(message.fightId);
             if (!fight.ContainCharacterFighter(client.Character.Id))
                 fight.TryJoin(client, message.fighterId);
@@ -149,7 +154,6 @@ namespace Symbioz.World.Handlers
             }
             try
             {
-           
                 client.Character.FighterInstance.Leave();
             }
             catch

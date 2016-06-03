@@ -107,7 +107,7 @@ namespace Symbioz.World.Models.Fights
         {
             GetAllFighters().ForEach(x => x.ShowFighter());
             if (AddFightSword)
-            Map.Instance.AddFightSword(GetFightCommonInformations());
+                Map.Instance.AddFightSword(GetFightCommonInformations());
             ShowPlacementCells();
         }
         public void UpdateTeam(FightTeam team)
@@ -144,7 +144,7 @@ namespace Symbioz.World.Models.Fights
         {
             Map.Instance.RemoveFightSword(Id);
             Started = true;
-            Send(new GameFightStartMessage(new Idol[0])); // see
+            Send(new GameFightStartMessage(new Idol[0]));
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
             SyncFighters();
             TimeLine.StartFight();
@@ -165,7 +165,7 @@ namespace Symbioz.World.Models.Fights
         public void FighterReconnect(CharacterFighter f)
         {
             f.disconnect = false;
-            //Send(new GameFightStartMessage(new Idol[0])); // see
+            Send(new GameFightStartMessage(new Idol[0])); // see
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
             Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
             SyncFighters();
@@ -283,7 +283,7 @@ namespace Symbioz.World.Models.Fights
         #region ManageMethods
         public List<short> BreakAtFirstObstacles(List<short> cells)
         {
-            
+
             List<short> results = new List<short>();
             if (cells == null)
                 return results;
@@ -392,10 +392,10 @@ namespace Symbioz.World.Models.Fights
         {
             GetAllFighters().ForEach(action);
         }
-        public void SpawnBomb(Fighter master,short templateid,sbyte grade,short cellid,FightTeam team)
+        public void SpawnBomb(Fighter master, short templateid, sbyte grade, short cellid, FightTeam team)
         {
-            BombFighter bomb = new BombFighter(master,team,MonsterRecord.GetMonster((ushort)templateid),cellid,grade);
-            Send(new GameActionFightSummonMessage(181,bomb.ContextualId,bomb.FighterInformations));
+            BombFighter bomb = new BombFighter(master, team, MonsterRecord.GetMonster((ushort)templateid), cellid, grade);
+            Send(new GameActionFightSummonMessage(181, bomb.ContextualId, bomb.FighterInformations));
             bomb.CheckWalls();
         }
         public MonsterFighter AddSummon(Fighter master, short monsterid, sbyte grade, short cellid, FightTeam team)
@@ -403,7 +403,7 @@ namespace Symbioz.World.Models.Fights
             MonsterFighter summoned = new MonsterFighter(MonsterRecord.GetMonster((ushort)monsterid),
               team, grade, cellid, master.ContextualId);
             if (summoned.Template.UseSummonSlot && !summoned.Template.UseBombSlot)
-            TimeLine.Insert(summoned, master);
+                TimeLine.Insert(summoned, master);
             Send(new GameActionFightSummonMessage(181, summoned.ContextualId, summoned.FighterInformations));
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(false), new int[0]));
             return summoned;
@@ -417,9 +417,9 @@ namespace Symbioz.World.Models.Fights
         {
             return Marks.OfType<T>().ToList().FindAll(predicate);
         }
-        public void AddMarkTrigger(Fighter fighter, MarkTrigger mark,FightTeam team = null)
+        public void AddMarkTrigger(Fighter fighter, MarkTrigger mark, FightTeam team = null)
         {
-            var message=  new GameActionFightMarkCellsMessage(0, fighter.ContextualId, mark.GetMark());
+            var message = new GameActionFightMarkCellsMessage(0, fighter.ContextualId, mark.GetMark());
             if (team == null)
                 Send(message);
             else
@@ -429,10 +429,10 @@ namespace Symbioz.World.Models.Fights
         }
         public void RemoveMarkTrigger(Fighter master, MarkTrigger mark)
         {
-            TryStartSequence(master.ContextualId,3);
+            TryStartSequence(master.ContextualId, 3);
             Marks.Remove(mark);
             MarkInteractions.RemoveAll(x => x.Mark == mark);
-            Send(new GameActionFightUnmarkCellsMessage(310, master.ContextualId,mark.Id));
+            Send(new GameActionFightUnmarkCellsMessage(310, master.ContextualId, mark.Id));
             TryEndSequence(3, 0);
         }
         public void Acknowledge()
@@ -449,7 +449,7 @@ namespace Symbioz.World.Models.Fights
                 if (Started)
                     ShowFightResults(results, fighter.Client);
             }
-            Dispose(); 
+            Dispose();
         }
         public virtual void OnFightEnded(TeamColorEnum winner)
         {
@@ -521,6 +521,7 @@ namespace Symbioz.World.Models.Fights
             foreach (var fighter in charactersFighting)
             {
                 bool winner = GetWinner() == fighter.Team.TeamColor;
+                fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
                 fighter.Client.Character.RejoinMap(SpawnJoin, winner);
             }
             FightProvider.Instance.RemoveFight(this);
@@ -556,7 +557,5 @@ namespace Symbioz.World.Models.Fights
             }
             return results;
         }
-
-
     }
 }

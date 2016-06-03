@@ -712,6 +712,14 @@ namespace Symbioz.World.Handlers
                 client.Character.isDebugging = false;
             }
         }
+
+        [InGameCommand("life", ServerRoleEnum.MODERATOR)]
+        public static void GetLife(string value, WorldClient client)
+        {
+            client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
+            client.Character.RefreshStats();
+            client.Character.Reply("Vous avez récupérer vos points de vie !");
+        }
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
