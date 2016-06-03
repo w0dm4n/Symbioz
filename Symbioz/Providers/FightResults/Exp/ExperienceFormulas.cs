@@ -131,7 +131,7 @@ namespace Symbioz.Providers.FightResults.Exp
             xpTotalOnePlayer = this.truncate(tmpSolo);
             xpTotalGroup = this.truncate(tmpGroup);
             if (pPlayerData.DeathMaxLevel > pPlayerData.level)//Player x6 Heroique mode
-                this._xpSolo = xpTotalOnePlayer * ConfigurationManager.Instance.ExperienceRatio * 2;
+                this._xpSolo = (xpTotalOnePlayer * ConfigurationManager.Instance.ExperienceRatio) * 2;
             else
                 this._xpSolo = xpTotalOnePlayer * ConfigurationManager.Instance.ExperienceRatio;
             this._xpGroup = xpTotalGroup;

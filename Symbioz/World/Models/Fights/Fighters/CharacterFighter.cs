@@ -32,7 +32,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         public bool HasLeft = false;
         public bool ReadyToSee = false;
         public bool disconnect = false;
-        public short turndisconnect = 0;
+        public short turndisconnect = 5;
         public WorldClient Client { get; set; }
         public CharacterFighter(WorldClient client, FightTeam team)
             : base(team)
@@ -213,9 +213,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             if (Fight == null)
                 return;
             this.disconnect = true;
-            Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté!"));
-            this.turndisconnect++;
-            if (this.turndisconnect < 5)
+            this.turndisconnect--;
+            String[] name = new string[2];
+            name[0] = Client.Character.Record.Name;
+            name[1] = turndisconnect.ToString();
+            Fight.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 5181, name));
+            if (this.turndisconnect > 0)
                 return;
             if (!Fight.Started)
                 Leave();
@@ -226,9 +229,8 @@ namespace Symbioz.World.Models.Fights.Fighters
                 AknowlegeAndLeave();
                 Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté !"));
             }
-
-
         }
+
         public override void RefreshStats()
         {
  

@@ -151,7 +151,7 @@ namespace Symbioz.World.Models.Fights
             TimeLine.GetFirstFighter().StartTurn();
 
         }
-        //RECO
+
         public void FighterDisconnect(CharacterFighter f)
         {
             if (f.IsPlaying)
@@ -159,24 +159,24 @@ namespace Symbioz.World.Models.Fights
                 f.EndTurn();
             }
             f.disconnect = true;
-            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
+            f.turndisconnect = 5;
+            String[] name = new string[2];
+            name[0] = f.Client.Character.Record.Name;
+            name[1] = "5";
+            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 5181, name));
         }
 
         public void FighterReconnect(CharacterFighter f)
         {
             f.disconnect = false;
-            Send(new GameFightStartMessage(new Idol[0])); // see
-            Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
-            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
-            SyncFighters();
-            GetAllFighters().ForEach(x => x.ShowFighter(f.Client));
             var fight = GetFightCommonInformations();
-            var team = fight.fightTeams.FirstOrDefault(x => x.teamId == f.Team.Id);
-            team.teamMembers.Add(f.GetFightMemberInformations());
             Send(new GameRolePlayRemoveChallengeMessage(Id));
             Send(new GameRolePlayShowChallengeMessage(fight));
+            GetAllFighters().ForEach(x => x.ShowFighter(f.Client));
+            String[] name = new string[1];
+            name[0] = f.Client.Character.Record.Name;
+            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 4977, name));
         }
-
         public void Fighterdeleted(CharacterFighter f)
         {
             var fight = GetFightCommonInformations();

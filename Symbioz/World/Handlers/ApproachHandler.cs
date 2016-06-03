@@ -1,4 +1,5 @@
-﻿using Symbioz.Auth;
+﻿using Symbioz;
+using Symbioz.Auth;
 using Symbioz.Auth.Handlers;
 using Symbioz.Auth.Models;
 using Symbioz.Core;
@@ -12,6 +13,7 @@ using Symbioz.Network.Messages;
 using Symbioz.ORM;
 using Symbioz.Utils;
 using Symbioz.World.Models;
+using Symbioz.World.Models.Fights;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Guilds;
@@ -45,12 +47,9 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleCharacterList(CharactersListRequestMessage message, WorldClient client)
         {
-            if (ConfigurationManager.Instance.ServerId == 22)
-                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
-            else
-                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
             bool reco = false;
             Character areco = null;
+
             foreach (CharacterRecord c in client.Characters)
             {
                 if (c == null)
@@ -61,18 +60,21 @@ namespace Symbioz.World.Handlers
                 {
                     reco = true;
                     areco = CharactersDisconnected.get_Character_disconnected(c.Name);
+                    break;
                 }
             }
             if (reco == true)
             {
-                Logger.Write("RECO IN FIGHT ID=" + areco.FighterInstance.Fight.Id, ConsoleColor.DarkCyan);
                 client.Character = areco;
                 client.Character.FighterInstance.Client = client;
                 client.Character.Client = client;
                 ProcessSelection(client);
-                //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
                 return;
             }
+            if (ConfigurationManager.Instance.ServerId == 22)
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            else
+                client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
         }
         [MessageHandler]
         public static void HandleCharacterNameSuggestion(CharacterNameSuggestionRequestMessage message, WorldClient client)
@@ -148,9 +150,7 @@ namespace Symbioz.World.Handlers
             replayCharacter.Honor = 0;
             replayCharacter.AlignmentValue = 0;
             client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
-            //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
-            //replayCharacter.Look = look;
-            //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
             Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
         }
@@ -192,6 +192,7 @@ namespace Symbioz.World.Handlers
                 client.Character.RefreshSpells();
                 client.Character.RefreshArenasInfos();
                 client.Character.RefreshPvPInfos();
+                client.Character.OnConnectedNotifications();
                 client.Send(new CharacterCapabilitiesMessage(4095));
                 client.Send(new CharacterLoadingCompleteMessage());
                 return;
@@ -213,19 +214,44 @@ namespace Symbioz.World.Handlers
         }
 
         [MessageHandler]
+        public static void HandleGameContextReady(GameContextReadyMessage message, WorldClient client)
+        {
+            Logger.Write("[" + client.Character.Record.Name + "] vien de se reconnecter en combats sur la map " + client.Character.FighterInstance.Fight.Map.Id, ConsoleColor.DarkCyan);
+            client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
+            client.Send(new GameFightJoinMessage(false, true, false, Fight.FIGHT_PREPARATION_TIME, (sbyte)client.Character.FighterInstance.Fight.FightType));
+            if (!client.Character.FighterInstance.Fight.Started)
+                client.Character.FighterInstance.Fight.ShowPlacementCells();
+            client.Send(new GameFightShowFighterMessage(client.Character.FighterInstance.FighterInformations));
+            client.Send(new GameEntitiesDispositionMessage(client.Character.FighterInstance.Fight.GetAllFighters().ConvertAll<IdentifiedEntityDispositionInformations>(x => x.GetIdentifiedEntityDisposition())));
+            client.Send(new GameFightResumeMessage(new List<FightDispellableEffectExtendedInformations>(), new List<GameActionMark>(), (ushort)client.Character.FighterInstance.Fight.TimeLine.m_round, client.Character.FighterInstance.Fight.Started ? 1 : 0, new List<Idol>(), new List<GameFightSpellCooldown>(), 0, 0));
+            client.Send(new GameFightTurnListMessage(client.Character.FighterInstance.Fight.TimeLine.GenerateTimeLine(), new int[0]));
+            client.Send(new GameFightSynchronizeMessage(client.Character.FighterInstance.Fight.GetAllFighters().ConvertAll<GameFightFighterInformations>(x => x.FighterInformations)));
+            client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+            client.Send(new MapComplementaryInformationsDataMessage(client.Character.SubAreaId, client.Character.FighterInstance.Fight.Map.Id, new List<HouseInformations>(),
+            new List<GameRolePlayActorInformations>(), client.Character.FighterInstance.Fight.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
+            new List<MapObstacle>(), new List<FightCommonInformations>()));
+            if (client.Character.FighterInstance.IsPlaying)
+                client.Send(new GameFightTurnStartMessage(client.Character.FighterInstance.ContextualId, FightTurnEngine.TURN_TIMEMOUT / 100));
+            else
+                client.Send(new GameFightTurnEndMessage(client.Character.FighterInstance.ContextualId));
+            client.Send(new GameFightStartMessage(new Idol[0])); // see
+            client.Send(new GameFightTurnListMessage(client.Character.FighterInstance.Fight.TimeLine.GenerateTimeLine(), new int[0]));
+            CharactersDisconnected.remove(client.Character.Record.Name);
+        }
+
+        [MessageHandler]
         public static void HandleGameContextCreate(GameContextCreateRequestMessage message, WorldClient client)
         {
-            client.Send(new GameContextDestroyMessage());
-            client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
             {
-                //client.Character.FighterInstance = null;
                 client.Character.RefreshStats();
+                client.Send(new GameContextDestroyMessage());
+                client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.FIGHT));
                 MapsHandler.SendCurrentMapMessage(client, client.Character.FighterInstance.Fight.Map.Id);
-                client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
-                client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
                 return;
             }
+            client.Send(new GameContextDestroyMessage());
+            client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             client.Character.RefreshStats();
             client.Character.Teleport(client.Character.Record.MapId);
 
@@ -234,6 +260,9 @@ namespace Symbioz.World.Handlers
             {
                 client.Send(new CinematicMessage(10));
                 client.Character.IsNew = false;
+                //client.Character.Record.OldLook = client.Character.Record.Look;
+                //client.Character.Record.AddElement();
+                //client.Character.Record.UpdateElement();
             }
             #endregion
         }

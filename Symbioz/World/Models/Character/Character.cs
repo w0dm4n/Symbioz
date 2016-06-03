@@ -372,9 +372,6 @@ namespace Symbioz.World.Models
         }
         public void ReCreateFighter(FightTeam team)
         {
-            Look.UnsetAura();
-            Client.Send(new GameContextDestroyMessage());
-            Client.Send(new GameContextCreateMessage(2));
             Client.Send(new GameFightStartingMessage((sbyte)team.Fight.FightType, 0, 1));
         }
         public void SendMap(Message message)

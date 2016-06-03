@@ -112,7 +112,7 @@ namespace Symbioz.World.Records
             this.Level = level;
             this.AccountId = accountid;
             this.Look = look;
-            this.OldLook = look;
+            this.OldLook = oldLook;
             this.Breed = breed;
             this.Sex = sex;
             this.MapId = mapid;
@@ -176,7 +176,7 @@ namespace Symbioz.World.Records
         }
         public static CharacterRecord Default(string name, int accountid, string look, sbyte breed, bool sex)
         {
-            return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, null, 1, breed, sex,
+            return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, look, 1, breed, sex,
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,

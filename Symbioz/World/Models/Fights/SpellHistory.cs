@@ -10,7 +10,7 @@ namespace Symbioz.World.Models.Fights
     public class SpellHistory
     {
         private List<CastedSpell> m_castedSpells = new List<CastedSpell>();
-
+    
         public void Add(SpellLevelRecord level,int targetId)
         {
             m_castedSpells.Add(new CastedSpell(level.SpellId,targetId,level.MinCastInterval));
