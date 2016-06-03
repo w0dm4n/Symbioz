@@ -135,6 +135,7 @@
     <Compile Include="Providers\CustomObjectUseHandler.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
+    <Compile Include="Network\CharactersDisconnected.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAgression.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAvA.cs" />
     <Compile Include="World\Models\Parties\Dungeon\DungeonPartyProvider.cs" />

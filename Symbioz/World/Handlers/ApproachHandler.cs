@@ -6,6 +6,7 @@ using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Helper;
+using Symbioz.Network;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.Network.Servers;
@@ -53,19 +54,23 @@ namespace Symbioz.World.Handlers
             else
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
             Boolean reco = false;
-            CharacterRecord areco = null;
+            Character areco = null;
             foreach (CharacterRecord c in client.Characters)
             {
-                if (c.InFight != -1)
+                if (c == null)
+                    continue;
+                if (CharactersDisconnected.is_disconnected(c.Name)
+                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance != null
+                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance.Fight != null)
                 {
                     reco = true;
-                    areco = c;
+                    areco = CharactersDisconnected.get_Character_disconnected(c.Name);
                 }
             }
             if (reco == true)
             {
-                Logger.Write("RECO IN FIGHT ID=" + areco.InFight, ConsoleColor.DarkCyan);
-                client.Character = new Character(areco,client);
+                Logger.Write("RECO IN FIGHT ID=" + areco.FighterInstance.Fight.Id, ConsoleColor.DarkCyan);
+                client.Character = areco;
                 ProcessSelection(client);
                 //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
                 return;
@@ -178,7 +183,10 @@ namespace Symbioz.World.Handlers
 
         static void ProcessSelection(WorldClient client)
         {
-            client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
+            if (ConfigurationManager.Instance.ServerId == 22)
+                client.Send(new CharacterSelectedSuccessMessage(new CharacterHardcoreOrEpicInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex, client.Character.Record.Energy == 0 ? (byte)0 : (byte)1, (ushort)client.Character.Record.DeathCount, (byte)client.Character.Record.DeathMaxLevel), false));
+            else
+                client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
             StatsRecord.InitializeCharacter(client.Character);
 
             client.Character.Inventory.Refresh();
@@ -202,55 +210,14 @@ namespace Symbioz.World.Handlers
             client.Send(new GameContextDestroyMessage());
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             client.Character.RefreshStats();
-            client.Character.Teleport(client.Character.Record.MapId);
-            if (client.Character.Record.InFight != -1)
+            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
             {
-                Character old = null;
-                foreach (WorldClient c in WorldServer.Instance.GetAllClientsOnline())
-                {
-                    if (c.Character == null)
-                        continue;
-                    if (c.Character.Id == client.Character.Id && c != client)
-                    {
-                        old = c.Character;
-                        break;
-                    }
-                }
-                if (old != null && old.FighterInstance != null)
-                {
-                    /*client.Character.ReCreateFighter(old.FighterInstance.Team);
-                    client.Character.FighterInstance.CellId = old.FighterInstance.CellId;
-                    client.Character.FighterInstance.Fight = old.FighterInstance.Fight;
-                    client.Character.FighterInstance.IsPlaying = old.FighterInstance.IsPlaying;
-                    client.Character.FighterInstance.Dead = old.FighterInstance.Dead;
-                    client.Character.FighterInstance.Buffs = old.FighterInstance.Buffs;
-                    client.Character.FighterInstance.BuffIdProvider = old.FighterInstance.BuffIdProvider;
-                    client.Character.FighterInstance.Direction = old.FighterInstance.Direction;
-                    client.Character.FighterInstance.FighterInformations = old.FighterInstance.FighterInformations;
-                    client.Character.FighterInstance.FighterStats = old.FighterInstance.FighterStats;
-                    if (client.Character.FighterInstance.Fight.BlueTeam != null
-                        && old.FighterInstance.Team.Id == client.Character.FighterInstance.Fight.BlueTeam.Id)
-                    {
-                        client.Character.FighterInstance.Fight.BlueTeam.AddFighter(client.Character.FighterInstance);
-                        client.Character.FighterInstance.Fight.BlueTeam.RemoveFighter(old.FighterInstance);
-                        client.Character.FighterInstance.Fight.Fighterdeleted(old.FighterInstance);
-                    }
-                    else
-                    {
-                        client.Character.FighterInstance.Fight.RedTeam.AddFighter(client.Character.FighterInstance);
-                        client.Character.FighterInstance.Fight.RedTeam.RemoveFighter(old.FighterInstance);
-                        client.Character.FighterInstance.Fight.Fighterdeleted(old.FighterInstance);
-                    }*/
-                    client.Character = null;
-                    client.Character = old;
-                    old.Client = client;
-                    client.Character.FighterInstance.Client = client;
-                    WorldServer.Instance.RemoveClient(old.Client);
-                    client.Character.Client = client;
-                    client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
-                    client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
-                }
+                client.Character.FighterInstance = null;
+               // client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
+               // client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
             }
+            //else
+                client.Character.Teleport(client.Character.Record.MapId);
             #region Dofus Cinematic
             if (client.Character.IsNew)
             {

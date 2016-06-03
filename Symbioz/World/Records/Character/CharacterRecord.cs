@@ -98,8 +98,6 @@ namespace Symbioz.World.Records
         public int DeathCount;
         [Update]
         public int DeathMaxLevel;
-        [Ignore]
-        public int InFight = -1;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,

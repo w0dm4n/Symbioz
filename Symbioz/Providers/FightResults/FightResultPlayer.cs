@@ -16,6 +16,7 @@ using Symbioz.Providers.FightResults.Exp;
 using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models;
 using Symbioz.Network.Servers;
+using Symbioz.Network;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -79,7 +80,7 @@ namespace Symbioz.Providers.FightResults
             }
             if (fighter.disconnect)
             {
-                client.Character.Record.InFight = -1;//reco en combats n'est plus possible
+                CharactersDisconnected.remove(client.Character.Record.Name);
                 client.Character.AddElement(client.Character.Record);
                 client.Character.Save();
                 WorldServer.Instance.WorldClients.Remove(client);

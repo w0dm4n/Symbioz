@@ -88,7 +88,7 @@ namespace Symbioz.Network.Servers
             {
                 if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
                 {
-                    client.Character.AddElement(client.Character.Record);
+                    CharactersDisconnected.add(client.Character);
                     client.Character.FighterInstance.Fight.FighterDisconnect(client.Character.FighterInstance);
                     remove = false;
                 }
