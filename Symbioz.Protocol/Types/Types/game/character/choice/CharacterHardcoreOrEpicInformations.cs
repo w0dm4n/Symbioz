@@ -36,20 +36,20 @@ public override short TypeId
 }
 
         public byte deathState;
-        public ushort deathCount;
-        public byte deathMaxLevel;
+        public ushort DeathCount;
+        public byte DeathMaxLevel;
         
 
 public CharacterHardcoreOrEpicInformations()
 {
 }
 
-public CharacterHardcoreOrEpicInformations(uint id, byte level, string name, Types.EntityLook entityLook, sbyte breed, bool sex, byte deathState, ushort deathCount, byte deathMaxLevel)
+public CharacterHardcoreOrEpicInformations(uint id, byte level, string name, Types.EntityLook entityLook, sbyte breed, bool sex, byte deathState, ushort DeathCount, byte DeathMaxLevel)
          : base(id, level, name, entityLook, breed, sex)
         {
             this.deathState = deathState;
-            this.deathCount = deathCount;
-            this.deathMaxLevel = deathMaxLevel;
+            this.DeathCount = DeathCount;
+            this.DeathMaxLevel = DeathMaxLevel;
         }
         
 
@@ -58,8 +58,8 @@ public override void Serialize(ICustomDataOutput writer)
 
 base.Serialize(writer);
             writer.WriteByte(deathState);
-            writer.WriteVarUhShort(deathCount);
-            writer.WriteByte(deathMaxLevel);
+            writer.WriteVarUhShort(DeathCount);
+            writer.WriteByte(DeathMaxLevel);
             
 
 }
@@ -71,12 +71,12 @@ public override void Deserialize(ICustomDataInput reader)
             deathState = reader.ReadByte();
             if (deathState < 0)
                 throw new Exception("Forbidden value on deathState = " + deathState + ", it doesn't respect the following condition : deathState < 0");
-            deathCount = reader.ReadVarUhShort();
-            if (deathCount < 0)
-                throw new Exception("Forbidden value on deathCount = " + deathCount + ", it doesn't respect the following condition : deathCount < 0");
-            deathMaxLevel = reader.ReadByte();
-            if ((deathMaxLevel < 1) || (deathMaxLevel > 200))
-                throw new Exception("Forbidden value on deathMaxLevel = " + deathMaxLevel + ", it doesn't respect the following condition : (deathMaxLevel < 1) || (deathMaxLevel > 200)");
+            DeathCount = reader.ReadVarUhShort();
+            if (DeathCount < 0)
+                throw new Exception("Forbidden value on DeathCount = " + DeathCount + ", it doesn't respect the following condition : DeathCount < 0");
+            DeathMaxLevel = reader.ReadByte();
+            if ((DeathMaxLevel < 1) || (DeathMaxLevel > 200))
+                throw new Exception("Forbidden value on DeathMaxLevel = " + DeathMaxLevel + ", it doesn't respect the following condition : (DeathMaxLevel < 1) || (DeathMaxLevel > 200)");
             
 
 }

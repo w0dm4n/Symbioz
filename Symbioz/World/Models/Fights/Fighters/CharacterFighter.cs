@@ -186,9 +186,9 @@ namespace Symbioz.World.Models.Fights.Fighters
                 {
                     if (Core.ConfigurationManager.Instance.ServerId == 22)
                     {
-                        Client.Character.Record.deathCount++;
-                        if (Client.Character.Record.deathMaxLevel < Client.Character.Record.Level)
-                            Client.Character.Record.deathMaxLevel = Client.Character.Record.Level;
+                        Client.Character.Record.DeathCount++;
+                        if (Client.Character.Record.DeathMaxLevel < Client.Character.Record.Level)
+                            Client.Character.Record.DeathMaxLevel = Client.Character.Record.Level;
                         Client.Character.Record.Energy = 0;
                         Client.Character.Look = ContextActorLook.Parse("{24}");
                     }

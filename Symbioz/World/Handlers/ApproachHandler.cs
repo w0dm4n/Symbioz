@@ -56,7 +56,7 @@ namespace Symbioz.World.Handlers
             CharacterRecord areco = null;
             foreach (CharacterRecord c in client.Characters)
             {
-                if (c.infight != -1)
+                if (c.InFight != -1)
                 {
                     reco = true;
                     areco = c;
@@ -64,7 +64,7 @@ namespace Symbioz.World.Handlers
             }
             if (reco == true)
             {
-                Logger.Write("RECO IN FIGHT ID=" + areco.infight, ConsoleColor.DarkCyan);
+                Logger.Write("RECO IN FIGHT ID=" + areco.InFight, ConsoleColor.DarkCyan);
                 client.Character = new Character(areco,client);
                 ProcessSelection(client);
                 //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
@@ -203,7 +203,7 @@ namespace Symbioz.World.Handlers
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             client.Character.RefreshStats();
             client.Character.Teleport(client.Character.Record.MapId);
-            if (client.Character.Record.infight != -1)
+            if (client.Character.Record.InFight != -1)
             {
                 Character old = null;
                 foreach (WorldClient c in WorldServer.Instance.GetAllClientsOnline())

@@ -95,19 +95,19 @@ namespace Symbioz.World.Records
         [Update]
         public short Energy;
         [Update]
-        public byte deathMaxLevel;
+        public int DeathCount;
         [Update]
-        public ushort deathCount;
-        [Update]
-        public int infight;
+        public int DeathMaxLevel;
+        [Ignore]
+        public int InFight = -1;
 
-        public CharacterRecord(int id, string name, int accountid, string look, byte level, sbyte breed,
+        public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
             int ornamentid, sbyte alignside, sbyte alignvalue, sbyte aligngrade, uint characterpower, ushort statspoints,
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
-            ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount,bool pvpEnlable,
-            short Energy, byte deathMaxLevel, ushort deathCount)
+            ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
+            short energy, int deathMaxLevel, int deathCount)
         {
             this.Id = id;
             this.Name = name;
@@ -144,11 +144,10 @@ namespace Symbioz.World.Records
             this.MaxRank = maxRank;
             this.ArenaVictoryCount = arenaVictoryCount;
             this.ArenaFightCount = arenaFightsCount;
-            this.PvPEnable = pvpEnlable;
-            this.Energy = Energy;
-            this.deathCount = deathCount;
-            this.deathMaxLevel = deathMaxLevel;
-            this.infight = -1;
+            this.PvPEnable = pvpEnable;
+            this.Energy = energy;
+            this.DeathCount = deathCount;
+            this.DeathMaxLevel = deathMaxLevel;
         }
         [BeforeSave]
         public static void BeforeSave()
@@ -175,11 +174,11 @@ namespace Symbioz.World.Records
 
             if (this.Energy == 0)
                 death = 1;
-            return new CharacterHardcoreOrEpicInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex, death, this.deathCount, this.deathMaxLevel);
+            return new CharacterHardcoreOrEpicInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex, death, (ushort)this.DeathCount, (byte)this.DeathMaxLevel);
         }
         public static CharacterRecord Default(string name, int accountid, string look, sbyte breed, bool sex)
         {
-            return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, 1, breed, sex,
+            return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, null, 1, breed, sex,
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,

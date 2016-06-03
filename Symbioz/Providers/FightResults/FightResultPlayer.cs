@@ -44,9 +44,9 @@ namespace Symbioz.Providers.FightResults
             {
                 if (ConfigurationManager.Instance.ServerId == 22)
                 {
-                    client.Character.Record.deathCount++;
-                    if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
-                        client.Character.Record.deathMaxLevel = client.Character.Record.Level;
+                    client.Character.Record.DeathCount++;
+                    if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
+                        client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
                     client.Character.Record.Energy = 0;
                     client.Character.Look = ContextActorLook.Parse("{24}");
                     client.Character.Restrictions.cantChat = true;
@@ -71,15 +71,15 @@ namespace Symbioz.Providers.FightResults
             }
             else if (fighter.Fight is FightAgression && winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)//LOOSER
             {
-                client.Character.Record.deathCount++;
-                if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
-                    client.Character.Record.deathMaxLevel = client.Character.Record.Level;
+                client.Character.Record.DeathCount++;
+                if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
+                    client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
                 client.Character.Record.Energy = 0;
                 client.Character.Look = ContextActorLook.Parse("{24}");
             }
             if (fighter.disconnect)
             {
-                client.Character.Record.infight = -1;//reco en combats n'est plus possible
+                client.Character.Record.InFight = -1;//reco en combats n'est plus possible
                 client.Character.AddElement(client.Character.Record);
                 client.Character.Save();
                 WorldServer.Instance.WorldClients.Remove(client);
