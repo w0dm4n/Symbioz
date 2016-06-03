@@ -8,9 +8,12 @@ using Symbioz.Enums;
 using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
+using Symbioz.Network.Servers;
 using Symbioz.ORM;
 using Symbioz.Utils;
 using Symbioz.World.Models;
+using Symbioz.World.Models.Fights;
+using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Guilds;
@@ -41,6 +44,7 @@ namespace Symbioz.World.Handlers
             client.Send(new TrustStatusMessage(true, true));
             client.Send(new ServerOptionalFeaturesMessage(new sbyte[] { 1, 2, 3, 4, 5, 6 }));
         }
+
         [MessageHandler]
         public static void HandleCharacterList(CharactersListRequestMessage message, WorldClient client)
         {
@@ -48,6 +52,24 @@ namespace Symbioz.World.Handlers
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             else
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
+            Boolean reco = false;
+            CharacterRecord areco = null;
+            foreach (CharacterRecord c in client.Characters)
+            {
+                if (c.infight != -1)
+                {
+                    reco = true;
+                    areco = c;
+                }
+            }
+            if (reco == true)
+            {
+                Logger.Write("RECO IN FIGHT ID=" + areco.infight, ConsoleColor.DarkCyan);
+                client.Character = new Character(areco,client);
+                ProcessSelection(client);
+                //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                return;
+            }
         }
         [MessageHandler]
         public static void HandleCharacterNameSuggestion(CharacterNameSuggestionRequestMessage message, WorldClient client)
@@ -93,11 +115,11 @@ namespace Symbioz.World.Handlers
             client.Character.IsNew = true;
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
+            client.Character.Record.AddElement();
             client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
-            client.Character.Save();
             ProcessSelection(client);
         }
         [MessageHandler]
@@ -123,8 +145,8 @@ namespace Symbioz.World.Handlers
             replayCharacter.Honor = 0;
             replayCharacter.AlignmentValue = 0;
             client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
+            client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
             //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
-            //replayCharacter.Look = look;
             //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
@@ -181,6 +203,54 @@ namespace Symbioz.World.Handlers
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             client.Character.RefreshStats();
             client.Character.Teleport(client.Character.Record.MapId);
+            if (client.Character.Record.infight != -1)
+            {
+                Character old = null;
+                foreach (WorldClient c in WorldServer.Instance.GetAllClientsOnline())
+                {
+                    if (c.Character == null)
+                        continue;
+                    if (c.Character.Id == client.Character.Id && c != client)
+                    {
+                        old = c.Character;
+                        break;
+                    }
+                }
+                if (old != null && old.FighterInstance != null)
+                {
+                    /*client.Character.ReCreateFighter(old.FighterInstance.Team);
+                    client.Character.FighterInstance.CellId = old.FighterInstance.CellId;
+                    client.Character.FighterInstance.Fight = old.FighterInstance.Fight;
+                    client.Character.FighterInstance.IsPlaying = old.FighterInstance.IsPlaying;
+                    client.Character.FighterInstance.Dead = old.FighterInstance.Dead;
+                    client.Character.FighterInstance.Buffs = old.FighterInstance.Buffs;
+                    client.Character.FighterInstance.BuffIdProvider = old.FighterInstance.BuffIdProvider;
+                    client.Character.FighterInstance.Direction = old.FighterInstance.Direction;
+                    client.Character.FighterInstance.FighterInformations = old.FighterInstance.FighterInformations;
+                    client.Character.FighterInstance.FighterStats = old.FighterInstance.FighterStats;
+                    if (client.Character.FighterInstance.Fight.BlueTeam != null
+                        && old.FighterInstance.Team.Id == client.Character.FighterInstance.Fight.BlueTeam.Id)
+                    {
+                        client.Character.FighterInstance.Fight.BlueTeam.AddFighter(client.Character.FighterInstance);
+                        client.Character.FighterInstance.Fight.BlueTeam.RemoveFighter(old.FighterInstance);
+                        client.Character.FighterInstance.Fight.Fighterdeleted(old.FighterInstance);
+                    }
+                    else
+                    {
+                        client.Character.FighterInstance.Fight.RedTeam.AddFighter(client.Character.FighterInstance);
+                        client.Character.FighterInstance.Fight.RedTeam.RemoveFighter(old.FighterInstance);
+                        client.Character.FighterInstance.Fight.Fighterdeleted(old.FighterInstance);
+                    }*/
+                    client.Character = null;
+                    client.Character = old;
+                    old.Client = client;
+                    client.Character.FighterInstance.Client = client;
+                    WorldServer.Instance.RemoveClient(old.Client);
+                    client.Character.Client = client;
+                    client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
+                    client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                }
+            }
             #region Dofus Cinematic
             if (client.Character.IsNew)
             {

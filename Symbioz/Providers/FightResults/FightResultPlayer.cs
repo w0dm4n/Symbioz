@@ -15,6 +15,7 @@ using Symbioz.World.Records;
 using Symbioz.Providers.FightResults.Exp;
 using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models;
+using Symbioz.Network.Servers;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -30,7 +31,7 @@ namespace Symbioz.Providers.FightResults
             : base(fighter, winner)
         {
             this.PlayerLevel = fighter.Client.Character.Record.Level;
-
+            WorldClient client = (Fighter as CharacterFighter).Client;
             if (fighter.Fight is FightPvM && winner == fighter.Team.TeamColor)
             {
                 GeneratePVMLoot();
@@ -43,7 +44,6 @@ namespace Symbioz.Providers.FightResults
             {
                 if (ConfigurationManager.Instance.ServerId == 22)
                 {
-                    WorldClient client = (Fighter as CharacterFighter).Client;
                     client.Character.Record.deathCount++;
                     if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
                         client.Character.Record.deathMaxLevel = client.Character.Record.Level;
@@ -71,12 +71,18 @@ namespace Symbioz.Providers.FightResults
             }
             else if (fighter.Fight is FightAgression && winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)//LOOSER
             {
-                WorldClient client = (Fighter as CharacterFighter).Client;
                 client.Character.Record.deathCount++;
                 if (client.Character.Record.deathMaxLevel < client.Character.Record.Level)
                     client.Character.Record.deathMaxLevel = client.Character.Record.Level;
                 client.Character.Record.Energy = 0;
                 client.Character.Look = ContextActorLook.Parse("{24}");
+            }
+            if (fighter.disconnect)
+            {
+                client.Character.Record.infight = -1;//reco en combats n'est plus possible
+                client.Character.AddElement(client.Character.Record);
+                client.Character.Save();
+                WorldServer.Instance.WorldClients.Remove(client);
             }
         }
         public override FightResultListEntry GetEntry()

@@ -97,7 +97,6 @@ namespace Symbioz.World.Models.Fights
             this.FightCellId = fightcellid;
             this.TimeLine.OnNewRound += TimeLine_OnNewRound;
             this.Synchronizer = new ClientsSynchronizer(this);
-
         }
 
         void TimeLine_OnNewRound(uint round)
@@ -152,6 +151,41 @@ namespace Symbioz.World.Models.Fights
             TimeLine.GetFirstFighter().StartTurn();
 
         }
+        //RECO
+        public void FighterDisconnect(CharacterFighter f)
+        {
+            if (f.IsPlaying)
+            {
+                f.EndTurn();
+            }
+            f.disconnect = true;
+            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
+        }
+
+        public void FighterReconnect(CharacterFighter f)
+        {
+            f.disconnect = false;
+            Send(new GameFightStartMessage(new Idol[0])); // see
+            Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
+            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
+            SyncFighters();
+            GetAllFighters().ForEach(x => x.ShowFighter(f.Client));
+            var fight = GetFightCommonInformations();
+            var team = fight.fightTeams.FirstOrDefault(x => x.teamId == f.Team.Id);
+            team.teamMembers.Add(f.GetFightMemberInformations());
+            Send(new GameRolePlayRemoveChallengeMessage(Id));
+            Send(new GameRolePlayShowChallengeMessage(fight));
+        }
+
+        public void Fighterdeleted(CharacterFighter f)
+        {
+            var fight = GetFightCommonInformations();
+            var team = fight.fightTeams.FirstOrDefault(x => x.teamId == f.Team.Id);
+            team.teamMembers.RemoveAll(x => x.id == f.ContextualId);
+            Send(new GameRolePlayRemoveChallengeMessage(Id));
+            Send(new GameRolePlayShowChallengeMessage(fight));
+        }
+
         public void Reply(string message)
         {
             OnCharacterFighters(x => x.Character.Reply(message));

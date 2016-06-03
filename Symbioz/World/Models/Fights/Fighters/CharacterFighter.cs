@@ -31,6 +31,8 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public bool HasLeft = false;
         public bool ReadyToSee = false;
+        public bool disconnect = false;
+        public short turndisconnect = 0;
         public WorldClient Client { get; set; }
         public CharacterFighter(WorldClient client, FightTeam team)
             : base(team)
@@ -142,6 +144,8 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public void Leave()
         {
+            if (this.disconnect)
+                return;
             if (!Fight.Started)
             {
                 RemoveCompanion();
@@ -212,6 +216,11 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             if (Fight == null)
                 return;
+            this.disconnect = true;
+            Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté!"));
+            this.turndisconnect++;
+            if (this.turndisconnect < 5)
+                return;
             if (!Fight.Started)
                 Leave();
             else
@@ -255,6 +264,10 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public override void StartTurn()
         {
+            if (this.disconnect)
+            {
+                OnDisconnect();
+            }
             base.StartTurn();
             RefreshStats();
             Client.Send(new GameFightTurnStartPlayingMessage());

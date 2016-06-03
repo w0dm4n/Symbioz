@@ -83,9 +83,20 @@ namespace Symbioz.Network.Servers
         }
         public void RemoveClient(WorldClient client)
         {
+            Boolean remove = true;
             if (client != null && client.Character != null)
+            {
+                if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+                {
+                    client.Character.Record.infight = client.Character.FighterInstance.Fight.Id;
+                    client.Character.AddElement(client.Character.Record);
+                    client.Character.FighterInstance.Fight.FighterDisconnect(client.Character.FighterInstance);
+                    remove = false;
+                }
                 client.Character.Save();
-            WorldClients.Remove(client);
+            }
+            if (remove == true)
+                WorldClients.Remove(client);
             Logger.World("Client Disconnected!");
         }
         public List<WorldClient> GetAllClientsOnline()

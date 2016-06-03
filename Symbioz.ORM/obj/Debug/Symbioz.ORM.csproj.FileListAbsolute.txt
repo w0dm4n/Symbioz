@@ -57,3 +57,10 @@ C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\bin\De
 C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Symbioz.ORM.csprojResolveAssemblyReference.cache
 C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.dll
 C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.pdb
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\bin\Debug\Shader.ORM.dll
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\bin\Debug\Shader.ORM.pdb
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\bin\Debug\Shader.Helper.dll
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\bin\Debug\Shader.Helper.pdb
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\obj\Debug\Symbioz.ORM.csprojResolveAssemblyReference.cache
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.dll
+C:\Users\utilisateur\.babun\cygwin\home\utilisateur\Symbioz\Symbioz.ORM\obj\Debug\Shader.ORM.pdb

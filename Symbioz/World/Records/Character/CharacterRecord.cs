@@ -31,6 +31,7 @@ namespace Symbioz.World.Records
         public int AccountId;
         [Update]
         public string Look;
+        public string OldLook;
         [Update]
         public byte Level;
         public sbyte Breed;
@@ -97,6 +98,8 @@ namespace Symbioz.World.Records
         public byte deathMaxLevel;
         [Update]
         public ushort deathCount;
+        [Update]
+        public int infight;
 
         public CharacterRecord(int id, string name, int accountid, string look, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -111,6 +114,7 @@ namespace Symbioz.World.Records
             this.Level = level;
             this.AccountId = accountid;
             this.Look = look;
+            this.OldLook = look;
             this.Breed = breed;
             this.Sex = sex;
             this.MapId = mapid;
@@ -144,6 +148,7 @@ namespace Symbioz.World.Records
             this.Energy = Energy;
             this.deathCount = deathCount;
             this.deathMaxLevel = deathMaxLevel;
+            this.infight = -1;
         }
         [BeforeSave]
         public static void BeforeSave()
