@@ -10,13 +10,13 @@ Target Server Type    : MYSQL
 Target Server Version : 50520
 File Encoding         : 65001
 
-Date: 2016-05-24 18:07:01
+Date: 2016-06-03 02:44:54
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for characters
+-- Table structure for `characters`
 -- ----------------------------
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE `characters` (
@@ -24,6 +24,7 @@ CREATE TABLE `characters` (
   `Name` varchar(255) DEFAULT NULL,
   `AccountId` int(11) DEFAULT NULL,
   `Look` varchar(255) DEFAULT NULL,
+  `OldLook` varchar(255) DEFAULT NULL,
   `Level` varchar(255) DEFAULT NULL,
   `Breed` varchar(255) DEFAULT NULL,
   `Sex` varchar(255) DEFAULT NULL,
@@ -55,12 +56,13 @@ CREATE TABLE `characters` (
   `ArenaVictoryCount` int(11) DEFAULT NULL,
   `ArenaFightCount` int(11) DEFAULT NULL,
   `PvpEnable` varchar(11) DEFAULT NULL,
-  `Energy` int(11) DEFAULT NULL,
-  `deathMaxLevel` int(3) DEFAULT NULL,
-  `deathCount` int(11) DEFAULT NULL,
+  `Energy` int(11) DEFAULT '10000',
+  `DeathCount` int(11) DEFAULT '0',
+  `DeathMaxLevel` int(11) DEFAULT '1',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of characters
 -- ----------------------------
+INSERT INTO `characters` VALUES ('1', 'Taki', '1', '{1|80,2124|1=28414802,1=36017610,1=51258685,1=69223306,1=87478761|140}', '{1|80,2124|1=28414802,1=36017610,1=51258685,1=69223306,1=87478761|140}', '1', '8', 'False', '154010883', '304', '7', '0', '1', '0', '0', '0', '0', '0', '0', '5', '1', '0', '', '', '0', '0', '1', '-1', '0', '154010883', '300', '300', '300', '0', '0', 'False', '10000', '3', '1');

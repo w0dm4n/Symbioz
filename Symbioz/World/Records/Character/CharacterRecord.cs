@@ -95,9 +95,9 @@ namespace Symbioz.World.Records
         [Update]
         public short Energy;
         [Update]
-        public int DeathCount;
+        public ushort DeathCount;
         [Update]
-        public int DeathMaxLevel;
+        public byte DeathMaxLevel;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -105,7 +105,7 @@ namespace Symbioz.World.Records
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
-            short energy, int deathMaxLevel, int deathCount)
+            short energy, ushort deathCount, byte deathMaxLevel)
         {
             this.Id = id;
             this.Name = name;
@@ -172,7 +172,7 @@ namespace Symbioz.World.Records
 
             if (this.Energy == 0)
                 death = 1;
-            return new CharacterHardcoreOrEpicInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex, death, (ushort)this.DeathCount, (byte)this.DeathMaxLevel);
+            return new CharacterHardcoreOrEpicInformations((uint)Id, Level, Name, ContextActorLook.Parse(Look).ToEntityLook(), Breed, Sex, death, this.DeathCount, this.DeathMaxLevel);
         }
         public static CharacterRecord Default(string name, int accountid, string look, sbyte breed, bool sex)
         {

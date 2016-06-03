@@ -6,15 +6,11 @@ using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Helper;
-using Symbioz.Network;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
-using Symbioz.Network.Servers;
 using Symbioz.ORM;
 using Symbioz.Utils;
 using Symbioz.World.Models;
-using Symbioz.World.Models.Fights;
-using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Guilds;
@@ -45,7 +41,6 @@ namespace Symbioz.World.Handlers
             client.Send(new TrustStatusMessage(true, true));
             client.Send(new ServerOptionalFeaturesMessage(new sbyte[] { 1, 2, 3, 4, 5, 6 }));
         }
-
         [MessageHandler]
         public static void HandleCharacterList(CharactersListRequestMessage message, WorldClient client)
         {
@@ -53,28 +48,6 @@ namespace Symbioz.World.Handlers
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             else
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
-            bool reco = false;
-            Character areco = null;
-            foreach (CharacterRecord c in client.Characters)
-            {
-                if (c == null)
-                    continue;
-                if (CharactersDisconnected.is_disconnected(c.Name)
-                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance != null
-                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance.Fight != null)
-                {
-                    reco = true;
-                    areco = CharactersDisconnected.get_Character_disconnected(c.Name);
-                }
-            }
-            if (reco == true)
-            {
-                Logger.Write("RECO IN FIGHT ID=" + areco.FighterInstance.Fight.Id, ConsoleColor.DarkCyan);
-                client.Character = areco;
-                ProcessSelection(client);
-                //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
-                return;
-            }
         }
         [MessageHandler]
         public static void HandleCharacterNameSuggestion(CharacterNameSuggestionRequestMessage message, WorldClient client)
@@ -120,11 +93,11 @@ namespace Symbioz.World.Handlers
             client.Character.IsNew = true;
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
+            client.Character.Record.AddElement();
             client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
-            client.Character.Save();
             ProcessSelection(client);
         }
         [MessageHandler]
@@ -150,8 +123,8 @@ namespace Symbioz.World.Handlers
             replayCharacter.Honor = 0;
             replayCharacter.AlignmentValue = 0;
             client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
-            client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
             //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
+            //replayCharacter.Look = look;
             //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
@@ -186,12 +159,6 @@ namespace Symbioz.World.Handlers
             client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
             StatsRecord.InitializeCharacter(client.Character);
 
-            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
-            {
-                client.Send(new CharacterCapabilitiesMessage(4095));
-                client.Send(new CharacterLoadingCompleteMessage());
-                return;
-            }
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
             client.Character.RefreshEmotes();
@@ -207,21 +174,15 @@ namespace Symbioz.World.Handlers
             client.Send(new CharacterLoadingCompleteMessage());
 
         }
+
         [MessageHandler]
         public static void HandleGameContextCreate(GameContextCreateRequestMessage message, WorldClient client)
         {
             client.Send(new GameContextDestroyMessage());
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
-            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
-            {
-                //client.Character.FighterInstance = null;
-                MapsHandler.SendCurrentMapMessage(client, client.Character.Map.Id);
-                client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
-                 client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
-                return;
-            }
             client.Character.RefreshStats();
             client.Character.Teleport(client.Character.Record.MapId);
+
             #region Dofus Cinematic
             if (client.Character.IsNew)
             {
