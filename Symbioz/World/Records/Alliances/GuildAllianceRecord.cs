@@ -12,12 +12,13 @@ using Symbioz.Network.Clients;
 
 namespace Symbioz.World.Records.Alliances
 {
-    [Table("guildsalliances",true)]
+    [Table("guildsalliances", true)]
     public class GuildAllianceRecord : ITable
     {
 
         public static List<GuildAllianceRecord> GuildsAlliances = new List<GuildAllianceRecord>();
 
+        [Primary]
         public int GuildId;
         public int AllianceId;
 

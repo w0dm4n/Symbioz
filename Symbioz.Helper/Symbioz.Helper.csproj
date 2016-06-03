@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AsyncRandom.cs" />
     <Compile Include="ConstantsRepertory.cs" />
+    <Compile Include="DateTimeUtils.cs" />
     <Compile Include="ErrorLogsManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="UIDProvider.cs" />

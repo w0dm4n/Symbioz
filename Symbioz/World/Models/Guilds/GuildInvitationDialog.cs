@@ -28,6 +28,7 @@ namespace Symbioz.World.Models.Guilds
             Recruted.Send(new GuildInvitedMessage((uint)Recruter.Character.Id, Recruter.Character.Record.Name, Recruter.Character.GetGuild().GetBasicInformations()));
             Recruter.Send(new GuildInvitationStateRecruterMessage(Recruted.Character.Record.Name, (sbyte)GuildInvitationStateEnum.GUILD_INVITATION_SENT));
         }
+
         public void Answer(bool accept)
         {
             if (accept)
@@ -42,6 +43,7 @@ namespace Symbioz.World.Models.Guilds
                 Recruter.Send(new GuildInvitationStateRecrutedMessage((sbyte)GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
             }
         }
+
         public void Dispose()
         {
             this.Recruter.Character.GuildInvitationDialog = null;

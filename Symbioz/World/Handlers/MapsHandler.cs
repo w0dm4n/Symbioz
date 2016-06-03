@@ -15,6 +15,7 @@ using Symbioz.Core;
 using Symbioz.Provider;
 using Symbioz.World.Records.Monsters;
 using Symbioz.World.Records.Maps;
+using Shader.Helper;
 
 namespace Symbioz.World.Handlers
 {
@@ -51,20 +52,33 @@ namespace Symbioz.World.Handlers
             sbyte direction = PathParser.GetDirection(message.keyMovements.Last());
             short cellid = PathParser.ReadCell(message.keyMovements.Last());
             if (client.Character.IsFighting)
+            {
                 client.Character.FighterInstance.Move(message.keyMovements.ToList(), cellid, direction);
+            }
             else
             {
                 if (client.Character.Busy || client.Character.Restrictions.cantMove == true)
                     return;
+
                 if (client.Character.Map.Id == message.mapId)
                 {
+                    if (client.Character.HasGuild)
+                    {
+                        client.Character.Look.UnsetGuildBanner(client.Character.GetGuild().SymbolShape);
+                    }
+
+                    if (client.Character.HasAlliance)
+                    {
+                        client.Character.Look.UnsetAllianceBanner(client.Character.GetAlliance().SymbolShape);
+                    }
+
                     client.Character.Look.UnsetAura();
                     client.Character.RefreshOnMapInstance();
                     client.Character.Record.Direction = direction;
                     client.Character.MovedCell = cellid;
                     client.Character.SendMap(new GameMapMovementMessage(message.keyMovements, client.Character.Id));
                 }
-             }
+            }
         }
 
         [MessageHandler]
@@ -213,8 +227,34 @@ namespace Symbioz.World.Handlers
             else
             {
                 client.Character.Look.UnsetAura();
+
+                if (client.Character.HasGuild)
+                {
+                    client.Character.Look.UnsetGuildBanner(client.Character.GetGuild().SymbolShape);
+                }
+
+                if (client.Character.HasAlliance)
+                {
+                    client.Character.Look.UnsetAllianceBanner(client.Character.GetAlliance().SymbolShape);
+                }
+
+                switch (template.Id)
+                {
+                    case 97:
+                        if (client.Character.HasGuild)
+                            client.Character.Look.SetBanner(client.Character.GetGuild().SymbolShape);
+                        break;
+
+                    case 98:
+                        if (client.Character.HasAlliance)
+                        {
+                            client.Character.Look.SetBanner(client.Character.GetAlliance().SymbolShape, false);
+                        }
+                        break;
+                }
+
                 client.Character.RefreshOnMapInstance();
-                client.Character.SendMap(new EmotePlayMessage(message.emoteId, 12, client.Character.Id, client.Account.Id));
+                client.Character.SendMap(new EmotePlayMessage(message.emoteId, DateTimeUtils.GetEpochFromDateTime(DateTime.Now), client.Character.Id, client.Account.Id));
             }
         }
 

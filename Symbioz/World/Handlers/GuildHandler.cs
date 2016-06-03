@@ -12,6 +12,7 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.Network.Servers;
+using Shader.Helper;
 
 namespace Symbioz.World.Handlers
 {
@@ -35,6 +36,7 @@ namespace Symbioz.World.Handlers
                 client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_ERROR_NAME_ALREADY_EXISTS));
             }
         }
+
         [MessageHandler]
         public static void HandleGuildInvitationMessage(GuildInvitationMessage message, WorldClient client)
         {
@@ -44,16 +46,19 @@ namespace Symbioz.World.Handlers
 
             dialog.Request();
         }
+
         [MessageHandler]
         public static void HandleGuildKickRequestMessage(GuildKickRequestMessage message, WorldClient client)
         {
             GuildProvider.Instance.LeaveGuild(WorldServer.Instance.GetOnlineClient((int)message.kickedId).Character);
         }
+
         [MessageHandler]
         public static void HandleGuildInvitationAnswerMessage(GuildInvitationAnswerMessage message, WorldClient client)
         {
             client.Character.GuildInvitationDialog.Answer(message.accept);
         }
+
         [MessageHandler]
         public static void HandleGuildChangeMemberParameters(GuildChangeMemberParametersMessage message, WorldClient client)
         {
@@ -66,6 +71,7 @@ namespace Symbioz.World.Handlers
                 c.Send(new GuildMembershipMessage(c.Character.GetGuild().GetGuildInformations(),message.rights,true));
             }
         }
+
         [MessageHandler]
         public static void HandleGuildGetInformations(GuildGetInformationsMessage message, WorldClient client)
         {
@@ -92,6 +98,16 @@ namespace Symbioz.World.Handlers
             }
         }
 
+        [MessageHandler]
+        public static void HandleGuildFactsRequestMessage(GuildFactsRequestMessage message, WorldClient client)
+        {
+            var targetGuild = GuildRecord.GetGuild((int)message.guildId);
+            if(targetGuild != null)
+            {
+                client.Send(GuildProvider.GetGuildFactsMessage(targetGuild));
+            }
+        }
+
         #region GuildInformations
 
         public static void SendGuildInformationsMembers(WorldClient client)
@@ -110,7 +126,7 @@ namespace Symbioz.World.Handlers
             ulong expNextFloor = ExperienceRecord.GetExperienceForGuild((ushort)(guild.Level + 1));
 
             client.Send(new GuildInformationsGeneralMessage(true, false,
-                (byte)guild.Level, expFloor, guild.Experience, expNextFloor, 0,
+                (byte)guild.Level, expFloor, guild.Experience, expNextFloor, DateTimeUtils.GetEpochFromDateTime(guild.CreationDate),
                 (ushort)CharacterGuildRecord.MembersCount(guild.Id),
                 (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id)));
         }

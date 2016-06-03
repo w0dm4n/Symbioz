@@ -1,7 +1,0 @@
-Client: 127.0.0.1:52456
-At: 01/06/2016 09:52:18
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Fights.Fighters.CharacterFighter.GetSpellLevel(UInt16 spellid) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\CharacterFighter.cs:ligne 241
-   à Symbioz.World.Models.Fights.Fighters.Fighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\Fighter.cs:ligne 353
-   à Symbioz.World.Models.Fights.Fighters.CharacterFighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\CharacterFighter.cs:ligne 114
-   à Symbioz.World.Handlers.FightHandler.HandleSpellCast(GameActionFightCastRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 40

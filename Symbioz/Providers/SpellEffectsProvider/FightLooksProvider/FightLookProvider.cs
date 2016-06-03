@@ -14,7 +14,6 @@ namespace Symbioz.Providers.SpellEffectsProvider
     class FightLookProvider
     {
         public delegate ContextActorLook CustomLookHandlerDel(Fighter fighter);
-        // key = spellId
         public static Dictionary<ushort, CustomLookHandlerDel> Handlers = new Dictionary<ushort, CustomLookHandlerDel>();
 
         [StartupInvoke(StartupInvokeType.Others)]

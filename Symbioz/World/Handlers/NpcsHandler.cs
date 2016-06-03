@@ -11,17 +11,18 @@ using Symbioz.World.Records;
 
 namespace Symbioz.World.Handlers
 {
-    class NpcsHandler
+    public class NpcsHandler
     {
         [MessageHandler]
-        public static void HandleNpcGenericAction(NpcGenericActionRequestMessage message,WorldClient client)
+        public static void HandleNpcGenericAction(NpcGenericActionRequestMessage message, WorldClient client)
         {
             NpcSpawnRecord record = NpcSpawnRecord.GetNpcByContextualId(message.npcId);
             if (record != null)
-            NpcsActionsProvider.Handle(client, record,message.npcActionId);
+                NpcsActionsProvider.Handle(client, record, message.npcActionId);
         }
+
         [MessageHandler]
-        public static void HandleNpcDialogReply(NpcDialogReplyMessage message,WorldClient client)
+        public static void HandleNpcDialogReply(NpcDialogReplyMessage message, WorldClient client)
         {
             client.Character.LeaveDialog();
             NpcsRepliesProvider.Handle(client, NpcReplyRecord.GetNpcRepliesData(message.replyId));            

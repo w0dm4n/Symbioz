@@ -8,35 +8,52 @@ using System.Text;
 using System.Threading.Tasks;
 using Symbioz.World.Records;
 using Symbioz.Enums;
+using Symbioz.World.Records.Emblems;
 
 namespace Symbioz.World.Models
 {
     public class ContextActorLook : EntityLook
     {
         public const short AURA_SCALE = 100;
-        public bool IsRiding { get { return subentities.Find(x=>x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER) != null;} }
-        public ContextActorLook() { }
-        public ContextActorLook(ushort bonesid,List<ushort> skins,List<int> colors,List<short> scales,List<SubEntity> subentities):base(bonesid,skins,colors,scales,subentities)
+        public const int EMPTY_COLOR = 0;
+
+        public bool IsRiding
         {
-           
+            get
+            {
+                return subentities.Find(x => x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER) != null;
+            }
         }
+
+        public bool DisplayingGuildBanner = false;
+        public bool DisplayingAllianceBanner = false;
+
+        public ContextActorLook() { }
+
+        public ContextActorLook(ushort bonesid, List<ushort> skins, List<int> colors, List<short> scales, List<SubEntity> subentities) : base(bonesid, skins, colors, scales, subentities)
+        { }
+
         public SubEntity RiderSubEntity()
         {
             return subentities.Find(x => x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
         }
+
         public ContextActorLook CloneContextActorLook()
         {
-            return new ContextActorLook(bonesId, new List<ushort>(skins), new List<int>(indexedColors),new List<short>(scales), new List<SubEntity>(subentities.ConvertAll<SubEntity>(x=>CloneSubEntity(x))));
+            return new ContextActorLook(bonesId, new List<ushort>(skins), new List<int>(indexedColors), new List<short>(scales), new List<SubEntity>(subentities.ConvertAll<SubEntity>(x => CloneSubEntity(x))));
         }
+
         public SubEntity CloneSubEntity(SubEntity subentity)
         {
             return new SubEntity(subentity.bindingPointCategory, subentity.bindingPointIndex, new EntityLook(subentity.subEntityLook.bonesId, new List<ushort>(subentity.subEntityLook.skins),
                 new List<int>(subentity.subEntityLook.indexedColors), new List<short>(subentity.subEntityLook.scales), subentity.subEntityLook.subentities)); // subentity.sublook.subentites not cloned
         }
+
         public EntityLook ToEntityLook()
         {
             return new EntityLook(bonesId, skins, indexedColors, scales, subentities);
         }
+
         public void SetScale(short scale)
         {
             if (IsRiding)
@@ -44,6 +61,7 @@ namespace Symbioz.World.Models
             else
                 scales[0] = scale;
         }
+
         public void SetBonesId(ushort id)
         {
             if (IsRiding)
@@ -51,6 +69,7 @@ namespace Symbioz.World.Models
             else
                 bonesId = id;
         }
+
         public void RemoveSkin(ushort id)
         {
             if (IsRiding)
@@ -58,31 +77,68 @@ namespace Symbioz.World.Models
             else
                 skins.Remove(id);
         }
+
         public void AddSkin(ushort id)
         {
             if (IsRiding)
             {
                 var look = RiderSubEntity().subEntityLook;
                 if (!look.skins.Contains(id))
-                look.skins.Add(id);
+                    look.skins.Add(id);
             }
             else
                 skins.Add(id);
         }
+
+        public void SetBanner(int iconId, bool isGuildBanner = true)
+        {
+            if(isGuildBanner)
+            {
+                this.AddSkin((ushort)EmblemSymbol.GetSkinId(iconId));
+                this.DisplayingGuildBanner = true;
+            }
+            else
+            {
+                this.AddSkin((ushort)(2569 + iconId));
+                this.DisplayingAllianceBanner = true;
+            }
+        }
+
+        public void UnsetGuildBanner(int iconId)
+        {
+            if(this.DisplayingGuildBanner)
+            {
+                this.RemoveSkin((ushort)EmblemSymbol.GetSkinId(iconId));
+                this.DisplayingGuildBanner = false;
+            }
+        }
+
+        public void UnsetAllianceBanner(int iconId)
+        {
+            if (this.DisplayingAllianceBanner)
+            {
+                this.RemoveSkin((ushort)(2569 + iconId));
+                this.DisplayingAllianceBanner = false;
+            }
+        }
+
         public void UnsetAura()
         {
             subentities.RemoveAll(x => x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_BASE_FOREGROUND);
         }
+
         public void SetAura(ushort bonesid)
         {
-            subentities.Add(new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_BASE_FOREGROUND, 0, SimpleBonesLook(bonesid,AURA_SCALE)));
+            subentities.Add(new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_BASE_FOREGROUND, 0, SimpleBonesLook(bonesid, AURA_SCALE)));
         }
+
         public ContextActorLook CharacterToRider(ushort bonesid, List<ushort> rskins, List<int> rcolors, short rscale)
         {
             this.bonesId = 2;
             ContextActorLook newLook = new ContextActorLook(bonesid, rskins, rcolors, new List<short>() { rscale }, new List<SubEntity>() { new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, ToEntityLook()) });
             return newLook;
         }
+
         public ContextActorLook RiderToCharacter()
         {
             var playerLook = this.subentities.Find(x => x.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
@@ -93,10 +149,12 @@ namespace Symbioz.World.Models
             }
             else return this;
         }
+
         public ContextActorLook CharacterToRider(ushort bonesid, short rscale)
         {
             return CharacterToRider(bonesid, new List<ushort>(), new List<int>(), rscale);
         }
+
         public static ContextActorLook Parse(string str)
         {
             if (string.IsNullOrEmpty(str) || str[0] != '{')
@@ -168,8 +226,9 @@ namespace Symbioz.World.Models
             {
                 colors.Add(color.Item2);
             }
-            return new ContextActorLook((ushort)bones, skins.Select(entry => (ushort)entry).ToList(), colors.ToList(), scales.ToList(), list);
+            return new ContextActorLook((ushort)bones, skins.Select(entry => (ushort)entry).ToList(), colors, scales.ToList(), list);
         }
+
         private static Tuple<int, int> ParseIndexedColor(string str)
         {
             int num = str.IndexOf("=");
@@ -178,10 +237,12 @@ namespace Symbioz.World.Models
             int item2 = int.Parse(str.Substring(num + (flag ? 2 : 1), str.Length - (num + (flag ? 2 : 1))), flag ? System.Globalization.NumberStyles.HexNumber : System.Globalization.NumberStyles.Integer);
             return Tuple.Create<int, int>(item, item2);
         }
+
         public static string ConvertToString(EntityLook look)
         {
             return new ContextActorLook(look.bonesId, look.skins, look.indexedColors, look.scales, look.subentities).ConvertToString();
         }
+
         public string ConvertToString()
         {
             System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
@@ -245,19 +306,22 @@ namespace Symbioz.World.Models
             stringBuilder.Append("}");
             return stringBuilder.ToString();
         }
-     
+
         public static ContextActorLook FromEntityLook(EntityLook look)
         {
             return new ContextActorLook(look.bonesId, look.skins, look.indexedColors, look.scales, look.subentities);
         }
-        public static ContextActorLook SimpleBonesLook(ushort bonesid,short scale = 100)
+
+        public static ContextActorLook SimpleBonesLook(ushort bonesid, short scale = 100)
         {
-            return new ContextActorLook(bonesid,new List<ushort>(),new List<int>(),new List<short>(){scale},new List<SubEntity>());
+            return new ContextActorLook(bonesid, new List<ushort>(), new List<int>(), new List<short>() { scale }, new List<SubEntity>());
         }
+
         public static ContextActorLook SimpleSkinLook(ushort skinid, short scale = 100)
         {
-            return new ContextActorLook(1, new List<ushort>(){skinid}, new List<int>(), new List<short>() { scale }, new List<SubEntity>());
+            return new ContextActorLook(1, new List<ushort>() { skinid }, new List<int>(), new List<short>() { scale }, new List<SubEntity>());
         }
+
 
         public static List<int> GetDofusColors(List<int> colors)
         {
@@ -269,6 +333,6 @@ namespace Symbioz.World.Models
             }
             return col.ToList();
         }
-       
+
     }
 }

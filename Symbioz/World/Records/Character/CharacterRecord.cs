@@ -99,7 +99,7 @@ namespace Symbioz.World.Records
         [Update]
         public byte DeathMaxLevel;
         [Update]
-        public String Succes;
+        public string Succes;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -107,7 +107,7 @@ namespace Symbioz.World.Records
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
-            short energy, ushort deathCount, byte deathMaxLevel, String succes)
+            short energy, ushort deathCount, byte deathMaxLevel, string succes)
         {
             this.Id = id;
             this.Name = name;

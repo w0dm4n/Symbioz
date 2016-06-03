@@ -13,6 +13,7 @@ using Symbioz.Network.Servers;
 using Symbioz.World.Records;
 using Symbioz.Helper;
 using Symbioz.Enums;
+using Shader.Helper;
 
 namespace Symbioz.World.Models.Alliances
 {
@@ -60,22 +61,22 @@ namespace Symbioz.World.Models.Alliances
 
         public static AllianceRecord CreateAlliance(GuildRecord creator, string tag, string name, GuildEmblem emblem)
         {
-            AllianceRecord Alliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundShape, emblem.backgroundColor, creator.Id);
-            Alliance.AddElement();
-            JoinAlliance(creator, Alliance, null);
-            return Alliance;
+            AllianceRecord newAlliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundShape, emblem.backgroundColor, creator.Id, DateTime.Now);
+            newAlliance.AddElement();
+            JoinAlliance(creator, newAlliance, null);
+            return newAlliance;
         }
 
         public static void DeleteAlliance(int id)
         {
-            AllianceRecord Alliance = AllianceProvider.GetAlliance(id);
-            List<GuildAllianceRecord> AllianceMembers = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == id);
-            foreach(GuildAllianceRecord member in AllianceMembers)
+            AllianceRecord currentAlliance = AllianceProvider.GetAlliance(id);
+            List<GuildAllianceRecord> allianceMembers = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == id);
+            foreach(GuildAllianceRecord member in allianceMembers)
             {
                 LeaveAlliance(member.GuildId);
                 member.RemoveElement();
             }
-            Alliance.RemoveElement();
+            currentAlliance.RemoveElement();
         }
 
         public static void JoinAlliance(GuildRecord Guild, AllianceRecord Alliance, WorldClient Inviter = null)
@@ -102,10 +103,10 @@ namespace Symbioz.World.Models.Alliances
             AllianceMember.RemoveElement();
         }
 
-        public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int AllianceId)
+        public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int allianceId)
         {
             List<GuildInsiderFactSheetInformations> guilds = new List<GuildInsiderFactSheetInformations>();
-            List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == AllianceId);
+            List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
             foreach(GuildAllianceRecord record in records)
             {
                 GuildRecord guild = GuildRecord.GetGuild(record.GuildId);
@@ -113,6 +114,20 @@ namespace Symbioz.World.Models.Alliances
                 guilds.Add(a);
             }
             return (IEnumerable<GuildInsiderFactSheetInformations>)guilds;
+        }
+
+        public static IEnumerable<GuildInAllianceInformations> GetGuildsInAllianceInformations(int allianceId)
+        {
+            List<GuildInAllianceInformations> guildsInAllianceInformations = new List<GuildInAllianceInformations>();
+            List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
+            foreach (GuildAllianceRecord record in records)
+            {
+                GuildRecord guild = GuildRecord.GetGuild(record.GuildId);
+                GuildInAllianceInformations guildInAllianceInformations = new GuildInAllianceInformations((uint)guild.Id, guild.Name,
+                    guild.GetEmblemObject(), (byte)guild.Level, (byte)GuildProvider.GetMembers(guild.Id).Length, true);
+                guildsInAllianceInformations.Add(guildInAllianceInformations);
+            }
+            return (IEnumerable<GuildInAllianceInformations>)guildsInAllianceInformations;
         }
 
         public static AllianceRecord GetAllianceFromGuild(int guildId)
@@ -131,7 +146,14 @@ namespace Symbioz.World.Models.Alliances
 
         public static AllianceInsiderInfoMessage GetAllianceInsiderInfoMessage(AllianceRecord alliance)
         {
-            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTime.Now.Second), AllianceProvider.GetGuildsInsiderFactSheetInformations(alliance.Id), (IEnumerable<PrismSubareaEmptyInfo>)new List<PrismSubareaEmptyInfo>());
+            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInsiderFactSheetInformations(alliance.Id), (IEnumerable<PrismSubareaEmptyInfo>)new List<PrismSubareaEmptyInfo>());
+        }
+
+        public static AllianceFactsMessage GetAllianceFactsMessage(AllianceRecord alliance)
+        {
+            var leaderCharacterId = GuildProvider.GetLeader(alliance.LeaderGuildId).CharacterId;
+            var leaderCharacterName = CharacterRecord.GetCharacterRecordById(leaderCharacterId).Name;
+            return new AllianceFactsMessage(new AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInAllianceInformations(alliance.Id), (IEnumerable<ushort>)new List<ushort>(), (uint)leaderCharacterId, leaderCharacterName);
         }
     }
 }

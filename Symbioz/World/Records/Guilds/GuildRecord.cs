@@ -36,8 +36,10 @@ namespace Symbioz.World.Records.Guilds
 
         public int MaxTaxCollectors;
 
+        public DateTime CreationDate;
+
         public GuildRecord(int id, string name, ushort symbolShape, int symbolColor,
-            sbyte backgroundShape, int backgroundColor, ushort level, ulong experience, int maxTaxCollectors)
+            sbyte backgroundShape, int backgroundColor, ushort level, ulong experience, int maxTaxCollectors, DateTime creationDate)
         {
             this.Id = id;
             this.Name = name;
@@ -48,23 +50,29 @@ namespace Symbioz.World.Records.Guilds
             this.Level = level;
             this.Experience = experience;
             this.MaxTaxCollectors = maxTaxCollectors;
+            this.CreationDate = creationDate;
         }
+
         public GuildEmblem GetEmblemObject()
         {
             return new GuildEmblem(SymbolShape, SymbolColor, BackgroundShape, BackgroundColor);
         }
+
         public GuildInformations GetGuildInformations()
         {
-            return new GuildInformations((uint)Id, Name, new GuildEmblem(SymbolShape, SymbolColor, BackgroundShape, BackgroundColor));
+            return new GuildInformations((uint)Id, Name, this.GetEmblemObject());
         }
+
         public BasicGuildInformations GetBasicInformations()
         {
             return new BasicGuildInformations((uint)Id, Name);
         }
+
         public static GuildRecord GetGuild(int id)
         {
             return Guilds.Find(x => x.Id == id);
         }
+
         public static bool CanCreateGuild(string guildName)
         {
             return Guilds.Find(x => x.Name == guildName) == null;
@@ -96,6 +104,5 @@ namespace Symbioz.World.Records.Guilds
             }
             return null;
         }
-
     }
 }

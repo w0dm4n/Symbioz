@@ -342,6 +342,7 @@ namespace Symbioz.World.Models
             {
                 Client.Send(new GuildMembershipMessage(this.GetGuild().GetGuildInformations(), CharacterGuildRecord.GetCharacterGuild(this.Id).Rights, true));
                 this.HumanOptions.Add(new HumanOptionGuild(this.GetGuild().GetGuildInformations()));
+                this.SetGuildLook();
                 Client.Character.RefreshOnMapInstance();
             }
         }
@@ -351,8 +352,38 @@ namespace Symbioz.World.Models
             {
                 Client.Send(new AllianceMembershipMessage(GetAlliance().GetAllianceInformations(), true));
                 this.HumanOptions.Add(new HumanOptionAlliance(GetAlliance().GetAllianceInformations(),(sbyte)0));
+                this.SetAllianceAndGuildLook();
                 Client.Character.RefreshOnMapInstance();
             }
+        }
+        public void SetGuildLook()
+        {
+            List<int> lookIndexedColors = new List<int>();
+            lookIndexedColors.AddRange(this.GetCharacterBaseIndexedColors());
+            lookIndexedColors.Add(ContextActorLook.EMPTY_COLOR);
+            lookIndexedColors.Add(this.GetGuild().BackgroundColor);
+            lookIndexedColors.Add(this.GetGuild().SymbolColor);
+            lookIndexedColors = ContextActorLook.GetDofusColors(lookIndexedColors);
+
+            this.Look = new ContextActorLook(this.Look.bonesId, this.Look.skins, lookIndexedColors, this.Look.scales, this.Look.subentities);
+        }
+        public void SetAllianceAndGuildLook()
+        {
+            List<int> lookIndexedColors = new List<int>();
+            lookIndexedColors.AddRange(this.GetCharacterBaseIndexedColors());
+            lookIndexedColors.Add(ContextActorLook.EMPTY_COLOR);
+            lookIndexedColors.Add(this.GetGuild().BackgroundColor);
+            lookIndexedColors.Add(this.GetGuild().SymbolColor);
+            lookIndexedColors.Add(this.GetAlliance().BackgroundColor);
+            lookIndexedColors.Add(this.GetAlliance().SymbolColor);
+
+            lookIndexedColors = ContextActorLook.GetDofusColors(lookIndexedColors);
+
+            this.Look = new ContextActorLook(this.Look.bonesId, this.Look.skins, lookIndexedColors, this.Look.scales, this.Look.subentities);
+        }
+        public List<int> GetCharacterBaseIndexedColors()
+        {
+            return this.Look.indexedColors.GetRange(0, 5);
         }
         public CharacterFighter CreateFighter(FightTeam team)
         {
@@ -1049,10 +1080,16 @@ namespace Symbioz.World.Models
             }
         }
 
+        public CharacterMinimalInformations GetCharacterMinimalInformations()
+        {
+            return new CharacterMinimalInformations((uint)this.Id, (byte)this.Record.Level, this.Record.Name);
+        }
+
         public void SendMessage(string message)
         {
             Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new string[] { message }));
         }
+
         public List<string> GetSuccess()
         {
             if (Record.Succes == null)
@@ -1063,6 +1100,7 @@ namespace Symbioz.World.Models
 
                 return Record.Succes.Split(',').ToList();
         }
+
         public bool HasSucces(int Id)
         {
             if (GetSuccess().Contains(Id.ToString()))
@@ -1070,6 +1108,7 @@ namespace Symbioz.World.Models
             else
                 return false;
         }
+
         public void AddAchievements(string id)
         {
             if (Record.Succes == null)

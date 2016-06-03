@@ -33,8 +33,9 @@ namespace Symbioz.World.Records.Alliances
         public sbyte BackgroundShape;
         public int BackgroundColor;
         public int LeaderGuildId;
+        public DateTime CreationDate;
 
-        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, sbyte backgroundShape, int backgroundColor, int leader)
+        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, sbyte backgroundShape, int backgroundColor, int leader, DateTime creationDate)
         {
             this.Id = id;
             this.Name = name;
@@ -44,17 +45,20 @@ namespace Symbioz.World.Records.Alliances
             this.BackgroundShape = backgroundShape;
             this.BackgroundColor = backgroundColor;
             this.LeaderGuildId = leader;
+            this.CreationDate = creationDate;
         }
 
         public AllianceInformations GetAllianceInformations()
         {
             return new AllianceInformations((uint)Id, Tag, Name, new GuildEmblem(SymbolShape, SymbolColor, BackgroundShape, BackgroundColor));
         }
+
         public BasicAllianceInformations GetBasicInformations()
         {
             return new BasicAllianceInformations((uint)Id, Tag);
         }
-        public bool KickFromAlliance(int guildId,WorldClient by)
+
+        public bool KickFromAlliance(int guildId, WorldClient by)
         {
             if(GuildRecord.GetGuild(guildId) != null)
             {
@@ -103,6 +107,7 @@ namespace Symbioz.World.Records.Alliances
                 client.Send(new AllianceJoinedMessage(alliance.GetAllianceInformations(), true));
                 client.Character.LearnEmote(AllianceProvider.EMOTE_ID);
                 client.Character.HumanOptions.Add(new HumanOptionAlliance(alliance.GetAllianceInformations(),(sbyte)0));
+                client.Character.SetAllianceAndGuildLook();
                 client.Character.RefreshOnMapInstance();
             }
             else
@@ -115,6 +120,7 @@ namespace Symbioz.World.Records.Alliances
         {
             return Alliances.Find(x => x.Name == allianceName) != null;
         }
+
         public static bool TagTaked(string allianceTag)
         {
             return Alliances.Find(x => x.Tag == allianceTag) != null;
@@ -141,7 +147,6 @@ namespace Symbioz.World.Records.Alliances
                 }
                 member.RemoveElement();
             }
-            //alliance.RemoveElement();
         }
 
         public static int PopNextId()

@@ -55,7 +55,7 @@ namespace Symbioz.World.Handlers
                 return false;
             var itemname = ItemRecord.GetItem(itemgid).Name;
             client.Account.Informations.BankKamas += (uint)price;
-            client.Character.Reply("Banque : + " + price + " Kamas (vente de " +quantity+ "  <b>[" + itemname + "]</b>).");
+            client.Character.Reply("Banque : + " + price + " Kama(s) (vente de " +quantity+ "  <b>[" + itemname + "]</b>).");
             return true;
         }
         public static void AddEventualBidShopGains(WorldClient client)
@@ -65,8 +65,9 @@ namespace Symbioz.World.Handlers
             {
                 var itemname = ItemRecord.GetItem(gain.ItemGID).Name;
                 client.Account.Informations.BankKamas += gain.ItemPrice;
-                client.Character.Reply("Banque : + " + gain.ItemPrice + " Kamas (vente de " + gain.ItemQuantity + "  <b>[" + itemname + "]</b> hors jeu).");
+                client.Character.Reply("Banque : + " + gain.ItemPrice + " Kama(s) (vente de " + gain.ItemQuantity + "  <b>[" + itemname + "]</b> hors jeu).");
                 gain.RemoveElement();
+                client.Character.RemoveElement(gain);
                 client.Account.Informations.UpdateElement();
                 client.Character.UpdateElement(client.Account.Informations);
             }

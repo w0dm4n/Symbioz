@@ -12,6 +12,7 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.Network.Clients;
 using Symbioz.World.Records.Alliances;
 using Symbioz.World.Models.Alliances;
+using Shader.Helper;
 
 namespace Symbioz.World.Models.Guilds
 {
@@ -28,27 +29,31 @@ namespace Symbioz.World.Models.Guilds
         public GuildRecord CreateGuild(Character owner, GuildCreationValidMessage message)
         {
             GuildRecord guild = new GuildRecord(GuildRecord.PopNextId(), message.guildName, message.guildEmblem.symbolShape,
-                   message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1);
+                   message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1, DateTime.Now);
             guild.AddElement();
             JoinGuild(guild, owner, GuildRightsBitEnum.GUILD_RIGHT_BOSS, (ushort)GuildRightsBitEnum.GUILD_RIGHT_BOSS);
             return guild;
         }
+
         public void JoinGuild(GuildRecord guild, Character character, GuildRightsBitEnum rights, ushort rank)
         {
             CharacterGuildRecord characterGuild = new CharacterGuildRecord(character.Id, guild.Id, rank, 0, 0, (uint)rights);
             characterGuild.AddElement();
             character.HumanOptions.Add(new HumanOptionGuild(guild.GetGuildInformations()));
             character.Client.Send(new GuildJoinedMessage(guild.GetGuildInformations(), (uint)rights, true));
+            character.SetGuildLook();
             character.RefreshOnMapInstance();
             character.LearnEmote(GuildProvider.EMOTE_ID);
+
             if (character.HasAlliance)
             {
-                character.HumanOptions.Add(new HumanOptionAlliance(character.GetAlliance().GetAllianceInformations(),(sbyte)0));
+                character.HumanOptions.Add(new HumanOptionAlliance(character.GetAlliance().GetAllianceInformations(), (sbyte)0));
                 character.Client.Send(new AllianceJoinedMessage(character.GetAlliance().GetAllianceInformations(), true));
                 character.RefreshOnMapInstance();
                 character.LearnEmote(AllianceProvider.EMOTE_ID);
             }
         }
+
         public void LeaveGuild(Character character)
         {
             CharacterGuildRecord.GetCharacterGuild(character.Id).RemoveElement();
@@ -58,10 +63,12 @@ namespace Symbioz.World.Models.Guilds
             character.RefreshOnMapInstance();
             character.ForgetEmote(GuildProvider.EMOTE_ID);
         }
+
         public bool HasGuild(int characterId)
         {
             return CharacterGuildRecord.HasGuild(characterId);
         }
+
         public static WorldClient[] GetMembers(int guildId)
         {
             List<WorldClient> clients = new List<WorldClient>();
@@ -72,6 +79,7 @@ namespace Symbioz.World.Models.Guilds
             clients.RemoveAll(x => x == null);
             return clients.ToArray();
         }
+
         public int ConnectedMembersCount(int guildId)
         {
             int count = 0;
@@ -93,6 +101,31 @@ namespace Symbioz.World.Models.Guilds
                 }
             }
             return null;
+        }
+
+        public static GuildFactSheetInformations GetGuildFactSheetInformations(GuildRecord guildRecord)
+        {
+            return new GuildFactSheetInformations((uint)guildRecord.Id, guildRecord.Name, guildRecord.GetEmblemObject(), (uint)GuildProvider.GetLeader(guildRecord.Id).CharacterId, (byte)guildRecord.Level, (ushort)GuildProvider.GetMembers(guildRecord.Id).Length);
+        }
+
+        public static IEnumerable<CharacterMinimalInformations> GetMembersInformations(int guildId)
+        {
+            List<CharacterMinimalInformations> characterMinimalInformations = new List<CharacterMinimalInformations>();
+            var guildMembers = GuildProvider.GetMembers(guildId);
+            if(guildMembers != null && guildMembers.Count() > 0)
+            {
+                foreach (var guildMember in guildMembers)
+                {
+                    characterMinimalInformations.Add(guildMember.Character.GetCharacterMinimalInformations());
+                }
+            }
+            return (IEnumerable<CharacterMinimalInformations>)characterMinimalInformations;
+        }
+
+        public static GuildFactsMessage GetGuildFactsMessage(GuildRecord guildRecord)
+        {
+            //TODO: TaxCollectors
+            return new GuildFactsMessage(GetGuildFactSheetInformations(guildRecord), DateTimeUtils.GetEpochFromDateTime(guildRecord.CreationDate), 0, true, GetMembersInformations(guildRecord.Id));
         }
     }
 }

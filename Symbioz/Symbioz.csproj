@@ -312,6 +312,7 @@
     <Compile Include="World\Records\Companions\CompanionsCharacteristics.cs" />
     <Compile Include="World\Records\Companions\CompanionSpellRecord.cs" />
     <Compile Include="World\Records\DungeonsIdRecord.cs" />
+    <Compile Include="World\Records\Emblems\EmblemSymbol.cs" />
     <Compile Include="World\Records\Guilds\CharacterGuildRecord.cs" />
     <Compile Include="World\Records\Guilds\GuildRecord.cs" />
     <Compile Include="World\Records\Items\BankItemRecord.cs" />
