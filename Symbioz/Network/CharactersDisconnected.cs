@@ -15,7 +15,7 @@ namespace Symbioz.Network
         {
             if (Disconnect_list.ContainsKey(c.Record.Name))
                 return;
-            Disconnect_list.Add(c.Record.Name, c);
+            Disconnect_list.Add(c.Record.Name, c); 
         }
 
         public static bool is_disconnected(String key)

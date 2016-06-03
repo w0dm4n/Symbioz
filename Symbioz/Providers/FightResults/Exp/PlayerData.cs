@@ -10,7 +10,7 @@ namespace Symbioz.Providers.FightResults.Exp
     public class PlayerData
     {
 
-        public PlayerData(int level, int wisdom)
+        public PlayerData(int level, int wisdom, byte DeathMaxLevel)
         {
             this.level = level;
             this.wisdom = wisdom;
@@ -18,6 +18,7 @@ namespace Symbioz.Providers.FightResults.Exp
             this.xpRatioMount = 0;
             this.xpGuildGivenPercent = 0;
             this.xpAlliancePrismBonusPercent = 0;
+            this.DeathMaxLevel = DeathMaxLevel;
         }
 
         public int level;
@@ -31,5 +32,7 @@ namespace Symbioz.Providers.FightResults.Exp
         public int xpGuildGivenPercent;
 
         public int xpAlliancePrismBonusPercent;
+
+        public byte DeathMaxLevel;
     }
 }

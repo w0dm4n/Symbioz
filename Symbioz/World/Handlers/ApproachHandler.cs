@@ -6,6 +6,7 @@ using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Helper;
+using Symbioz.Network;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.ORM;
@@ -48,6 +49,30 @@ namespace Symbioz.World.Handlers
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
             else
                 client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterBaseInformations>(x => x.GetBaseInformation()), false)); // StartupActions ?
+            bool reco = false;
+            Character areco = null;
+            foreach (CharacterRecord c in client.Characters)
+            {
+                if (c == null)
+                    continue;
+                if (CharactersDisconnected.is_disconnected(c.Name)
+                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance != null
+                    && CharactersDisconnected.get_Character_disconnected(c.Name).FighterInstance.Fight != null)
+                {
+                    reco = true;
+                    areco = CharactersDisconnected.get_Character_disconnected(c.Name);
+                }
+            }
+            if (reco == true)
+            {
+                Logger.Write("RECO IN FIGHT ID=" + areco.FighterInstance.Fight.Id, ConsoleColor.DarkCyan);
+                client.Character = areco;
+                client.Character.FighterInstance.Client = client;
+                client.Character.Client = client;
+                ProcessSelection(client);
+                //client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                return;
+            }
         }
         [MessageHandler]
         public static void HandleCharacterNameSuggestion(CharacterNameSuggestionRequestMessage message, WorldClient client)
@@ -123,9 +148,7 @@ namespace Symbioz.World.Handlers
             replayCharacter.Honor = 0;
             replayCharacter.AlignmentValue = 0;
             client.Character = new Character(CharacterRecord.GetCharacterRecordById(message.characterId), client);
-            //string look = BreedRecord.GetBreedEntityLook((int)replayCharacter.Breed, replayCharacter.Sex, (int)0, null).ConvertToString();
-            //replayCharacter.Look = look;
-            //client.Send(new CharactersListMessage(client.Characters.ConvertAll<CharacterHardcoreOrEpicInformations>(x => x.GetHardcoreOrEpicInformations()), false));
+            client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
             Logger.Log("Character " + replayCharacter.Name + " replay!");
             ProcessSelection(client);
         }
@@ -157,8 +180,21 @@ namespace Symbioz.World.Handlers
         static void ProcessSelection(WorldClient client)
         {
             client.Send(new CharacterSelectedSuccessMessage(new CharacterBaseInformations((uint)client.Character.Id, (byte)client.Character.Record.Level, client.Character.Record.Name, client.Character.Look.ToEntityLook(), (sbyte)client.Character.Record.Breed, client.Character.Record.Sex), false));
+            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+            {
+                client.Character.Inventory.Refresh();
+                client.Character.RefreshShortcuts();
+                client.Character.RefreshEmotes();
+                client.Character.InitializeCosmetics();
+                client.Character.RefreshJobs();
+                client.Character.RefreshSpells();
+                client.Character.RefreshArenasInfos();
+                client.Character.RefreshPvPInfos();
+                client.Send(new CharacterCapabilitiesMessage(4095));
+                client.Send(new CharacterLoadingCompleteMessage());
+                return;
+            }
             StatsRecord.InitializeCharacter(client.Character);
-
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
             client.Character.RefreshEmotes();
@@ -180,6 +216,15 @@ namespace Symbioz.World.Handlers
         {
             client.Send(new GameContextDestroyMessage());
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
+            if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+            {
+                //client.Character.FighterInstance = null;
+                client.Character.RefreshStats();
+                MapsHandler.SendCurrentMapMessage(client, client.Character.FighterInstance.Fight.Map.Id);
+                client.Character.ReCreateFighter(client.Character.FighterInstance.Team);
+                client.Character.FighterInstance.Fight.FighterReconnect(client.Character.FighterInstance);
+                return;
+            }
             client.Character.RefreshStats();
             client.Character.Teleport(client.Character.Record.MapId);
 

@@ -165,7 +165,7 @@ namespace Symbioz.World.Models.Fights
         public void FighterReconnect(CharacterFighter f)
         {
             f.disconnect = false;
-            Send(new GameFightStartMessage(new Idol[0])); // see
+            //Send(new GameFightStartMessage(new Idol[0])); // see
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
             Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 164, new string[0]));
             SyncFighters();
