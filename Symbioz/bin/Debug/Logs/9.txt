@@ -1,0 +1,6 @@
+Client: 127.0.0.1:57906
+At: 04/06/2016 03:51:11
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Guilds.GuildProvider.JoinGuild(GuildRecord guild, Character character, GuildRightsBitEnum rights, UInt16 rank) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Guilds\GuildProvider.cs:ligne 50
+   à Symbioz.World.Models.Guilds.GuildProvider.CreateGuild(Character owner, GuildCreationValidMessage message) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Guilds\GuildProvider.cs:ligne 34
+   à Symbioz.World.Handlers.GuildsHandler.HandleGuildCreationRequest(GuildCreationValidMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\GuildHandler.cs:ligne 31

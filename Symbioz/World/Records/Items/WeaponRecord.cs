@@ -163,5 +163,106 @@ namespace Symbioz.World.Records.Items
             short diceside = (short)(critical == FightSpellCastCriticalEnum.CRITICAL_HIT ? effect.diceSide + record.CriticalHitBonus : effect.diceSide);
             return new ExtendedSpellEffect(new SpellEffectRecord(0, 0, (short)effect.actionId, GetWeaponRawZone(type), DefaultWeaponEffectsTargetMask, dicenum, diceside, 0, effect.diceConst, 0, 0));
         }
+
+        public short[] GetDamagedCell(int currentCell, WeaponRecord template, MapRecord CurrentMap, short CasterCell)
+        {
+            short[] allCell = new short[4];
+
+            int x = 14;
+            bool quatorze = true;
+            byte direction = 0;
+
+            int line = 13;
+            while (x < (currentCell + 1))
+            {
+                if (quatorze == false)
+                {
+                    quatorze = true;
+                    x += 13;
+                }
+                else
+                {
+                    quatorze = false;
+                    x += 14;
+                }
+            }
+            if (quatorze)
+                line = 14;
+            if (CasterCell + 15 == currentCell)//bas droite (line == 13)
+            {
+                Logger.Log("bas droite");
+            }
+            else if (CasterCell - 15 == currentCell)//haut gauche (line == 13)
+            {
+                Logger.Log("hautgauche");
+            }
+            else if (CasterCell + 13 == currentCell && line == 13)//bas
+            {
+                //bas gauche
+                direction = 3;
+            }
+            else if (CasterCell + 13 == currentCell && line == 14)//bas
+            {
+                Logger.Log("bas13/14");
+            }
+            else if (CasterCell + 14 == currentCell && line == 13)//bas
+            {
+                //bas gauche
+                direction = 3;
+            }
+            else if (CasterCell + 14 == currentCell && line == 14)//bas
+            {
+               // bas droite
+                direction = 1;
+            }
+            else if (CasterCell - 13 == currentCell && line == 13)//haut
+            {
+                //haut droite
+                direction = 7;
+            }
+            else if (CasterCell - 13 == currentCell && line == 14)//haut
+            {
+                Logger.Log("haut13/14");
+            }
+            else if (CasterCell - 14 == currentCell && line == 13)//haut
+            {
+                //haut gauche
+                direction = 5;
+            }
+            else if (CasterCell - 14 == currentCell && line == 14)//haut
+            {
+                Logger.Log("haut14/14");
+            }
+            else
+                Logger.Log("INCONNUE");
+            allCell[0] = (short)currentCell;
+            Logger.Log("DIRECTION = " + direction);
+            switch (direction)
+            {
+                case 1://bas droit
+
+                    break;
+
+                case 3: // bas gauche
+                    if (line == 13)
+                        Logger.Log("13");
+                    else if (line == 14)
+                        Logger.Log("14");
+                    //allCell[1] = (short)(currentCell + line);//bas gauche
+                    allCell[1] = (short)(CasterCell - 1);//haut gauche
+                    allCell[2] = (short)((currentCell + line) + 1);//bas gauche
+                    allCell[3] = (short)((currentCell + line) + 2);//bas gauche
+                    break;
+                case 5://haut gauche
+
+                    break;
+
+                case 7://haut drote
+
+                    break;
+                
+            }
+            return (allCell);
+        }
     }
 }

@@ -1,0 +1,6 @@
+Client: 127.0.0.1:58965
+At: 04/06/2016 04:02:27
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Character.OnConnectedGuildInformations() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 343
+   à Symbioz.World.Handlers.ApproachHandler.ProcessSelection(WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ApproachHandler.cs:ligne 209
+   à Symbioz.World.Handlers.ApproachHandler.HandleCharacterSelection(CharacterSelectionMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ApproachHandler.cs:ligne 88

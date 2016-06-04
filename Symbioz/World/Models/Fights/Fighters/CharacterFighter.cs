@@ -348,24 +348,25 @@ namespace Symbioz.World.Models.Fights.Fighters
                 return true;
             }
             WeaponRecord template = WeaponRecord.GetWeapon(weapon.GID);
-             
+
             FightSpellCastCriticalEnum critical = RollCriticalDice(template);
             Fight.TryStartSequence(this.ContextualId, 2);
             int targetId = target != null ? target.ContextualId : 0;
             Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, targetId, cellid, (sbyte)critical, false, weapon.GID));
             var effects = template.GetWeaponEffects(critical);
-            this.HandleWeaponEffect(cellid, effects, critical);
+            this.HandleWeaponEffect(cellid, effects, critical, template, Fight.Map, this.CellId);
             this.FighterStats.Stats.ActionPoints -= template.ApCost;
             this.GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)(-template.ApCost));
             Fight.TryEndSequence(2, 0);
             return true;
         }
-        public void HandleWeaponEffect(short cellid, List<ExtendedSpellEffect> handledEffects, FightSpellCastCriticalEnum critical)
+        public void HandleWeaponEffect(short cellid, List<ExtendedSpellEffect> handledEffects, FightSpellCastCriticalEnum critical,
+            WeaponRecord template, MapRecord CurrentMap, short CasterCellId)
         {
             foreach (var effect in handledEffects)
             {
                 Fight.TryStartSequence(ContextualId, 1);
-                short[] cells = ShapesProvider.Handle(effect.ZoneShape, cellid, CellId, effect.ZoneSize).ToArray();
+                short[] cells = template.GetDamagedCell(cellid, template, CurrentMap, CasterCellId);
                 var actors = GetAffectedActors(cells, effect.Targets);
                 SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
                 Fight.TryEndSequence(1, 0);

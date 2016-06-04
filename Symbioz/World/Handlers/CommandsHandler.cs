@@ -716,9 +716,20 @@ namespace Symbioz.World.Handlers
         [InGameCommand("life", ServerRoleEnum.MODERATOR)]
         public static void GetLife(string value, WorldClient client)
         {
-            client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
-            client.Character.RefreshStats();
-            client.Character.Reply("Vous avez récupérer vos points de vie !");
+            if (!client.Character.IsFighting)
+            {
+                client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
+                client.Character.RefreshStats();
+                client.Character.Reply("Vous avez récupérer vos points de vie !");
+            }
+            else
+                client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
+        }
+
+        [InGameCommand("direction", ServerRoleEnum.MODERATOR)]
+        public static void GetDirection(string value, WorldClient client)
+        {
+            client.Character.Reply(client.Character.Record.Direction);
         }
         #endregion
 
