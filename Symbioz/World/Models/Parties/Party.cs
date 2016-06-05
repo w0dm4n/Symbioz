@@ -53,35 +53,38 @@ namespace Symbioz.World.Models.Parties
 
         public void CreateInvitation(WorldClient by, WorldClient to, PartyTypeEnum type = PartyTypeEnum.PARTY_TYPE_CLASSICAL, ushort dungeonId = 0)
         {
-            if (to.Character.PartyMember != null && to.Character.PartyMember.Loyal)
+            if (to != null)
             {
-                by.Character.Reply("Ce joueur est déjà dans un groupe et ne veut pas recevoir d'autre invitations");
-                return;
-            }
-            if (to.Character.PlayerStatus.statusId != (sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE)
-            {
-                string toName = to.Character.Record.Name;
-                switch (to.Character.PlayerStatus.statusId)
+                if (to.Character.PartyMember != null && to.Character.PartyMember.Loyal)
                 {
-                    case (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE:
-                        by.Character.ReplyImportant(toName + " est actuellement en mode privé");
-                        break;
-                    case (sbyte)PlayerStatusEnum.PLAYER_STATUS_SOLO:
-                        by.Character.ReplyImportant(toName + " est actuellement en mode solo");
-                        break;
-                    case (sbyte)PlayerStatusEnum.PLAYER_STATUS_AFK:
-                        by.Character.ReplyImportant(toName + " est actuellement absent");
-                        break;
+                    by.Character.Reply("Ce joueur est déjà dans un groupe et ne veut pas recevoir d'autre invitations");
+                    return;
                 }
-                return;
+                if (to.Character.PlayerStatus.statusId != (sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE)
+                {
+                    string toName = to.Character.Record.Name;
+                    switch (to.Character.PlayerStatus.statusId)
+                    {
+                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE:
+                            by.Character.ReplyImportant(toName + " est actuellement en mode privé");
+                            break;
+                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_SOLO:
+                            by.Character.ReplyImportant(toName + " est actuellement en mode solo");
+                            break;
+                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_AFK:
+                            by.Character.ReplyImportant(toName + " est actuellement absent");
+                            break;
+                    }
+                    return;
+                }
+                this.NewGuest(to, by);
+                if (type == PartyTypeEnum.PARTY_TYPE_DUNGEON)
+                {
+                    to.Send(new PartyInvitationDungeonMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_DUNGEON, this.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Id, dungeonId));
+                    return;
+                }
+                to.Send(new PartyInvitationMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_CLASSICAL, by.Character.Record.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Record.Id));
             }
-            this.NewGuest(to, by);
-            if (type == PartyTypeEnum.PARTY_TYPE_DUNGEON)
-            {
-                to.Send(new PartyInvitationDungeonMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_DUNGEON, this.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Id, dungeonId));
-                return;
-            }
-            to.Send(new PartyInvitationMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_CLASSICAL, by.Character.Record.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Record.Id));
         }
 
         public void AcceptInvitation(WorldClient client)

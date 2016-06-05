@@ -39,7 +39,7 @@ namespace Symbioz.Network.Clients
             SSyncClient.Send(packet);
 
             if (ConfigurationManager.Instance.ShowProtocolMessages)
-            Logger.Info(string.Format("[Send] {0}", message.ToString()));
+                Logger.Info(string.Format("[Send] {0}", message.ToString()));
         }
 
         public void SendRaw(string rawname)

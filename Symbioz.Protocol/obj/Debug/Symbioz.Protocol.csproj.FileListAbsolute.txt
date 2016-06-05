@@ -38,3 +38,8 @@ C:\Users\utilisateur\Desktop\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.
 C:\Users\utilisateur\Desktop\Symbioz\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
 C:\Users\utilisateur\Desktop\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
 C:\Users\utilisateur\Desktop\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Protocol\bin\Debug\Shader.Protocol.pdb
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Symbioz.Protocol.csprojResolveAssemblyReference.cache
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.dll
+C:\Users\Zaliro\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Protocol\obj\Debug\Shader.Protocol.pdb

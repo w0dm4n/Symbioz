@@ -42,6 +42,7 @@ namespace Symbioz.World.Models.Guilds
             {
                 Recruter.Send(new GuildInvitationStateRecrutedMessage((sbyte)GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
             }
+            this.Dispose();
         }
 
         public void Dispose()

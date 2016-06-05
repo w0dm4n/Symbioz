@@ -48,6 +48,11 @@ namespace Symbioz.World.Records.Alliances
             this.CreationDate = creationDate;
         }
 
+        public GuildEmblem GetEmblemObject()
+        {
+            return new GuildEmblem(SymbolShape, SymbolColor, BackgroundShape, BackgroundColor);
+        }
+
         public AllianceInformations GetAllianceInformations()
         {
             return new AllianceInformations((uint)Id, Tag, Name, new GuildEmblem(SymbolShape, SymbolColor, BackgroundShape, BackgroundColor));
@@ -56,6 +61,11 @@ namespace Symbioz.World.Records.Alliances
         public BasicAllianceInformations GetBasicInformations()
         {
             return new BasicAllianceInformations((uint)Id, Tag);
+        }
+
+        public BasicNamedAllianceInformations GetBasicNamedAllianceInformations()
+        {
+            return new BasicNamedAllianceInformations((uint)this.Id, this.Tag, this.Name);
         }
 
         public bool KickFromAlliance(int guildId, WorldClient by)
@@ -72,7 +82,6 @@ namespace Symbioz.World.Records.Alliances
                         AllianceRecord.OnCharacterLeftAlliance(character);
                     }
                     member.RemoveElement();
-                    Logger.Log(AllianceRecord.CountGuildInAlliance(member.AllianceId));
                     if(AllianceRecord.CountGuildInAlliance(member.AllianceId) < 1)
                     {
                         AllianceRecord.DeleteAlliance(member.AllianceId);
@@ -142,7 +151,8 @@ namespace Symbioz.World.Records.Alliances
             List<GuildAllianceRecord> members = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
             foreach(GuildAllianceRecord member in members)
             {
-                foreach(WorldClient client in WorldServer.Instance.GetAllClientsOnline().FindAll(x=>x.Character.GuildId == member.GuildId)){
+                foreach(WorldClient client in WorldServer.Instance.GetAllClientsOnline().FindAll(x=>x.Character.GuildId == member.GuildId))
+                {
                     AllianceRecord.OnCharacterLeftAlliance(client.Character);
                 }
                 member.RemoveElement();
@@ -163,5 +173,19 @@ namespace Symbioz.World.Records.Alliances
                 Locker.ExitReadLock();
             }
         }
+
+        #region Extended
+
+        public void Send(Message message)
+        {
+            AllianceProvider.GetClients(this.Id).ForEach(x => x.Send(message));
+        }
+
+        public void SendChatMessage(string message)
+        {
+            this.Send(new TextInformationMessage(0, 0, new string[] { message }));
+        }
+
+        #endregion
     }
 }

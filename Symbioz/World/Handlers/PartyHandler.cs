@@ -1,6 +1,7 @@
 ﻿using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
+using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.Network.Servers;
@@ -42,14 +43,22 @@ namespace Symbioz.World.Handlers
             }
             if (p == null)
                 return;
+
             WorldClient to = WorldServer.Instance.WorldClients.Find(x => x.Character.Record.Name == message.name);
-            p.CreateInvitation(client, to);
-            if (p.Members.Count == 0)
+            if (to != null)
             {
-                if (to.Character.PartyMember != null && to.Character.PartyMember.Loyal)
-                    return;
-                p.BossCharacterId = client.Character.Id;
-                p.NewMember(client);
+                p.CreateInvitation(client, to);
+                if (p.Members.Count == 0)
+                {
+                    if (to.Character.PartyMember != null && to.Character.PartyMember.Loyal)
+                        return;
+                    p.BossCharacterId = client.Character.Id;
+                    p.NewMember(client);
+                }
+            }
+            else
+            {
+                client.Character.Reply(ConstantsRepertory.UNKKNOWN_OR_OFFLINE_CHARACTER);
             }
             
         }

@@ -17,7 +17,7 @@ using Shader.Helper;
 
 namespace Symbioz.World.Models.Alliances
 {
-    public class AllianceProvider : Singleton<AllianceProvider>
+    public class AllianceProvider
     {
 
         public static byte EMOTE_ID = 98;
@@ -85,7 +85,7 @@ namespace Symbioz.World.Models.Alliances
             Gmember.AddElement();
             if(Inviter != null)
                 Inviter.Send(new AllianceInvitationAnswerMessage(true));
-            foreach(CharacterGuildRecord member in CharacterGuildRecord.CharactersGuilds.FindAll(x=>x.GuildId == Guild.Id))
+            foreach(CharacterGuildRecord member in CharacterGuildRecord.CharactersGuilds.FindAll(x => x.GuildId == Guild.Id))
             {
                 AllianceRecord.OnCharacterJoinAlliance(CharacterRecord.GetCharacterRecordById(member.CharacterId), Alliance);
             }
@@ -106,14 +106,35 @@ namespace Symbioz.World.Models.Alliances
         public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int allianceId)
         {
             List<GuildInsiderFactSheetInformations> guilds = new List<GuildInsiderFactSheetInformations>();
+
+            GuildInsiderFactSheetInformations leaderGuildInformations = null;
+            var allianceGuildLeader = AllianceProvider.GetLeader(allianceId);
+
             List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
             foreach(GuildAllianceRecord record in records)
             {
                 GuildRecord guild = GuildRecord.GetGuild(record.GuildId);
-                GuildInsiderFactSheetInformations a = new GuildInsiderFactSheetInformations((uint)guild.Id, guild.Name, guild.GetEmblemObject(), (uint)guild.GetLeader().CharacterId, (byte)guild.Level, (ushort)GuildProvider.GetMembers(guild.Id).Length, CharacterRecord.GetCharacterRecordById(guild.GetLeader().CharacterId).Name, (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id), 0, 0, true);
-                guilds.Add(a);
+                GuildInsiderFactSheetInformations guildInsiderFactSheetInformations = new GuildInsiderFactSheetInformations((uint)guild.Id, guild.Name,
+                    guild.GetEmblemObject(), (uint)guild.GetLeader().CharacterId, (byte)guild.Level, (ushort)GuildProvider.GetMembers(guild.Id).Length,
+                    CharacterRecord.GetCharacterRecordById(guild.GetLeader().CharacterId).Name, (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id),
+                    0, 0, true);
+
+                if(allianceGuildLeader.Id == guild.Id)
+                {
+                    leaderGuildInformations = guildInsiderFactSheetInformations;
+                }
+                else
+                {
+                    guilds.Add(guildInsiderFactSheetInformations);
+                }
             }
-            return (IEnumerable<GuildInsiderFactSheetInformations>)guilds;
+
+            if(leaderGuildInformations != null)
+            {
+                guilds.Insert(0, leaderGuildInformations);
+            }
+
+            return guilds;
         }
 
         public static IEnumerable<GuildInAllianceInformations> GetGuildsInAllianceInformations(int allianceId)
@@ -124,10 +145,10 @@ namespace Symbioz.World.Models.Alliances
             {
                 GuildRecord guild = GuildRecord.GetGuild(record.GuildId);
                 GuildInAllianceInformations guildInAllianceInformations = new GuildInAllianceInformations((uint)guild.Id, guild.Name,
-                    guild.GetEmblemObject(), (byte)guild.Level, (byte)GuildProvider.GetMembers(guild.Id).Length, true);
+                    guild.GetEmblemObject(), (byte)guild.Level, (byte)CharacterGuildRecord.GetMembers(guild.Id).Length, true);
                 guildsInAllianceInformations.Add(guildInAllianceInformations);
             }
-            return (IEnumerable<GuildInAllianceInformations>)guildsInAllianceInformations;
+            return guildsInAllianceInformations;
         }
 
         public static AllianceRecord GetAllianceFromGuild(int guildId)
@@ -144,16 +165,78 @@ namespace Symbioz.World.Models.Alliances
             return GuildRecord.GetGuild(alliance.LeaderGuildId);
         }
 
+        public static bool IsLeader(int characterId, int guildId, int allianceId)
+        {
+            bool isLeader = false;
+            var guildLeader = GetLeader(allianceId);
+            if(guildLeader != null)
+            {
+                var characterGuild = GuildRecord.GetGuild(guildId);
+                if (guildLeader == characterGuild && GuildProvider.IsLeader(characterId, characterGuild.Id))
+                {
+                    isLeader = true;
+                }
+            }
+            return isLeader;
+        }
+
         public static AllianceInsiderInfoMessage GetAllianceInsiderInfoMessage(AllianceRecord alliance)
         {
-            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInsiderFactSheetInformations(alliance.Id), (IEnumerable<PrismSubareaEmptyInfo>)new List<PrismSubareaEmptyInfo>());
+            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInsiderFactSheetInformations(alliance.Id), new List<PrismSubareaEmptyInfo>());
         }
 
         public static AllianceFactsMessage GetAllianceFactsMessage(AllianceRecord alliance)
         {
             var leaderCharacterId = GuildProvider.GetLeader(alliance.LeaderGuildId).CharacterId;
             var leaderCharacterName = CharacterRecord.GetCharacterRecordById(leaderCharacterId).Name;
-            return new AllianceFactsMessage(new AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInAllianceInformations(alliance.Id), (IEnumerable<ushort>)new List<ushort>(), (uint)leaderCharacterId, leaderCharacterName);
+            return new AllianceFactsMessage(new AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, alliance.GetEmblemObject(),
+                DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)),
+                AllianceProvider.GetGuildsInAllianceInformations(alliance.Id),
+                new List<ushort>(), (uint)leaderCharacterId, leaderCharacterName);
+        }
+
+        public static int GetGuildsCount(int allianceId)
+        {
+            return GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId).Count;
+        }
+
+        public static int GetMembersCount(int allianceId)
+        {
+            int membersCount = 0;
+            List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
+            foreach (GuildAllianceRecord record in records)
+            {
+                membersCount = (membersCount + CharacterGuildRecord.GetMembers(record.GuildId).Length);
+            }
+            return membersCount;
+        }
+
+        public static List<WorldClient> GetClients(int allianceId)
+        {
+            List<WorldClient> clients = new List<WorldClient>();
+            List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
+            foreach (GuildAllianceRecord record in records)
+            {
+                foreach (GuildMember guildMember in CharacterGuildRecord.GetMembers(record.GuildId))
+                {
+                    var client = WorldServer.Instance.GetOnlineClient((int)guildMember.id);
+                    if (client != null)
+                    {
+                        clients.Add(client);
+                    }
+                }
+            }
+            return clients;
+        }
+
+        public static bool GuildIsInAlliance(int guildId, int allianceId)
+        {
+            bool isInAlliance = false;
+            if(GuildAllianceRecord.GuildsAlliances.FirstOrDefault(x => x.AllianceId == allianceId && x.GuildId == guildId) != null)
+            {
+                isInAlliance = true;
+            }
+            return isInAlliance;
         }
     }
 }

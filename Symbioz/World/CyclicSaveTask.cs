@@ -16,7 +16,7 @@ namespace Symbioz.World
 {
     class CyclicSaveTask
     {
-        [StartupInvoke("Cyclic Save Task",StartupInvokeType.Cyclics)]
+        [StartupInvoke("Cyclic Save Task", StartupInvokeType.Cyclics)]
         public static void Start()
         {
             SaveTask.OnSaveStarted += Cache_OnSaveStarted;
@@ -34,6 +34,7 @@ namespace Symbioz.World
             WorldServer.Instance.ClearAllOnlineCharacters();
             InitializeSave();
         }
+
         static void Cache_OnSaveEnded(int elapsed)
         {
             Logger.Init2("Sauvegarde terminé (" + elapsed + ")s");
@@ -43,6 +44,7 @@ namespace Symbioz.World
             WorldServer.Instance.SetServerState(ServerStatusEnum.ONLINE);
             WorldServer.Instance.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 165, new string[0]));
         }
+
         public static void InitializeSave()
         {
             var a = Assembly.GetAssembly(typeof(CyclicSaveTask));

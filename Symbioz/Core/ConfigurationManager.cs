@@ -120,6 +120,10 @@ namespace Symbioz.Core
 
         public bool SafeRun { get; set; }
 
+        public int CyclicFileGenerationInterval { get; set; }
+        
+        public string CyclicFileGenerationPath { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -138,13 +142,15 @@ namespace Symbioz.Core
             config.DutyMapId = 99091983;
             config.DutyCellId = 300;
             config.StartKamas = 0;
-            config.WelcomeMessage = "SymbiozEmu version " + ConstantsRepertory.VERSION;
+            config.WelcomeMessage = "Symbioz " + ConstantsRepertory.VERSION;
             config.ShowProtocolMessages = true;
             config.KamasDropRatio = 1;
             config.ExperienceRatio = 1;
             config.ItemsDropRatio = 1;
             config.StartBankKamas = 0;
             config.SafeRun = false;
+            config.CyclicFileGenerationInterval = 900000;
+            config.CyclicFileGenerationPath = "C:/wamp/www/games/dofus2/game-export";
             return config;
         }
     }

@@ -35,7 +35,7 @@ namespace Symbioz.Providers
 
         public const int DEFAULT_RANK = 300;
 
-        public const int FIGHTERS_PER_TEAM = 3; // 3 (3vs3)
+        public const int FIGHTERS_PER_TEAM = 3; //3 (3vs3)
 
         public const sbyte SEARCH_LEVEL_SHIFT = 20;
 

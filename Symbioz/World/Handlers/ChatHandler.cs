@@ -2,6 +2,7 @@
 using Symbioz.Core.Startup;
 using Symbioz.DofusProtocol.Messages;
 using Symbioz.Enums;
+using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.Network.Servers;
@@ -80,11 +81,12 @@ namespace Symbioz.World.Handlers
             {
                 if(target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE)
                 {
-                    client.Character.ReplyImportant(target.Character.Record.Name + " est actuellement en mode privé");
+                    client.Character.ReplyImportant(target.Character.Record.Name + " est actuellement en mode privé.");
                     return;
-                }else if(target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_SOLO)
+                }
+                else if(target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_SOLO)
                 {
-                    client.Character.ReplyImportant(target.Character.Record.Name + " est actuellement en mode solo");
+                    client.Character.ReplyImportant(target.Character.Record.Name + " est actuellement en mode solo.");
                     return;
                 }
                 target.Send(new ChatServerMessage((sbyte)ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, message.content, 1, client.Character.Record.Name, client.Character.Id, client.Character.Record.Name, client.Account.Id));
@@ -100,7 +102,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("Le personnage n'existe pas ou n'est pas connecté");
+                client.Character.Reply(ConstantsRepertory.UNKKNOWN_OR_OFFLINE_CHARACTER);
             }
         }
         public static void SendAnnounceMessage(string value, Color color)

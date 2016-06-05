@@ -11,6 +11,7 @@ using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Servers;
 using Symbioz.ORM;
+using Symbioz.Providers.DataWriter;
 using Symbioz.Providers.Maps;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Fights.Marks;
@@ -731,6 +732,14 @@ namespace Symbioz.World.Handlers
         {
             client.Character.Reply(client.Character.Record.Direction);
         }
+
+        [InGameCommand("rewrite", ServerRoleEnum.MODERATOR)]
+        public static void Rewrite(string value, WorldClient client)
+        {
+            DataWriterProvider.Instance.Generate();
+            client.Character.Reply("Génération des fichiers de données forcée.");
+        }
+
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)

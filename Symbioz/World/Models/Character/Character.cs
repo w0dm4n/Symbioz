@@ -71,8 +71,8 @@ namespace Symbioz.World.Models
         public PlayerTradeExchange PlayerTradeInstance { get; set; }
         public CraftExchange CraftInstance { get; set; }
         public GuildInvitationDialog GuildInvitationDialog { get; set; }
+        public AllianceInvitationDialog AllianceInvitationDialog { get; set; }
         #endregion
-
 
         public bool IsFighting { get { return !FighterInstance.IsNull(); } }
 
@@ -199,14 +199,14 @@ namespace Symbioz.World.Models
             var field = GetCache(element);
             if (field == null)
             {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                Console.WriteLine("[Remove] Error ! Field unknown");
                 return;
             }
 
             var method = field.FieldType.GetMethod("Remove");
             if (method == null)
             {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                Console.WriteLine("[Remove] Error ! Field unknown");
                 return;
             }
 
@@ -351,7 +351,8 @@ namespace Symbioz.World.Models
             if (HasAlliance)
             {
                 Client.Send(new AllianceMembershipMessage(GetAlliance().GetAllianceInformations(), true));
-                this.HumanOptions.Add(new HumanOptionAlliance(GetAlliance().GetAllianceInformations(),(sbyte)0));
+                this.HumanOptions.Add(new HumanOptionAlliance(GetAlliance().GetAllianceInformations(), (sbyte)0));
+                Client.Send(AllianceProvider.GetAllianceInsiderInfoMessage(this.GetAlliance()));
                 this.SetAllianceAndGuildLook();
                 Client.Character.RefreshOnMapInstance();
             }

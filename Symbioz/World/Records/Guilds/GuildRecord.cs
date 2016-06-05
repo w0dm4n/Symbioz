@@ -1,7 +1,9 @@
-﻿using Symbioz.DofusProtocol.Types;
+﻿using Symbioz.DofusProtocol.Messages;
+using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.ORM;
 using Symbioz.World.Models.Guilds;
+using Symbioz.World.Records.Alliances;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +65,14 @@ namespace Symbioz.World.Records.Guilds
             return new GuildInformations((uint)Id, Name, this.GetEmblemObject());
         }
 
+        public bool IsInAlliance
+        {
+            get
+            {
+                return GuildAllianceRecord.GuildsAlliances.FirstOrDefault(x => x.GuildId == this.Id) != null ? true : false;
+            }
+        }
+
         public BasicGuildInformations GetBasicInformations()
         {
             return new BasicGuildInformations((uint)Id, Name);
@@ -104,5 +114,19 @@ namespace Symbioz.World.Records.Guilds
             }
             return null;
         }
+
+        #region Extended
+
+        public void Send(Message message)
+        {
+            GuildProvider.Instance.GetClients(this.Id).ForEach(x => x.Send(message));
+        }
+
+        public void SendChatMessage(string message)
+        {
+            this.Send(new TextInformationMessage(0, 0, new string[] { message }));
+        }
+
+        #endregion
     }
 }

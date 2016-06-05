@@ -133,9 +133,11 @@
     <Compile Include="Providers\Conditions\VitalityCondition.cs" />
     <Compile Include="Providers\Conditions\WisdomCondition.cs" />
     <Compile Include="Providers\CustomObjectUseHandler.cs" />
+    <Compile Include="Providers\DataWriter\DataWriterProvider.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Handlers\ApproachHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
+    <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
     <Compile Include="Network\CharactersDisconnected.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAgression.cs" />

@@ -21,7 +21,6 @@ namespace Symbioz.DofusProtocol.Messages
         public IEnumerable<Types.GuildInsiderFactSheetInformations> guilds;
         public IEnumerable<Types.PrismSubareaEmptyInfo> prisms;
 
-
         public AllianceInsiderInfoMessage()
         {
         }
@@ -33,10 +32,8 @@ namespace Symbioz.DofusProtocol.Messages
             this.prisms = prisms;
         }
 
-
         public override void Serialize(ICustomDataOutput writer)
         {
-
             allianceInfos.Serialize(writer);
             writer.WriteUShort((ushort)guilds.Count());
             foreach (var entry in guilds)
@@ -49,8 +46,6 @@ namespace Symbioz.DofusProtocol.Messages
                 writer.WriteShort(entry.TypeId);
                 entry.Serialize(writer);
             }
-
-
         }
 
         public override void Deserialize(ICustomDataInput reader)
@@ -72,12 +67,6 @@ namespace Symbioz.DofusProtocol.Messages
                 (prisms as Types.PrismSubareaEmptyInfo[])[i] = Types.ProtocolTypeManager.GetInstance<Types.PrismSubareaEmptyInfo>(reader.ReadShort());
                 (prisms as Types.PrismSubareaEmptyInfo[])[i].Deserialize(reader);
             }
-
-
         }
-
-
     }
-
-
 }

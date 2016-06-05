@@ -18,6 +18,7 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.World.Models;
 using Symbioz.Network.Clients;
 using System.IO;
+using Symbioz.Providers.DataWriter;
 
 namespace Symbioz
 {
@@ -32,6 +33,8 @@ namespace Symbioz
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
            
             Startup.StartServers();
+            DataWriterProvider.Instance.Init();
+
             new Thread(new ThreadStart(SymbiozCommands.HandleCommands)).Start();
         }
 
@@ -40,8 +43,6 @@ namespace Symbioz
             SaveTask.Save();
             Thread.Sleep(1000);
             Environment.Exit(1);
-
         }
-
     }
 }

@@ -13,6 +13,7 @@ using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.Network.Servers;
 using Shader.Helper;
+using Symbioz.Helper;
 
 namespace Symbioz.World.Handlers
 {
@@ -41,10 +42,22 @@ namespace Symbioz.World.Handlers
         public static void HandleGuildInvitationMessage(GuildInvitationMessage message, WorldClient client)
         {
             WorldClient target = WorldServer.Instance.GetOnlineClient((int)message.targetId);
-
-            GuildInvitationDialog dialog = new GuildInvitationDialog(client, target);
-
-            dialog.Request();
+            if (target != null)
+            {
+                if (!target.Character.HasGuild)
+                {
+                    GuildInvitationDialog dialog = new GuildInvitationDialog(client, target);
+                    dialog.Request();
+                }
+                else
+                {
+                    target.Character.Reply("Impossible d'inviter ce joueur car il appartient déjà à une guilde.");
+                }
+            }
+            else
+            {
+                target.Character.Reply(ConstantsRepertory.UNKKNOWN_OR_OFFLINE_CHARACTER);
+            }
         }
 
         [MessageHandler]
@@ -56,7 +69,10 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleGuildInvitationAnswerMessage(GuildInvitationAnswerMessage message, WorldClient client)
         {
-            client.Character.GuildInvitationDialog.Answer(message.accept);
+            if (client.Character.GuildInvitationDialog != null)
+            {
+                client.Character.GuildInvitationDialog.Answer(message.accept);
+            }
         }
 
         [MessageHandler]
@@ -67,8 +83,8 @@ namespace Symbioz.World.Handlers
             SendGuildInformationsMembers(client);
             if (WorldServer.Instance.IsConnected(member.CharacterId))
             {
-                WorldClient c = WorldServer.Instance.GetOnlineClient(member.CharacterId);
-                c.Send(new GuildMembershipMessage(c.Character.GetGuild().GetGuildInformations(),message.rights,true));
+                WorldClient targetClient = WorldServer.Instance.GetOnlineClient(member.CharacterId);
+                targetClient.Send(new GuildMembershipMessage(targetClient.Character.GetGuild().GetGuildInformations(),message.rights,true));
             }
         }
 
@@ -105,6 +121,10 @@ namespace Symbioz.World.Handlers
             if(targetGuild != null)
             {
                 client.Send(GuildProvider.GetGuildFactsMessage(targetGuild));
+            }
+            else
+            {
+                client.Send(new GuildFactsErrorMessage(message.guildId));
             }
         }
 

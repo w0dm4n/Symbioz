@@ -16,5 +16,8 @@ namespace Symbioz.Helper
         public const ConsoleColor Symbioz_COLOR2 = ConsoleColor.DarkCyan;
         public const string VOTE_URL = "http://gaya.servegame.com/vote.php";
         public const ushort TOKEN_ID = 15714;
+
+        /* WorldMessages */
+        public const string UNKKNOWN_OR_OFFLINE_CHARACTER = "Le personnage n'existe pas ou n'est pas connecté.";
     }
 }
