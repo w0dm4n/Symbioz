@@ -378,13 +378,34 @@ namespace Symbioz.World.Handlers
         [InGameCommand("kamas", ServerRoleEnum.MODERATOR)]
         public static void AddKamasCommand(string value, WorldClient client)
         {
-            client.Character.AddKamas(int.Parse(value), true);
+            if (value == null)
+            {
+                client.Character.Reply("Syntaxe incorrect: (joueur, kamas)");
+                return;
+            }
+            string[] Array = value.Split(' ');
+            if (Array == null)
+                return;
+            if (Array.Length == 2)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(Array[0]);
+                if (target != null)
+                    target.Character.AddKamas(int.Parse(Array[1]), true);
+                else
+                    client.Character.Reply("Ce joueur n'est pas connecté");
+            }
+            else
+                client.Character.Reply("Syntaxe incorrect : (joueur, kamas)");
         }
 
         [InGameCommand("ban", ServerRoleEnum.MODERATOR)]
         public static void BanCommand(string value, WorldClient client)
         {
+            if (value == null)
+                return;
             var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target == null)
+                return;
             if (target.Account.Role == ServerRoleEnum.FONDATOR)
             {
                 client.Character.Reply("Impossible sur un administrateur");
@@ -404,7 +425,11 @@ namespace Symbioz.World.Handlers
         [InGameCommand("kick", ServerRoleEnum.MODERATOR)]
         public static void KickCommand(string value, WorldClient client)
         {
+            if (value == null)
+                return;
             var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target == null)
+                return;
             if (target.Account.Role == ServerRoleEnum.FONDATOR)
             {
                 client.Character.Reply("Impossible sur un administrateur");
@@ -438,7 +463,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("le joueur n'existe pas ou n'est pas connécté");
+                client.Character.Reply("le joueur n'existe pas ou n'est pas connecté");
             }
         }
 
@@ -473,8 +498,25 @@ namespace Symbioz.World.Handlers
         [InGameCommand("item", ServerRoleEnum.MODERATOR)]
         public static void AddItemCommand(string value, WorldClient client)
         {
-            client.Character.Inventory.Add(ushort.Parse(value), 1);
-            client.Send(new ObtainedItemMessage(ushort.Parse(value), 1));
+            if (value == null)
+            {
+                client.Character.Reply("Syntaxe incorrect : (joueur, id, quantité)");
+                return;
+            }
+            string[] array = value.Split(' ');
+            if (array.Length != 3)
+                client.Character.Reply("Syntaxe incorrect : (joueur, id, quantité)");
+            else
+            {
+                var target = WorldServer.Instance.GetOnlineClient(array[0]);
+                if (target != null)
+                {
+                    target.Character.Inventory.Add(ushort.Parse(array[1]), uint.Parse(array[2]));
+                    client.Send(new ObtainedItemMessage(ushort.Parse(array[1]), uint.Parse(array[2])));
+                }
+                else
+                    client.Character.Reply("Le joueur n'est pas connecté !");
+            }
         }
 
         [InGameCommand("weapon", ServerRoleEnum.MODERATOR)]

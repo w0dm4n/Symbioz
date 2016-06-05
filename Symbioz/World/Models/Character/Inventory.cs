@@ -560,10 +560,30 @@ namespace Symbioz.World.Models
             Character.RefreshShortcuts();
         }
 
+        public static bool InList(List<int> ObjGID, int gid)
+        {
+            foreach (var value in ObjGID)
+                if (value == gid)
+                    return (true);
+            return (false);
+        }
+
         public List<ObjectItem> ConvertAllObjectItems()
         {
-            return Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
+            List<ObjectItem> AllItems = Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
+            List<int> ObjGID = new List<int>();
+            List<ObjectItem> newList = new List<ObjectItem>();
+            foreach (ObjectItem Item in AllItems)
+            {
+                if (!InList(ObjGID, Item.objectGID))
+                {
+                    newList.Add(Item);
+                    ObjGID.Add(Item.objectGID);
+                }
+            }
+            return (newList);
         }
+
         public List<ItemRecord> ConvertAllToTemplates()
         {
             List<ItemRecord> records = new List<ItemRecord>();

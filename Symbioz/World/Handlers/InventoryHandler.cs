@@ -16,6 +16,8 @@ namespace Symbioz.World.Handlers
     {
         public static void HandleBread(ObjectUseMessage message, WorldClient client)
         {
+            if (client.Character.IsFighting)
+                return;
             var item = client.Character.Inventory.GetItem(message.objectUID);
             if (item == null)
                 return;
@@ -31,6 +33,8 @@ namespace Symbioz.World.Handlers
             if (client.Character.CurrentStats.LifePoints <= client.Character.StatsRecord.LifePoints)
             {
                 var effects = item.Effects.Split('|');
+                if (effects == null || effects.Length == 0)
+                    return;
                 foreach (var effect in effects)
                 {
                     var current = effect.Split(new string[] { "70#110#" }, StringSplitOptions.None);
