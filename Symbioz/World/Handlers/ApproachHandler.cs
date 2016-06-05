@@ -120,6 +120,7 @@ namespace Symbioz.World.Handlers
             client.Character.IsNew = true;
             StatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
+            client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
             client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();

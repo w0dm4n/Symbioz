@@ -74,6 +74,7 @@ namespace Symbioz.World.Models
         public AllianceInvitationDialog AllianceInvitationDialog { get; set; }
         #endregion
 
+
         public bool IsFighting { get { return !FighterInstance.IsNull(); } }
 
         public bool SearchingArena { get { return ArenaProvider.Instance.IsSearching(Client); } }
@@ -199,14 +200,14 @@ namespace Symbioz.World.Models
             var field = GetCache(element);
             if (field == null)
             {
-                Console.WriteLine("[Remove] Error ! Field unknown");
+                Console.WriteLine("[Remove] Erreur ! Field unknown");
                 return;
             }
 
             var method = field.FieldType.GetMethod("Remove");
             if (method == null)
             {
-                Console.WriteLine("[Remove] Error ! Field unknown");
+                Console.WriteLine("[Remove] Erreur ! Field unknown");
                 return;
             }
 
@@ -609,12 +610,12 @@ namespace Symbioz.World.Models
         }
         public void LearnAllEmotes()
         {
-            foreach(EmoteRecord emote in EmoteRecord.Emotes)
+            foreach (EmoteRecord emote in EmoteRecord.Emotes)
             {
-               /* if(ConfigurationManager.Instance.UnauthorizedCreationGiveEmotes.Contains(emote.Id) == false)
-                {
-                    LearnEmote((byte)(emote.Id));
-                }*/
+                /* if(ConfigurationManager.Instance.UnauthorizedCreationGiveEmotes.Contains(emote.Id) == false)
+                 {
+                     LearnEmote((byte)(emote.Id));
+                 }*/
             }
         }
         public void ForgetAllEmotes()
@@ -680,6 +681,7 @@ namespace Symbioz.World.Models
                 }
                 StatsRecord.LifePoints += 5;
                 CurrentStats.LifePoints += 5;
+                Record.CurrentLifePoint = CurrentStats.LifePoints;
                 Record.SpellPoints += 1;
                 Record.StatsPoints += 5;
                 UpdateBreedSpells(sendpackets);
@@ -1068,12 +1070,14 @@ namespace Symbioz.World.Models
             return HasAlliance ? AllianceRecord.GetAlliance(AllianceId) : null;
         }
 
-        public bool HasAlliance {
+        public bool HasAlliance
+        {
             get
             {
                 if (HasGuild)
                 {
-                    if (GuildAllianceRecord.GuildsAlliances.Find(x => x.GuildId == GetGuild().Id) != null){
+                    if (GuildAllianceRecord.GuildsAlliances.Find(x => x.GuildId == GetGuild().Id) != null)
+                    {
                         return true;
                     }
                 }

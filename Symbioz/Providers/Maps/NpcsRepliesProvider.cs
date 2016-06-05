@@ -92,6 +92,7 @@ namespace Symbioz.Providers
           
             client.Character.StatsRecord.BaseWisdom = 0;
             client.Character.Record.StatsPoints = (ushort)((client.Character.Record.Level * 5) -5);
+            client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
             client.Character.RefreshStats();
             client.Character.ShowNotification("Vos points de caracteristiques ont été remis a zéro.");
          

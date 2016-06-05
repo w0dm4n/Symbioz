@@ -522,6 +522,8 @@ namespace Symbioz.World.Models.Fights
             {
                 bool winner = GetWinner() == fighter.Team.TeamColor;
                 fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
+                fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                Logger.Log("ICI FDP");
                 fighter.Client.Character.RejoinMap(SpawnJoin, winner);
             }
             FightProvider.Instance.RemoveFight(this);

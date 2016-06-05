@@ -237,6 +237,7 @@ namespace Symbioz.Provider
             client.Character.StatsRecord.ContextVitality += value;
             client.Character.CurrentStats.LifePoints += (uint)value;
             client.Character.StatsRecord.LifePoints += value;
+            client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
         }
         private static void Intelligence(WorldClient client, short value)
         {
@@ -256,6 +257,7 @@ namespace Symbioz.Provider
             client.Character.StatsRecord.ContextVitality -= value;
             client.Character.CurrentStats.LifePoints -= (uint)value;
             client.Character.StatsRecord.LifePoints -= value;
+            client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
         }
         private static void SubAgility(WorldClient client, short value)
         {

@@ -156,11 +156,11 @@ namespace Symbioz.World.Handlers
             foreach (var item in Commands)
             {
                 if (client.Account.Role >= item.Key.MinimumRoleRequired)
-                    if(client.Account.Role > ServerRoleEnum.MODERATOR)
+                    if (client.Account.Role > ServerRoleEnum.MODERATOR)
                     {
                         client.Character.ReplyInConsole("- " + item.Key.Value);
                     }
-                    client.Character.Reply("- " + item.Key.Value);
+                client.Character.Reply("- " + item.Key.Value);
             }
         }
 
@@ -324,7 +324,7 @@ namespace Symbioz.World.Handlers
             client.Character.RefreshOnMapInstance();
         }
 
-      [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
+        [InGameCommand("overcalc", ServerRoleEnum.FONDATOR)]
         public static void OverCalcCommand(string value, WorldClient client)
         {
             var target = WorldServer.Instance.GetOnlineClient(value);
@@ -359,20 +359,20 @@ namespace Symbioz.World.Handlers
             TrySendRaw(client, value, "hibernate");
         }
 
-        [InGameCommand("notif",ServerRoleEnum.ANIMATOR)]
-        public static void Notif(string value,WorldClient client)
+        [InGameCommand("notif", ServerRoleEnum.ANIMATOR)]
+        public static void Notif(string value, WorldClient client)
         {
             WorldServer.Instance.GetAllClientsOnline().ForEach(x => x.Character.ShowNotification(value));
         }
 
-        [InGameCommand("lion",ServerRoleEnum.FONDATOR)]
-        public static void LionCommand(string value,WorldClient client)
+        [InGameCommand("lion", ServerRoleEnum.FONDATOR)]
+        public static void LionCommand(string value, WorldClient client)
         {
-              var target = WorldServer.Instance.GetOnlineClient(value);
-              if (target != null)
-                  Look("{1003}", target);
-              else
-                  client.Character.ReplyError("Le client n'existe pas");
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+                Look("{1003}", target);
+            else
+                client.Character.ReplyError("Le client n'existe pas");
         }
 
         [InGameCommand("kamas", ServerRoleEnum.MODERATOR)]
@@ -469,7 +469,7 @@ namespace Symbioz.World.Handlers
         {
             client.Character.Teleport(ConfigurationManager.Instance.DutyMapId, ConfigurationManager.Instance.DutyCellId);
         }
-        
+
         [InGameCommand("item", ServerRoleEnum.MODERATOR)]
         public static void AddItemCommand(string value, WorldClient client)
         {
@@ -514,22 +514,22 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("token",ServerRoleEnum.MODERATOR)]
-        public static void TokenCommand(string value,WorldClient client)
+        [InGameCommand("token", ServerRoleEnum.MODERATOR)]
+        public static void TokenCommand(string value, WorldClient client)
         {
             uint quantity = uint.Parse(value);
             client.Character.Inventory.Add(ConstantsRepertory.TOKEN_ID, quantity);
-            client.Send(new ObtainedItemMessage(ConstantsRepertory.TOKEN_ID,quantity ));
+            client.Send(new ObtainedItemMessage(ConstantsRepertory.TOKEN_ID, quantity));
         }
 
-        [InGameCommand("spawn",ServerRoleEnum.MODERATOR)]
-        public static void SpawnCommand(string value,WorldClient client)
+        [InGameCommand("spawn", ServerRoleEnum.MODERATOR)]
+        public static void SpawnCommand(string value, WorldClient client)
         {
-          /*  MonsterSpawnMapRecord monster = new MonsterSpawnMapRecord(100000 + 100, ushort.Parse(value), client.Character.Record.MapId, 100);
-            List<MonsterSpawnMapRecord> list = new List<MonsterSpawnMapRecord>();
+            /*  MonsterSpawnMapRecord monster = new MonsterSpawnMapRecord(100000 + 100, ushort.Parse(value), client.Character.Record.MapId, 100);
+              List<MonsterSpawnMapRecord> list = new List<MonsterSpawnMapRecord>();
 
-            list.Add(monster);
-           client.Character.Map.Instance.MonstersGroups.Add(new MonsterGroup(100, list, 100));*/
+              list.Add(monster);
+             client.Character.Map.Instance.MonstersGroups.Add(new MonsterGroup(100, list, 100));*/
         }
 
         [InGameCommand("walkable", ServerRoleEnum.FONDATOR)]
@@ -556,26 +556,26 @@ namespace Symbioz.World.Handlers
             client.Character.Teleport(99090957, 413);
         }
 
-        [InGameCommand("koriandre",ServerRoleEnum.PLAYER)]
-        public static void Koriandre(string value,WorldClient client)
+        [InGameCommand("koriandre", ServerRoleEnum.PLAYER)]
+        public static void Koriandre(string value, WorldClient client)
         {
             client.Character.Teleport(60036612, 301);
         }
 
-        [InGameCommand("givrefoux",ServerRoleEnum.PLAYER)]
-        public static void GivreFoux(string value,WorldClient client)
+        [InGameCommand("givrefoux", ServerRoleEnum.PLAYER)]
+        public static void GivreFoux(string value, WorldClient client)
         {
             client.Character.Teleport(54174027, 410);
         }
 
-        [InGameCommand("obsi",ServerRoleEnum.PLAYER)]
-        public static void ObsiCommand(string value,WorldClient client)
+        [InGameCommand("obsi", ServerRoleEnum.PLAYER)]
+        public static void ObsiCommand(string value, WorldClient client)
         {
             client.Character.Teleport(54169427, 271);
         }
 
-        [InGameCommand("mutemap",ServerRoleEnum.MODERATOR)]
-        public static void MuteMap(string value,WorldClient client)
+        [InGameCommand("mutemap", ServerRoleEnum.MODERATOR)]
+        public static void MuteMap(string value, WorldClient client)
         {
             if (client.Character.Map.Instance.Muted)
             {
@@ -589,8 +589,8 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("banip",ServerRoleEnum.MODERATOR)]
-        public static void BanIpCommand(string value,WorldClient client)
+        [InGameCommand("banip", ServerRoleEnum.MODERATOR)]
+        public static void BanIpCommand(string value, WorldClient client)
         {
             var target = WorldServer.Instance.GetOnlineClient(value);
             if (target.Account.Role == ServerRoleEnum.FONDATOR)
@@ -678,7 +678,7 @@ namespace Symbioz.World.Handlers
             var target = WorldServer.Instance.GetOnlineClient(value);
             if (target != null && target.Character.Restrictions.isMuted == true
                 && !(target.Character.Restrictions.isMuted = false))
-                    client.Character.Reply("Le joueur a bien été unmute.");
+                client.Character.Reply("Le joueur a bien été unmute.");
             else if (target == null)
                 client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
             else
@@ -719,9 +719,15 @@ namespace Symbioz.World.Handlers
         {
             if (!client.Character.IsFighting)
             {
-                client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
-                client.Character.RefreshStats();
-                client.Character.Reply("Vous avez récupérer vos points de vie !");
+                if (!client.Character.Restrictions.isDead)
+                {
+                    client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
+                    client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
+                    client.Character.RefreshStats();
+                    client.Character.Reply("Vous avez récupérer vos points de vie !");
+                }
+                else
+                    client.Character.Reply("Impossible de récupérer vos points de vie en étant mort !");
             }
             else
                 client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
@@ -734,15 +740,14 @@ namespace Symbioz.World.Handlers
         }
 
         [InGameCommand("rewrite", ServerRoleEnum.MODERATOR)]
-        public static void Rewrite(string value, WorldClient client)
-        {
-            DataWriterProvider.Instance.Generate();
-            client.Character.Reply("Génération des fichiers de données forcée.");
-        }
+         public static void Rewrite(string value, WorldClient client)
+         {
+             DataWriterProvider.Instance.Generate();
+             client.Character.Reply("Génération des fichiers de données forcée.");
+         }
+    #endregion
 
-        #endregion
-
-        static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
+    static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
         {
             var target = WorldServer.Instance.GetOnlineClient(targetname);
             if (target != null)
@@ -757,4 +762,3 @@ namespace Symbioz.World.Handlers
         }
     }
 }
- 

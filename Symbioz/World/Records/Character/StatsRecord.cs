@@ -290,8 +290,11 @@ namespace Symbioz.World.Records
            
             }
             var expNextFloor = ExperienceRecord.GetExperienceForLevel((uint)(character.Record.Level + 1));
+            if (character.Record.CurrentLifePoint > character.StatsRecord.LifePoints)
+                character.Record.CurrentLifePoint = 1;
+            character.CurrentStats.LifePoints = (uint)character.Record.CurrentLifePoint;
             var detailedstats = new CharacterCharacteristicsInformations(character.Record.Exp, expFloor, expNextFloor, character.Record.Kamas, character.Record.StatsPoints, 0, character.Record.SpellPoints, align,
-                (uint)(character.CurrentStats.LifePoints), (uint)stats.LifePoints, character.CurrentStats.Energy, (ushort)stats.MaxEnergyPoints, stats.ActionPoints, stats.MovementPoints, GetBase((short)character.Initiative), GetBase(stats.Prospecting),
+                (uint)character.Record.CurrentLifePoint, (uint)stats.LifePoints, character.CurrentStats.Energy, (ushort)stats.MaxEnergyPoints, stats.ActionPoints, stats.MovementPoints, GetBase((short)character.Initiative), GetBase(stats.Prospecting),
                 GetBase((short)apMax), GetBase((short)mpMax), GetBase(stats.BaseStrength,stats.ContextStrength,stats.PermanentStrenght), GetBase(stats.BaseVitality,stats.ContextVitality,stats.PermanentVitality), GetBase(stats.BaseWisdom,stats.ContextWisdom,stats.PermanentWisdom), GetBase(stats.BaseChance,stats.ContextChance,stats.PermanentChance), GetBase(stats.BaseAgility,stats.ContextAgility,stats.PermanentAgility), GetBase(stats.BaseIntelligence,stats.ContextIntelligence,stats.PermanentIntelligence),
                 GetBase(stats._Range), GetBase(stats.SummonableCreaturesBoost), GetBase(stats.Reflect), GetBase(stats.CriticalHit), (ushort)stats.CriticalHitWeapon, GetBase(0), GetBase(stats.HealBonus), GetBase(stats.AllDamagesBonus),
                 GetBase(stats.WeaponDamagesBonusPercent), GetBase(stats.AllDamagesBonusPercent), GetBase(stats.TrapBonus), GetBase(stats.TrapBonusPercent), GetBase(stats.GlyphBonusPercent), GetBase(0),
@@ -324,6 +327,7 @@ namespace Symbioz.World.Records
             character.Record.StatsPoints = 0;
             var stats = new StatsRecord(character.Id, breed.StartLifePoints, (short)(ConfigurationManager.Instance.StartLevel * 10), breed.StartLifePoints, breed.StartProspecting, 6, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0);
             character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
+            character.Record.CurrentLifePoint = character.CurrentStats.LifePoints;
             SaveTask.AddElement(stats);
             character.AddElement(stats);
         }

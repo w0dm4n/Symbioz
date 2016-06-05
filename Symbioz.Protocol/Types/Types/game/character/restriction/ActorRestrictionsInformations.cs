@@ -57,6 +57,7 @@ public virtual short TypeId
         public bool cantChangeZone;
         public bool cantAttackMonster;
         public bool cantWalk8Directions;
+        public bool isDead;
         
 
 public ActorRestrictionsInformations()

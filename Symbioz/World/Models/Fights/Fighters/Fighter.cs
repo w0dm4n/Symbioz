@@ -720,7 +720,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             if (eventtype == FighterEventType.AFTER_DIED)
             {
-                Logger.Log("Je suis mort !");
+                
             }
             bool result = false;
             var buffs = Buffs.FindAll(x => x.EventType == eventtype && x.Delay == 0);

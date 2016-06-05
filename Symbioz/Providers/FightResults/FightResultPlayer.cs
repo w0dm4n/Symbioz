@@ -45,17 +45,20 @@ namespace Symbioz.Providers.FightResults
             {
                 if (ConfigurationManager.Instance.ServerId == 22)
                 {
-                    client.Character.Record.DeathCount++;
-                    if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
-                        client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
-                    client.Character.Record.Energy = 0;
-                    client.Character.Look = ContextActorLook.Parse("{24}");
-                    client.Character.Restrictions.cantChat = true;
-                    client.Character.Restrictions.cantMove = true;
-                    client.Character.Restrictions.cantSpeakToNPC = true;
-                    client.Character.Restrictions.cantExchange = true;
-                    client.Character.Restrictions.cantAttackMonster = true;
-                    client.Character.Reply("Vous êtes mort !", false, false);
+                    if (!client.Character.Restrictions.isDead)
+                    {
+                        client.Character.Record.DeathCount++;
+                        if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
+                            client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
+                        client.Character.Record.Energy = 0;
+                        client.Character.Look = ContextActorLook.Parse("{24}");
+                        client.Character.Restrictions.cantMove = true;
+                        client.Character.Restrictions.cantSpeakToNPC = true;
+                        client.Character.Restrictions.cantExchange = true;
+                        client.Character.Restrictions.cantAttackMonster = true;
+                        client.Character.Restrictions.isDead = true;
+                        client.Character.Reply("Vous êtes mort !", false, false);
+                    }
                 }
             }
             if (fighter.Fight is FightArena && winner == fighter.Team.TeamColor)

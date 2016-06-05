@@ -83,6 +83,7 @@ namespace Symbioz.World.Handlers
                         linkedStat.SetValue((short)num);
                         client.Character.StatsRecord.LifePoints += (short)(client.Character.StatsRecord.BaseVitality - previousVitality);
                         client.Character.CurrentStats.LifePoints += (uint)(client.Character.StatsRecord.BaseVitality - previousVitality);
+                        client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                     }
                     else
                     {

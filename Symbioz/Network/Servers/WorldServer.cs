@@ -92,6 +92,7 @@ namespace Symbioz.Network.Servers
                     client.Character.FighterInstance.Fight.FighterDisconnect(client.Character.FighterInstance);
                     remove = false;
                 }
+                client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                 client.Character.Save();
             }
             if (remove == true)
