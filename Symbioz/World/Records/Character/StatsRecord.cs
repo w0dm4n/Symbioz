@@ -283,7 +283,7 @@ namespace Symbioz.World.Records
             var apMax = character.StatsRecord.ActionPoints;
           
 
-            if (character.FighterInstance != null)
+            if (character.FighterInstance != null && character.IsRegeneratingLife == false)
             {
                 mpMax = character.FighterInstance.FighterStats.RealStats.MovementPoints;
                 apMax = character.FighterInstance.FighterStats.RealStats.ActionPoints;

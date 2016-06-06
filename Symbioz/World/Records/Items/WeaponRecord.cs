@@ -236,7 +236,6 @@ namespace Symbioz.World.Records.Items
             else
                 Logger.Log("INCONNUE");
             allCell[0] = (short)currentCell;
-            Logger.Log("DIRECTION = " + direction);
             switch (direction)
             {
                 case 1://bas droit

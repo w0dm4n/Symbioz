@@ -76,6 +76,7 @@ namespace Symbioz.World.Handlers
                     client.Character.RefreshOnMapInstance();
                     client.Character.Record.Direction = direction;
                     client.Character.MovedCell = cellid;
+                    client.Character.CheckRegen();
                     client.Character.SendMap(new GameMapMovementMessage(message.keyMovements, client.Character.Id));
                 }
             }
@@ -220,6 +221,18 @@ namespace Symbioz.World.Handlers
         public static void HandleEmotePlay(EmotePlayRequestMessage message, WorldClient client)
         {
             EmoteRecord template = EmoteRecord.GetEmote(message.emoteId);
+            if (template.Id == 1) // ASSIS EMOTE ID
+            {
+                if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 10)
+                    client.Character.StopRegenLife();
+                if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 3)
+                {
+                    client.Character.StopRegenLife();
+                    client.Character.RegenLife(3);
+                }
+                else
+                  client.Character.RegenLife(3);
+           }
             if (template.IsAura)
             {
                 client.Character.PlayAura(message.emoteId);

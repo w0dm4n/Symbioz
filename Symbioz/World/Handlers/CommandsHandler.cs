@@ -596,7 +596,6 @@ namespace Symbioz.World.Handlers
             }
             else
                 client.Character.Reply("Syntaxe incorrecte : (joueur, titre)");
-            client.Character.AddTitle(ushort.Parse(value));
         }
 
         [InGameCommand("elements", ServerRoleEnum.FONDATOR)]
@@ -644,7 +643,19 @@ namespace Symbioz.World.Handlers
         [InGameCommand("emotes", ServerRoleEnum.MODERATOR)]
         public static void EmoteCommand(string value, WorldClient client)
         {
-            client.Character.LearnEmote(byte.Parse(value));
+            if (value == null)
+                return;
+            string[] Array = value.Split(' ');
+            if (Array != null && Array.Length == 2)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(Array[0]);
+                if (target != null)
+                    client.Character.LearnEmote(byte.Parse(Array[1]));
+                else
+                    client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+            }
+            else
+                client.Character.Reply("Syntaxe incorrecte : (joueur, id)");
         }
 
         [InGameCommand("pvp", ServerRoleEnum.PLAYER)]
@@ -852,9 +863,9 @@ namespace Symbioz.World.Handlers
              DataWriterProvider.Instance.Generate();
              client.Character.Reply("Génération des fichiers de données forcée.");
          }
-    #endregion
+        #endregion
 
-    static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
+        static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
         {
             var target = WorldServer.Instance.GetOnlineClient(targetname);
             if (target != null)

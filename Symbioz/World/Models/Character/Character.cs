@@ -31,6 +31,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using Symbioz.World.Models.Succes;
+using Shader.Helper;
 
 namespace Symbioz.World.Models
 {
@@ -44,6 +45,9 @@ namespace Symbioz.World.Models
         public bool isGod = false;
         public bool isDebugging = false;
         public ushort SubAreaId { get; set; }
+        public DateTime RegenStartTime;
+        public bool IsRegeneratingLife;
+        public short RegenRate;
         public MapRecord Map { get; set; }
         public short MovedCell { get; set; }
         public WorldClient Client { get; set; }
@@ -869,8 +873,8 @@ namespace Symbioz.World.Models
             }
             else
                 MapsHandler.SendCurrentMapMessage(Client, Client.Character.Record.MapId);
-            RefreshStats();
-
+             Client.Character.RegenLife(10);
+             Client.Character.RefreshStats();
         }
         public void EquipCompanion(short templateid)
         {
@@ -1120,6 +1124,86 @@ namespace Symbioz.World.Models
                 Record.Succes = id;
             else
                 Record.Succes += "," + id;
+        }
+
+        public void RegenLife(short RegenRate)
+        {
+            if (this.CurrentStats.LifePoints < this.StatsRecord.LifePoints)
+            {
+                this.Client.Send(new LifePointsRegenBeginMessage((byte)RegenRate));
+                RegenStartTime = DateTime.Now;
+                
+                this.RegenRate = RegenRate;
+                this.IsRegeneratingLife = true;
+            } 
+        }
+
+        public void CheckRegen()
+        {
+            if (this.IsRegeneratingLife)
+            {
+                if (this.RegenRate == 3)
+                {
+                    if (this.CurrentStats.LifePoints < this.StatsRecord.LifePoints)
+                    {
+                        this.StopRegenLife();
+                        this.RegenLife(10);
+                    }
+                }
+            }
+        }
+
+        public void GetLifeBackAtConnection()
+        {
+            var StartTime = this.Record.LastConnection;
+            var AtBegin = this.CurrentStats.LifePoints;
+            if (StartTime == 0)
+                return;
+            var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+            var LifePointsToAdd = 0;
+            while (StartTime < CurrentTime)
+            {
+                if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.StatsRecord.LifePoints)
+                    break;
+                LifePointsToAdd++;
+                StartTime++;
+            }
+            //LifePointsToAdd = LifePointsToAdd / 2; If we wanna reduce the rate of life back at the reconnection
+            this.CurrentStats.LifePoints += (uint)LifePointsToAdd;
+            if (this.CurrentStats.LifePoints > this.StatsRecord.LifePoints)
+                this.CurrentStats.LifePoints = (uint)this.StatsRecord.LifePoints;
+            this.Record.CurrentLifePoint = this.CurrentStats.LifePoints;
+            if (LifePointsToAdd != 0 && this.CurrentStats.LifePoints != AtBegin)
+                Client.Character.RefreshStats();
+        }
+
+        public void StopRegenLife()
+        {
+            if (this.IsRegeneratingLife)
+            {
+                this.Client.Send(new LifePointsRegenEndMessage());
+                var StartTime = DateTimeUtils.GetEpochFromDateTime(RegenStartTime);
+                var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                var LifePointsToAdd = 0;
+                while (StartTime < CurrentTime)
+                {
+                    if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.StatsRecord.LifePoints)
+                        break;
+                    if (this.RegenRate == 10)
+                        LifePointsToAdd++;
+                    else if (this.RegenRate == 3)
+                        LifePointsToAdd += 3;
+                    StartTime++;
+                }
+                if (this.RegenRate == 3)
+                    LifePointsToAdd++;
+                this.CurrentStats.LifePoints += (uint)LifePointsToAdd;
+                if (this.CurrentStats.LifePoints > this.StatsRecord.LifePoints)
+                    this.CurrentStats.LifePoints = (uint)this.StatsRecord.LifePoints;
+                this.Record.CurrentLifePoint = this.CurrentStats.LifePoints;
+                this.RefreshStats();
+                this.IsRegeneratingLife = false;
+            }
         }
     }
 }

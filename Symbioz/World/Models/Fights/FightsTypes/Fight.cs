@@ -521,8 +521,11 @@ namespace Symbioz.World.Models.Fights
             foreach (var fighter in charactersFighting)
             {
                 bool winner = GetWinner() == fighter.Team.TeamColor;
-                fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
-                fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                if (fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)
+                {
+                    fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
+                    fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                }
                 fighter.Client.Character.RejoinMap(SpawnJoin, winner);
             }
             FightProvider.Instance.RemoveFight(this);

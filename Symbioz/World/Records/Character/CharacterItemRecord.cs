@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Symbioz.World.Records.Items;
 
 namespace Symbioz.World.Models
 {
@@ -124,6 +125,12 @@ namespace Symbioz.World.Models
         {
             return ItemRecord.GetItem(GID);
         }
+
+        public WeaponRecord GetWeaponTemplate()
+        {
+            return WeaponRecord.GetWeapon(GID);
+        }
+
         public CharacterItemRecord ToMimicry(int newskinid)
         {
             return ItemEditor.AddEffectsAndClone(this, new List<ObjectEffect>() { new ObjectEffectInteger((ushort)EffectsEnum.Eff_Mimicry, (ushort)newskinid) },1);

@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,7 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.World.Records;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Parties;
+using Shader.Helper;
 
 namespace Symbioz.Network.Servers
 {
@@ -93,6 +94,9 @@ namespace Symbioz.Network.Servers
                     remove = false;
                 }
                 client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
+                if (client.Character.IsRegeneratingLife)
+                    client.Character.StopRegenLife();
+                client.Character.Record.LastConnection = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                 client.Character.Save();
             }
             if (remove == true)

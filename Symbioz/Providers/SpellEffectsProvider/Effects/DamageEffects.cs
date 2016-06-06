@@ -115,9 +115,11 @@ namespace Symbioz.Providers.SpellEffectsProvider
         [EffectHandler(EffectsEnum.Eff_DamageNeutral)]
         public static void DamageNeutral(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
-            var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.NeutralDamageBonus);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Neutral), fighter.ContextualId));
+            var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Strength);
+            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Earth), fighter.ContextualId));
 
+            /*var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.NeutralDamageBonus);
+            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Neutral), fighter.ContextualId));*/
         }
         [EffectHandler(EffectsEnum.Eff_Kill)]
         public static void Kill(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)

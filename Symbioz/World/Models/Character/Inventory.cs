@@ -366,32 +366,8 @@ namespace Symbioz.World.Models
         {
             if (!ConditionProvider.ParseAndEvaluate(Character.Client, template.Criteria))
             {
-                Character.Reply("Vous n'avez pas les critères nessessaire pour équiper cet objet");
+                Character.Reply("Vous n'avez pas les critères nessessaire pour équiper cet arme");
                 return;
-            }
-            if (CheckRingStacks(item, newposition))
-            {
-                Character.Reply("Vous avez déja équipé cet anneau!");
-                return;
-            }
-            if (CheckDofusStacks(item, newposition))
-            {
-                Character.Reply("Vous avez déja équipé ce dofus");
-                return;
-            }
-            if (DOFUS_POSITIONS.Contains((CharacterInventoryPositionEnum)item.Position) && DOFUS_POSITIONS.Contains((CharacterInventoryPositionEnum)newposition))
-                return;
-            if ((CharacterInventoryPositionEnum)newposition == CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD)
-            {
-                var weapon = GetEquipedWeapon();
-                if (weapon != null)
-                {
-                    if (WeaponRecord.GetWeapon(weapon.GID).TwoHanded)
-                    {
-                        Character.Reply("Vous devez deséquiper votre arme pour équiper le bouclier.");
-                        return;
-                    }
-                }
             }
             if ((CharacterInventoryPositionEnum)newposition == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)
             {
@@ -405,7 +381,7 @@ namespace Symbioz.World.Models
             var equiped = EquipedItem(newposition);
             if (equiped != null)
             {
-                UnequipItem(equiped, 63, equiped.GetTemplate(), quantity);
+                UnequipWeapon(equiped, 63, equiped.GetWeaponTemplate(), quantity);
                 SaveTask.UpdateElement(equiped);
                 this.Character.UpdateElement(equiped);
             }
@@ -425,7 +401,6 @@ namespace Symbioz.World.Models
                 AddWeaponSkin(item, template);
             }
             Character.RefreshGroupInformations();
-
         }
 
         public void UnequipItem(CharacterItemRecord item, byte newposition, ItemRecord template, uint quantity)
@@ -483,10 +458,10 @@ namespace Symbioz.World.Models
             return Items.Find(x => x.Position == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         }
         public void MoveItem(uint uid, byte newposition, uint quantity)
-        {
+        {  
             if (Character.IsFighting)
             {
-                Character.Reply("Impossible en de combat", true);
+                Character.Reply("Impossible en combat", true);
                 return;
             }
             var item = GetItem(uid);

@@ -68,6 +68,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
         }
         public UInt16ReflectedStat GetStatData()
         {
+            Logger.Log(PunishementAction);
             switch (PunishementAction)
             {
                 case 118:

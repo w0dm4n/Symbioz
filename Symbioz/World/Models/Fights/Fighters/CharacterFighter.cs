@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Symbioz.World.Models.Fights.Fighters
 {
@@ -55,6 +56,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public override void OnAdded()
         {
+            Client.Character.StopRegenLife();
             Client.Send(new GameFightJoinMessage(false, true, false, Fight.FIGHT_PREPARATION_TIME, (sbyte)Fight.FightType));
             Fight.ShowPlacementCells();
             base.OnAdded();
@@ -360,6 +362,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(2, 0);
             return true;
         }
+
+        private void CheckFightEnd(object source, ElapsedEventArgs e)
+        {
+            Fight.CheckFightEnd();
+        }
+
         public void HandleWeaponEffect(short cellid, List<ExtendedSpellEffect> handledEffects, FightSpellCastCriticalEnum critical,
             WeaponRecord template, MapRecord CurrentMap, short CasterCellId)
         {
@@ -371,7 +379,10 @@ namespace Symbioz.World.Models.Fights.Fighters
                 SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
                 Fight.TryEndSequence(1, 0);
             }
-            Fight.CheckFightEnd();
+            System.Timers.Timer Timer = new System.Timers.Timer();
+            Timer.Elapsed += new ElapsedEventHandler(CheckFightEnd);
+            Timer.Interval = 2000;
+            Timer.Enabled = true;
         }
     }
 }

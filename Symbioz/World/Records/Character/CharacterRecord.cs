@@ -102,6 +102,8 @@ namespace Symbioz.World.Records
         public string Succes;
         [Update]
         public uint CurrentLifePoint;
+        [Update]
+        public int LastConnection;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -109,7 +111,7 @@ namespace Symbioz.World.Records
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
-            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint)
+            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int LastConnection)
         {
             this.Id = id;
             this.Name = name;
@@ -152,6 +154,7 @@ namespace Symbioz.World.Records
             this.DeathMaxLevel = deathMaxLevel;
             this.Succes = succes;
             this.CurrentLifePoint = currentLifePoint;
+            this.LastConnection = LastConnection;
         }
         [BeforeSave]
         public static void BeforeSave()
@@ -186,7 +189,7 @@ namespace Symbioz.World.Records
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0);
         }
         public static bool CheckCharacterNameExist(string name)
         {
