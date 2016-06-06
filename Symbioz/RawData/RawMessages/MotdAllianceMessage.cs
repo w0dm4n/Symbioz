@@ -7,25 +7,25 @@ using System.Threading.Tasks;
 
 namespace Symbioz.RawData.RawMessages
 {
-    public class BugReportMessage : RawMessage
+    public class MotdAllianceMessage : RawMessage
     {
-        public const short Id = 1;
-        
-        public string Value { get; set; }
+        public const short Id = 2;
 
-        public BugReportMessage() { }
-        public BugReportMessage(string value)
+        public string Message { get; set; }
+
+        public MotdAllianceMessage() { }
+        public MotdAllianceMessage(string value)
         {
-            this.Value = value;
+            this.Message = value;
         }
         public override void Serialize(BigEndianWriter writer)
         {
-            writer.WriteUTF(Value);
+            writer.WriteUTF(this.Message);
         }
 
         public override void Deserialize(BigEndianReader reader)
         {
-            this.Value = reader.ReadUTF();
+            this.Message = reader.ReadUTF();
         }
     }
 }

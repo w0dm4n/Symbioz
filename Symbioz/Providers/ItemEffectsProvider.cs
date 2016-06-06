@@ -219,7 +219,6 @@ namespace Symbioz.Provider
             //}
             //client.Character.RefreshMapInstance();
         }
-
         private static void Wisdom(WorldClient client, short value)
         {
             client.Character.StatsRecord.ContextWisdom += value;

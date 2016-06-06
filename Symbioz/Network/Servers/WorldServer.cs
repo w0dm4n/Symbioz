@@ -115,6 +115,10 @@ namespace Symbioz.Network.Servers
         {
             return GetAllClientsOnline().Find(x => x.Character.Record.Name == characterName);
         }
+        public WorldClient GetOnlineClientByAccountId(int accountId)
+        {
+            return GetAllClientsOnline().Find(x => x.Account.Id == accountId);
+        }
         public Party GetPartyById(int partyId)
         {
             return this.Parties.Find(x => x.Id == partyId);

@@ -1,7 +1,0 @@
-Client: 127.0.0.1:63503
-At: 03/06/2016 07:19:20
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Fights.Fight.Dispose() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 527
-   à Symbioz.World.Models.Fights.Fight.EndFight() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 452
-   à Symbioz.World.Models.Fights.ClientsSynchronizer.ToggleReady(CharacterFighter fighter) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\ClientsSynchronizer.cs:ligne 60
-   à Symbioz.World.Handlers.FightHandler.HandleTurnReady(GameFightTurnReadyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 25

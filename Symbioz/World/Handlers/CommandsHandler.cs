@@ -14,6 +14,7 @@ using Symbioz.ORM;
 using Symbioz.Providers.DataWriter;
 using Symbioz.Providers.Maps;
 using Symbioz.World.Models;
+using Symbioz.World.Models.Alliances;
 using Symbioz.World.Models.Fights.Marks;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.PathProvider;
@@ -858,11 +859,67 @@ namespace Symbioz.World.Handlers
         }
 
         [InGameCommand("rewrite", ServerRoleEnum.MODERATOR)]
-         public static void Rewrite(string value, WorldClient client)
-         {
-             DataWriterProvider.Instance.Generate();
-             client.Character.Reply("Génération des fichiers de données forcée.");
-         }
+        public static void Rewrite(string value, WorldClient client)
+        {
+            DataWriterProvider.Instance.Generate();
+            client.Character.Reply("Génération des fichiers de données forcée.");
+        }
+
+        [InGameCommand("motd", ServerRoleEnum.PLAYER)]
+        public static void SetMotd(string value, WorldClient client)
+        {
+            string defaultSyntaxErrorMessage = "Arguments incorrects :<br/>- <b>.motd guild</b> (Pour définir le message d'accueil de votre guilde).<br/>- <b>.motd alliance</b> (Pour définir le message d'accueil de votre alliance).";
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                switch (value)
+                {
+                    case "guild":
+                        if (client.Character.HasGuild)
+                        {
+                            if (GuildProvider.IsLeader(client.Character.Id, client.Character.GetGuild().Id))
+                            {
+                                TrySendRaw(client, "GuildMotd");
+                            }
+                            else
+                            {
+                                client.Character.Reply("Vous devez être meneur de votre guilde pour définir le message d'accueil de celle-ci");
+                            }
+                        }
+                        else
+                        {
+                            client.Character.Reply("Vous n'appartenez à aucune guilde.");
+                        }
+                        break;
+
+                    case "alliance":
+                        if (client.Character.HasAlliance && client.Character.HasGuild)
+                        {
+                            if (AllianceProvider.IsLeader(client.Character.Id, client.Character.GuildId, client.Character.AllianceId))
+                            {
+                                TrySendRaw(client, "AllianceMotd");
+                            }
+                            else
+                            {
+                                client.Character.Reply("Vous devez être meneur de votre alliance pour définir le message d'accueil de celle-ci");
+                            }
+                        }
+                        else
+                        {
+                            client.Character.Reply("Vous n'appartenez à aucune alliance.");
+                        }
+                        break;
+
+                    default:
+                        client.Character.Reply(defaultSyntaxErrorMessage);
+                        break;
+                }
+            }
+            else
+            {
+                client.Character.Reply(defaultSyntaxErrorMessage);
+            }
+        }
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
@@ -877,6 +934,14 @@ namespace Symbioz.World.Handlers
             }
             else
                 client.Character.NotificationError("Le client " + targetname + " n'existe pas ou n'est pas connecté.");
+        }
+
+        static void TrySendRaw(WorldClient targetClient, string rawname)
+        {
+            if (targetClient != null)
+            {
+                targetClient.SendRaw(rawname);
+            }
         }
     }
 }

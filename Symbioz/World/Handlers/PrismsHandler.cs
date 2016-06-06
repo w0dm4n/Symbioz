@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Symbioz.World.Handlers
 {
-    class PrismsHandler
+    public class PrismsHandler
     {
         [MessageHandler]
-        public static void HandlePrismList(PrismsListRegisterMessage message,WorldClient client)
+        public static void HandlePrismList(PrismsListRegisterMessage message, WorldClient client)
         {
             client.Send(new PrismsListMessage(new PrismSubareaEmptyInfo[0]));
         }

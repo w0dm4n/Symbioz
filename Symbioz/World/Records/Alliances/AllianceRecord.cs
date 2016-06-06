@@ -34,8 +34,9 @@ namespace Symbioz.World.Records.Alliances
         public int BackgroundColor;
         public int LeaderGuildId;
         public DateTime CreationDate;
+        public string AllianceWelcomeMessage;
 
-        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, sbyte backgroundShape, int backgroundColor, int leader, DateTime creationDate)
+        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, sbyte backgroundShape, int backgroundColor, int leader, DateTime creationDate, string allianceWelcomeMessage)
         {
             this.Id = id;
             this.Name = name;
@@ -46,6 +47,7 @@ namespace Symbioz.World.Records.Alliances
             this.BackgroundColor = backgroundColor;
             this.LeaderGuildId = leader;
             this.CreationDate = creationDate;
+            this.AllianceWelcomeMessage = allianceWelcomeMessage;
         }
 
         public GuildEmblem GetEmblemObject()

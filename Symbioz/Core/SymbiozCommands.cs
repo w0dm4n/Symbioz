@@ -104,8 +104,8 @@ namespace Symbioz.Core
         internal static void Restore()
         {
             AuthDatabaseProvider.Clean(new string[] { "Characters", "CharactersItems", "CharactersJobs",
-                "Stats", "BidShopsItems", "SpellsShortcuts", "CharactersSpells","GeneralShortcuts","Guilds","CharactersGuilds" });
-            Logger.Init("Database Restored, Characters Deleted");
+                "Stats", "BidShopsItems", "SpellsShortcuts", "CharactersSpells", "GeneralShortcuts", "Guilds", "CharactersGuilds", "Alliances", "GuildsAlliances" });
+            Logger.Init("Database restored !");
             System.Threading.Thread.Sleep(2000);
             Environment.Exit(0);
         }

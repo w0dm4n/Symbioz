@@ -21,16 +21,11 @@ namespace Symbioz.World.Models.Guilds
     {
         public static GuildRightsBitEnum DEFAULT_JOIN_RANK = GuildRightsBitEnum.GUILD_RIGHT_NONE;
         public static byte EMOTE_ID = 97;
-        /// <summary>
-        /// Créer le GuildRecord et le CharacterGuildRecord, et les met en cache pour les sauvegarder en db.
-        /// </summary>
-        /// <param name="owner"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
+
         public GuildRecord CreateGuild(Character owner, GuildCreationValidMessage message)
         {
             GuildRecord guild = new GuildRecord(GuildRecord.PopNextId(), message.guildName, message.guildEmblem.symbolShape,
-                   message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1, DateTime.Now);
+                   message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1, DateTime.Now, string.Empty);
             owner.AddElement(guild);
             owner.Save();
             JoinGuild(guild, owner, GuildRightsBitEnum.GUILD_RIGHT_BOSS, (ushort)GuildRightsBitEnum.GUILD_RIGHT_BOSS);

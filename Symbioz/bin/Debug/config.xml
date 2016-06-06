@@ -25,5 +25,5 @@
   <RealHost />
   <SafeRun>False</SafeRun>
   <CyclicFileGenerationInterval>900000</CyclicFileGenerationInterval>
-  <CyclicFileGenerationPath>E:/UwAmp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
+  <CyclicFileGenerationPath>C:/wamp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
 </Configuration>

@@ -1,5 +1,0 @@
-Client: 127.0.0.1:61351
-At: 05/06/2016 03:06:37
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Alliances.AllianceInvitationDialog.Answer(Boolean accept) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Alliances\AllianceInvitationDialog.cs:ligne 37
-   à Symbioz.World.Handlers.AlllianceHandler.HandleAllianceInvitationAnswerMessage(AllianceInvitationAnswerMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\AlllianceHandler.cs:ligne 78

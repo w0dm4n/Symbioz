@@ -11,8 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Symbioz.Helper;
 using Symbioz.RawData.RawMessages;
-using Symbioz.RawData.Records;
 using Symbioz.ORM;
+using Symbioz.Network.Servers;
+using Symbioz.World.Models.Guilds;
+using Symbioz.World.Models.Alliances;
 
 namespace Symbioz.RawData
 {
@@ -36,7 +38,7 @@ namespace Symbioz.RawData
             }
         }
 
-        [StartupInvoke("Raw Handlers", StartupInvokeType.Others)]
+        [StartupInvoke("RawHandlers", StartupInvokeType.Others)]
         public static void Initialize()
         {
             foreach (var method in typeof(RawDatasHandler).GetMethods())
@@ -49,41 +51,37 @@ namespace Symbioz.RawData
             }
         }
 
-        [RawHandlerAttribute(BugReportMessage.Id)]
-        public static void HandleBugReportMessage(DofusClient client, BugReportMessage message)
+        [RawHandlerAttribute(MotdGuildMessage.Id)]
+        public static void HandleMotdGuildMessage(DofusClient client, MotdGuildMessage message)
         {
-            message.Value = message.Value.Replace("'", " ");
-            if (message.Value != string.Empty)
-                new BugReportRecord(message.Value).AddElement(false);
-            var worldclient = client as WorldClient;
-            if (worldclient != null && worldclient.Character != null)
-             worldclient.Character.ShowNotification("Votre rapport d'erreur a été soumis avec succès, merci.");
-        }
-
-        [RawHandlerAttribute(WhoAreYouMessage.Id)]
-        public static void HandleWhoAreYouMessage(DofusClient client,WhoAreYouMessage message)
-        {
-            Logger.Init("Client Definition:");
-            Logger.Init2("-Ip: "+client.SSyncClient.Ip);
-            Logger.Init2("-OS: " + message.OS);
-            Logger.Init2("-Username: " + message.Username);
-            if (client.Account != null)
-            Logger.Init2("-Account: " + client.Account.Username);
-            var worldclient = client as WorldClient;
-            if (worldclient != null)
+            var worldClient = WorldServer.Instance.GetOnlineClientByAccountId(client.Account.Id);
+            if (worldClient != null)
             {
-                if (worldclient.Character != null)
-                    Logger.Init2("-Character: " + worldclient.Character.Record.Name);
+                if (worldClient.Character.HasGuild && GuildProvider.IsLeader(worldClient.Character.Id, worldClient.Character.GetGuild().Id))
+                {
+                    if (!string.IsNullOrEmpty(message.Message))
+                    {
+                        worldClient.Character.GetGuild().GuildWelcomeMessage = message.Message;
+                        worldClient.Character.Reply("Vous avez modifié le message d'accueil de votre guilde.");
+                    }
+                }
             }
         }
 
-        [RawHandlerAttribute(FilesDirMessage.Id)]
-        public static void HandleFileDir(DofusClient client,FilesDirMessage message)
+        [RawHandlerAttribute(MotdAllianceMessage.Id)]
+        public static void HandleMotdAllianceMessage(DofusClient client, MotdAllianceMessage message)
         {
-            foreach (var bj in message.Files)
+            var worldClient = WorldServer.Instance.GetOnlineClientByAccountId(client.Account.Id);
+            if (worldClient != null)
             {
-                
-                Logger.Log(bj);
+                if (worldClient.Character.HasAlliance && worldClient.Character.HasGuild && AllianceProvider.IsLeader(worldClient.Character.Id, worldClient.Character.GuildId, worldClient.Character.AllianceId))
+                {
+                    if (!string.IsNullOrEmpty(message.Message))
+                    {
+                        worldClient.Character.GetAlliance().AllianceWelcomeMessage = message.Message;
+                        worldClient.Character.Reply("Vous avez modifié le message d'accueil de votre alliance.");
+                    }
+                }
             }
         }
     }

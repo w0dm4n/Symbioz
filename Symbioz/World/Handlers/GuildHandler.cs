@@ -84,7 +84,7 @@ namespace Symbioz.World.Handlers
             if (WorldServer.Instance.IsConnected(member.CharacterId))
             {
                 WorldClient targetClient = WorldServer.Instance.GetOnlineClient(member.CharacterId);
-                targetClient.Send(new GuildMembershipMessage(targetClient.Character.GetGuild().GetGuildInformations(),message.rights,true));
+                targetClient.Send(new GuildMembershipMessage(targetClient.Character.GetGuild().GetGuildInformations(), message.rights, true));
             }
         }
 

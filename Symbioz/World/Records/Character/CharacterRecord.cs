@@ -111,7 +111,7 @@ namespace Symbioz.World.Records
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
-            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int LastConnection)
+            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int lastConnection)
         {
             this.Id = id;
             this.Name = name;
@@ -154,7 +154,7 @@ namespace Symbioz.World.Records
             this.DeathMaxLevel = deathMaxLevel;
             this.Succes = succes;
             this.CurrentLifePoint = currentLifePoint;
-            this.LastConnection = LastConnection;
+            this.LastConnection = lastConnection;
         }
         [BeforeSave]
         public static void BeforeSave()

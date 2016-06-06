@@ -134,6 +134,8 @@
     <Compile Include="Providers\Conditions\WisdomCondition.cs" />
     <Compile Include="Providers\CustomObjectUseHandler.cs" />
     <Compile Include="Providers\DataWriter\DataWriterProvider.cs" />
+    <Compile Include="RawData\RawMessages\MotdAllianceMessage.cs" />
+    <Compile Include="RawData\RawMessages\RawMessage.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Handlers\ApproachHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
@@ -218,12 +220,8 @@
     <Compile Include="Providers\SpellEffectsProvider\Effects\MovementEffects.cs" />
     <Compile Include="Providers\SpellEffectsProvider\SpellEffectsHandler.cs" />
     <Compile Include="RawData\RawHandlerAttribute.cs" />
-    <Compile Include="RawData\RawMessages\FilesDirMessage.cs" />
-    <Compile Include="RawData\RawMessages\WhoAreYouMessage.cs" />
     <Compile Include="RawData\RawReceiver.cs" />
-    <Compile Include="RawData\RawMessages\RawMessage.cs" />
-    <Compile Include="RawData\RawMessages\BugReportMessage.cs" />
-    <Compile Include="RawData\Records\BugReportRecord.cs" />
+    <Compile Include="RawData\RawMessages\MotdGuildMessage.cs" />
     <Compile Include="World\CyclicMobsMovementTask.cs" />
     <Compile Include="World\CyclicSaveTask.cs" />
     <Compile Include="World\Handlers\AdminHandler.cs" />

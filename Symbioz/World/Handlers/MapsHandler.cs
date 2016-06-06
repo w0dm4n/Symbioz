@@ -221,18 +221,6 @@ namespace Symbioz.World.Handlers
         public static void HandleEmotePlay(EmotePlayRequestMessage message, WorldClient client)
         {
             EmoteRecord template = EmoteRecord.GetEmote(message.emoteId);
-            if (template.Id == 1) // ASSIS EMOTE ID
-            {
-                if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 10)
-                    client.Character.StopRegenLife();
-                if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 3)
-                {
-                    client.Character.StopRegenLife();
-                    client.Character.RegenLife(3);
-                }
-                else
-                  client.Character.RegenLife(3);
-           }
             if (template.IsAura)
             {
                 client.Character.PlayAura(message.emoteId);
@@ -253,12 +241,24 @@ namespace Symbioz.World.Handlers
 
                 switch (template.Id)
                 {
-                    case 97:
+                    case 1: //Émote s'asseoir
+                        if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 10)
+                            client.Character.StopRegenLife();
+                        if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 3)
+                        {
+                            client.Character.StopRegenLife();
+                            client.Character.RegenLife(3);
+                        }
+                        else
+                            client.Character.RegenLife(3);
+                        break;
+
+                    case 97: //Émote étendard de guilde
                         if (client.Character.HasGuild)
                             client.Character.Look.SetBanner(client.Character.GetGuild().SymbolShape);
                         break;
 
-                    case 98:
+                    case 98: //Émote étendard d'alliance
                         if (client.Character.HasAlliance)
                         {
                             client.Character.Look.SetBanner(client.Character.GetAlliance().SymbolShape, false);

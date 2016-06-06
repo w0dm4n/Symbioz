@@ -24,6 +24,7 @@ namespace Symbioz.Network.Messages
                 Raws.Add(rawName, File.ReadAllBytes(file));
             }
         }
+
         public static byte[] GetRawData(string name)
         {
             return Raws.FirstOrDefault(x => x.Key == name).Value;

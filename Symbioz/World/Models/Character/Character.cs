@@ -422,6 +422,20 @@ namespace Symbioz.World.Models
             Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new string[0]));
             Client.Character.Reply(ConfigurationManager.Instance.WelcomeMessage, System.Drawing.Color.GhostWhite);
             BidShopsHandler.AddEventualBidShopGains(Client);
+            if (this.HasGuild)
+            {
+                if (!string.IsNullOrEmpty(this.GetGuild().GuildWelcomeMessage))
+                {
+                    this.Reply(string.Format("(Annonce) <b>{0}</b> : {1}", this.GetGuild().Name, this.GetGuild().GuildWelcomeMessage), Color.Purple);
+                }
+            }
+            if (this.HasAlliance)
+            {
+                if (!string.IsNullOrEmpty(this.GetAlliance().AllianceWelcomeMessage))
+                {
+                    this.Reply(string.Format("(Annonce) <b>{0}</b> : {1}", this.GetAlliance().Name, this.GetAlliance().AllianceWelcomeMessage), Color.Pink);
+                }
+            }
         }
         public void RefreshArenasInfos()
         {

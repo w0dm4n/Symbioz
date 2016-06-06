@@ -40,8 +40,10 @@ namespace Symbioz.World.Records.Guilds
 
         public DateTime CreationDate;
 
+        public string GuildWelcomeMessage;
+
         public GuildRecord(int id, string name, ushort symbolShape, int symbolColor,
-            sbyte backgroundShape, int backgroundColor, ushort level, ulong experience, int maxTaxCollectors, DateTime creationDate)
+            sbyte backgroundShape, int backgroundColor, ushort level, ulong experience, int maxTaxCollectors, DateTime creationDate, string guildWelcomeMessage)
         {
             this.Id = id;
             this.Name = name;
@@ -53,6 +55,7 @@ namespace Symbioz.World.Records.Guilds
             this.Experience = experience;
             this.MaxTaxCollectors = maxTaxCollectors;
             this.CreationDate = creationDate;
+            this.GuildWelcomeMessage = guildWelcomeMessage;
         }
 
         public GuildEmblem GetEmblemObject()
