@@ -124,6 +124,12 @@ namespace Symbioz.Core
         
         public string CyclicFileGenerationPath { get; set; }
 
+        public int TimeBetweenSalesMessage { get; set; }
+
+        public int TimeBetweenSeekMessage { get; set; }
+
+        public int TurnBeforeFightDisconnection { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -151,6 +157,9 @@ namespace Symbioz.Core
             config.SafeRun = false;
             config.CyclicFileGenerationInterval = 900000;
             config.CyclicFileGenerationPath = "C:/wamp/www/games/dofus2/game-export";
+            config.TimeBetweenSalesMessage = 120;
+            config.TimeBetweenSeekMessage = 120;
+            config.TurnBeforeFightDisconnection = 20;
             return config;
         }
     }

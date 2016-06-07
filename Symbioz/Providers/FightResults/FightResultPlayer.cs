@@ -17,6 +17,8 @@ using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models;
 using Symbioz.Network.Servers;
 using Symbioz.Network;
+using Shader.Helper;
+using Symbioz.DofusProtocol.Messages;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -57,7 +59,9 @@ namespace Symbioz.Providers.FightResults
                         client.Character.Restrictions.cantExchange = true;
                         client.Character.Restrictions.cantAttackMonster = true;
                         client.Character.Restrictions.isDead = true;
-                        client.Character.Reply("Vous êtes mort !", false, false);
+                        String[] Data = new string[1];
+                        Data[0] = client.Character.Record.Name;
+                        client.Send(new TextInformationMessage(1, 190, Data));
                     }
                 }
             }
@@ -82,17 +86,19 @@ namespace Symbioz.Providers.FightResults
                 client.Character.Record.Energy = 0;
                 client.Character.Look = ContextActorLook.Parse("{24}");
             }
-            if (fighter.disconnect)
+            if (fighter.Disconnected)
             {
                 CharactersDisconnected.remove(client.Character.Record.Name);
-                client.Character.AddElement(client.Character.Record);
+                //client.Character.AddElement(client.Character.Record);
                 WorldServer.Instance.WorldClients.Remove(client);
             }
         }
+
         public override FightResultListEntry GetEntry()
         {
             return new FightResultPlayerListEntry((ushort)OutCome, 0, FightLoot, Fighter.ContextualId, !Fighter.Dead, PlayerLevel, AdditionalDatas);
         }
+
         public void GenerateArenaLoot()
         {
             if ((Fighter as CharacterFighter).HasLeft)
@@ -118,21 +124,13 @@ namespace Symbioz.Providers.FightResults
                 AdditionalDatas.Add(expdatas);
                 client.Character.AddXp((ulong)earnedXp);
             }
-
-        }
-
-        public static bool InArray(int[] array, int type)
-        {
-            foreach (var value in array)
-                if (value == type)
-                    return (true);
-            return (false);
         }
 
         public void GeneratePVMLoot()
         {
             if ((Fighter as CharacterFighter).HasLeft)
                 return;
+
             #region VariableDefinitions
             WorldClient client = (Fighter as CharacterFighter).Client;
             AsyncRandom random = new AsyncRandom();
@@ -181,6 +179,7 @@ namespace Symbioz.Providers.FightResults
             }
 
             #endregion
+
             client.Character.AddKamas((int)FightLoot.kamas);
             var weapon_dropped = 0;
             var item_dropped = 0;
@@ -190,7 +189,7 @@ namespace Symbioz.Providers.FightResults
                 int[] TypeInventoryId = new int[] { 11, 9, 10, 1, 17, 16, 23, 82, 151, 18 };
                 if (template != null)
                 {
-                    if (InArray(TypeInventoryId, template.TypeId))
+                    if (ArrayUtils.InArray(TypeInventoryId, template.TypeId))
                     {
                         if (item_dropped < 2)
                         {
@@ -233,6 +232,7 @@ namespace Symbioz.Providers.FightResults
             var expdatas = new FightResultExperienceData(true, true, true, true, false, false, false, client.Character.Record.Exp, ExperienceRecord.GetExperienceForLevel(client.Character.Record.Level), ExperienceRecord.GetExperienceForLevel((uint)client.Character.Record.Level + 1), (int)formulas._xpSolo, 0, 0, 0);
             AdditionalDatas.Add(expdatas);
             #endregion
+
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
 

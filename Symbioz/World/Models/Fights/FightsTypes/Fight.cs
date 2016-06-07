@@ -158,24 +158,20 @@ namespace Symbioz.World.Models.Fights
             {
                 f.EndTurn();
             }
-            f.disconnect = true;
-            f.turndisconnect = 5;
-            String[] name = new string[2];
-            name[0] = f.Client.Character.Record.Name;
-            name[1] = "5";
-            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 5181, name));
+            f.FirstRoundDisconnected = true;
+            f.Disconnected = true;
         }
 
         public void FighterReconnect(CharacterFighter f)
         {
-            f.disconnect = false;
+            f.Disconnected = false;
             var fight = GetFightCommonInformations();
             Send(new GameRolePlayRemoveChallengeMessage(Id));
             Send(new GameRolePlayShowChallengeMessage(fight));
             GetAllFighters().ForEach(x => x.ShowFighter(f.Client));
             String[] name = new string[1];
             name[0] = f.Client.Character.Record.Name;
-            Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 4977, name));
+            Send(new TextInformationMessage(1, 184, name));
         }
         public void Fighterdeleted(CharacterFighter f)
         {
@@ -523,8 +519,17 @@ namespace Symbioz.World.Models.Fights
                 bool winner = GetWinner() == fighter.Team.TeamColor;
                 if (fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)
                 {
-                    fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
-                    fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                    if (fighter.Client.Character.GetLifePoints == true)
+                    {
+                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.Client.Character.StatsRecord.LifePoints;
+                        fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                        fighter.Client.Character.GetLifePoints = false;
+                    }
+                    else
+                    {
+                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
+                        fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                    }
                 }
                 fighter.Client.Character.RejoinMap(SpawnJoin, winner);
             }

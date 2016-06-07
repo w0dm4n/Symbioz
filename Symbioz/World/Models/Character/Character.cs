@@ -44,7 +44,10 @@ namespace Symbioz.World.Models
         public bool IsNew = false;
         public bool isGod = false;
         public bool isDebugging = false;
+        public bool GetLifePoints = false;
         public ushort SubAreaId { get; set; }
+        public int LastSalesMessage = 0;
+        public int LastSeekMessage = 0;
         public DateTime RegenStartTime;
         public bool IsRegeneratingLife;
         public short RegenRate;
@@ -692,6 +695,7 @@ namespace Symbioz.World.Models
             if (Record.Exp + amount >= exp)
             {
                 Record.Level++;
+                this.GetLifePoints = true;
                 if (Record.Level == 100)
                 {
                     StatsRecord.ActionPoints++;
@@ -1188,7 +1192,10 @@ namespace Symbioz.World.Models
                 this.CurrentStats.LifePoints = (uint)this.StatsRecord.LifePoints;
             this.Record.CurrentLifePoint = this.CurrentStats.LifePoints;
             if (LifePointsToAdd != 0 && this.CurrentStats.LifePoints != AtBegin)
+            {
+                Client.Character.Reply("Vous avez récupéré <b>" + LifePointsToAdd + "</b> points de vie durant votre absence.");
                 Client.Character.RefreshStats();
+            }
         }
 
         public void StopRegenLife()
@@ -1218,6 +1225,66 @@ namespace Symbioz.World.Models
                 this.RefreshStats();
                 this.IsRegeneratingLife = false;
             }
+        }
+
+        public bool CanSendSalesMessage()
+        {
+            if (this.LastSalesMessage == 0)
+                return true;
+            else
+            {
+                var StartTime = LastSalesMessage;
+                var Seconds = 0;
+                var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                while (StartTime < CurrentTime)
+                {
+                    Seconds++;
+                    StartTime++;
+                }
+                    if (Seconds >= ConfigurationManager.Instance.TimeBetweenSalesMessage)
+                    return true;
+                else
+                {
+                    var Timeleft = ConfigurationManager.Instance.TimeBetweenSalesMessage - Seconds;
+                    this.Reply("Ce canal est restreint pour améliorer sa lisibilité. Vous pourrez envoyer un nouveau message dans " +  Timeleft + " secondes. Ceci ne vous autorise cependant pas pour autant à surcharger ce canal.");
+                    return false;
+                }
+            }
+        }
+
+        public void UpdateLastSalesMessage()
+        {
+            this.LastSalesMessage = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+        }
+
+        public bool CanSendSeekMessage()
+        {
+            if (this.LastSalesMessage == 0)
+                return true;
+            else
+            {
+                var StartTime = LastSeekMessage;
+                var Seconds = 0;
+                var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                while (StartTime < CurrentTime)
+                {
+                    Seconds++;
+                    StartTime++;
+                }
+                if (Seconds >= ConfigurationManager.Instance.TimeBetweenSeekMessage)
+                    return true;
+                else
+                {
+                    var Timeleft = ConfigurationManager.Instance.TimeBetweenSeekMessage - Seconds;
+                    this.Reply("Ce canal est restreint pour améliorer sa lisibilité. Vous pourrez envoyer un nouveau message dans " + Timeleft + " secondes. Ceci ne vous autorise cependant pas pour autant à surcharger ce canal.");
+                    return false;
+                }
+            }
+        }
+
+        public void UpdateLastSeekMessage()
+        {
+            this.LastSeekMessage = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
         }
     }
 }

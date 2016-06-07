@@ -659,7 +659,7 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Syntaxe incorrecte : (joueur, id)");
         }
 
-        [InGameCommand("pvp", ServerRoleEnum.PLAYER)]
+     /*   [InGameCommand("pvp", ServerRoleEnum.PLAYER)]
         public static void PvPCommand(string value, WorldClient client)
         {
             client.Character.Teleport(88212759, 442);
@@ -688,6 +688,7 @@ namespace Symbioz.World.Handlers
         {
             client.Character.Teleport(54169427, 271);
         }
+        */
 
         [InGameCommand("mutemap", ServerRoleEnum.MODERATOR)]
         public static void MuteMap(string value, WorldClient client)

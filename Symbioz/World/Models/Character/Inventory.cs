@@ -535,25 +535,17 @@ namespace Symbioz.World.Models
             Character.RefreshShortcuts();
         }
 
-        public static bool InList(List<int> ObjGID, int gid)
-        {
-            foreach (var value in ObjGID)
-                if (value == gid)
-                    return (true);
-            return (false);
-        }
-
         public List<ObjectItem> ConvertAllObjectItems()
         {
             List<ObjectItem> AllItems = Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
             List<int> ObjGID = new List<int>();
             List<ObjectItem> newList = new List<ObjectItem>();
-            foreach (ObjectItem Item in AllItems)
+            foreach (ObjectItem item in AllItems)
             {
-                if (!InList(ObjGID, Item.objectGID))
+                if(!ObjGID.Contains(item.objectGID))
                 {
-                    newList.Add(Item);
-                    ObjGID.Add(Item.objectGID);
+                    newList.Add(item);
+                    ObjGID.Add(item.objectGID);
                 }
             }
             return (newList);

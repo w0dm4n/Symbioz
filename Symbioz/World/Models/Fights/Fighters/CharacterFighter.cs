@@ -1,4 +1,5 @@
-﻿using Symbioz.DofusProtocol.Messages;
+﻿using Symbioz.Core;
+using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Network.Clients;
@@ -32,8 +33,9 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public bool HasLeft = false;
         public bool ReadyToSee = false;
-        public bool disconnect = false;
-        public short turndisconnect = 5;
+        public bool Disconnected = false;
+        public bool FirstRoundDisconnected = false;
+        public short TurnDisconnect = (short)ConfigurationManager.Instance.TurnBeforeFightDisconnection;
         public WorldClient Client { get; set; }
         public CharacterFighter(WorldClient client, FightTeam team)
             : base(team)
@@ -106,7 +108,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 return base.CastSpellOnTarget(spellid, targetid);
             }
         }
-        public override bool CastSpellOnCell(ushort spellid, short cellid,int targetId = 0)
+        public override bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
         {
             CompanionFighter companion = GetCompanion();
             if (companion != null && companion.IsPlaying)
@@ -132,7 +134,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             {
                 Fight.Send(new GameFightRemoveTeamMemberMessage((short)Fight.Id, Team.Id, fighter.ContextualId));
                 if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
-                Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, fighter.ContextualId);
+                    Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, fighter.ContextualId);
                 Team.RemoveFighter(fighter);
             }
             else
@@ -146,7 +148,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public void Leave()
         {
-            if (this.disconnect)
+            if (this.Disconnected)
                 return;
             if (!Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PvM && Fight.FightType != FightTypeEnum.FIGHT_TYPE_AGRESSION)
             {
@@ -179,7 +181,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             {
                 if (IsPlaying)
                     EndTurn();
-                Fight.CheckFightEnd(); 
+                Fight.CheckFightEnd();
                 Fight.Send(new GameFightLeaveMessage(ContextualId));
                 if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)//Heroique
                 {
@@ -210,32 +212,39 @@ namespace Symbioz.World.Models.Fights.Fighters
                 companion.SwitchContext();
             base.Die();
         }
+
         public void OnDisconnect()
         {
             if (Fight == null)
                 return;
-            this.disconnect = true;
-            this.turndisconnect--;
-            String[] name = new string[2];
-            name[0] = Client.Character.Record.Name;
-            name[1] = turndisconnect.ToString();
-            Fight.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_FIGHT, 5181, name));
-            if (this.turndisconnect > 0)
+            if (this.TurnDisconnect > 0)
+            {
+                String[] Data = new string[2];
+                Data[0] = Client.Character.Record.Name;
+                Data[1] = TurnDisconnect.ToString();
+                if (this.FirstRoundDisconnected == false)
+                    this.TurnDisconnect--;
+                else
+                    this.FirstRoundDisconnected = false;
+                if (TurnDisconnect != 0)
+                    Fight.Send(new TextInformationMessage(1, 182, Data));
                 return;
+            }
             if (!Fight.Started)
                 Leave();
             else
             {
                 HasLeft = true;
                 Die();
-                AknowlegeAndLeave();
-                Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + "s'est déconnecté !"));
+                Leave();
+                //AknowlegeAndLeave();
+                //Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + " s'est déconnecté !"));
             }
         }
 
         public override void RefreshStats()
         {
- 
+
             this.FighterInformations = new GameFightCharacterInformations(ContextualId, FighterLook,
                 new EntityDispositionInformations(CellId, Direction), (sbyte)Team.TeamColor,
                 0, !Dead, FighterStats.GetMinimalStats(), new ushort[0], Client.Character.Record.Name, new PlayerStatus(0),
@@ -264,13 +273,13 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public override void StartTurn()
         {
-            if (this.disconnect)
-            {
+            if (this.Disconnected)
                 OnDisconnect();
-            }
             base.StartTurn();
             RefreshStats();
             Client.Send(new GameFightTurnStartPlayingMessage());
+            if (this.Disconnected)
+                base.EndTurn();
         }
         public void ShowPlacementCells()
         {

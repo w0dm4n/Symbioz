@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayUtils.cs" />
     <Compile Include="AsyncRandom.cs" />
     <Compile Include="ConstantsRepertory.cs" />
     <Compile Include="DateTimeUtils.cs" />
