@@ -56,18 +56,18 @@ namespace Symbioz.Auth.Records
                 Locker.ExitReadLock();
             }
         }
-        public static Account GetAccountFromDb(string ndc)
+        public static Account GetAccountFromDb(string username)
         {
             Locker.EnterReadLock();
             try
             {
                 Account account = null;
-                string query = "SELECT * FROM Accounts WHERE Username = '" + ndc + "'";
+                string query = "SELECT * FROM Accounts WHERE Username = '" + username + "'";
                 MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.Connection).ExecuteReader();
                 while (dataReader.Read())
                 {
                     account = new Account();
-                    account.Username = ndc;
+                    account.Username = dataReader["Username"].ToString();
                     account.Password = dataReader["Password"].ToString();
                     account.Nickname = dataReader["Nickname"].ToString();
                     account.Role = (ServerRoleEnum)dataReader.GetInt32("Role");
@@ -82,6 +82,35 @@ namespace Symbioz.Auth.Records
             finally
             {
                 Locker.ExitReadLock(); 
+            }
+        }
+
+        public static Account GetAccountFromDb(int accountId)
+        {
+            Locker.EnterReadLock();
+            try
+            {
+                Account account = null;
+                string query = "SELECT * FROM Accounts WHERE Id = '" + accountId + "'";
+                MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.Connection).ExecuteReader();
+                while (dataReader.Read())
+                {
+                    account = new Account();
+                    account.Username = dataReader["Username"].ToString();
+                    account.Password = dataReader["Password"].ToString();
+                    account.Nickname = dataReader["Nickname"].ToString();
+                    account.Role = (ServerRoleEnum)dataReader.GetInt32("Role");
+                    account.Id = dataReader.GetInt32("Id");
+                    account.Banned = dataReader.GetBoolean("Banned");
+                    account.MaxCharactersCount = dataReader.GetInt32("MaxCharactersCount");
+                    account.PointsCount = dataReader.GetInt32("PointCount");
+                }
+                dataReader.Close();
+                return account;
+            }
+            finally
+            {
+                Locker.ExitReadLock();
             }
         }
         public static bool RemovePoints(Account account)

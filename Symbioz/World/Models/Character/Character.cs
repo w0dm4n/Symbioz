@@ -23,6 +23,7 @@ using Symbioz.World.Records.Companions;
 using Symbioz.World.Records.Guilds;
 using Symbioz.World.Records.Maps;
 using Symbioz.World.Records.Monsters;
+using Symbioz.World.Records.Friends;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,6 +33,8 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Symbioz.World.Models.Succes;
 using Shader.Helper;
+using Symbioz.Network.Servers;
+using Symbioz.Auth.Records;
 
 namespace Symbioz.World.Models
 {
@@ -68,6 +71,7 @@ namespace Symbioz.World.Models
         public List<Shortcut> GeneralShortcuts { get { return GeneralShortcutRecord.GetCharacterShortcuts(Id); } }
         public List<SuccesRewards> SuccesShortcuts = new List<SuccesRewards>();
         public PartyMember PartyMember;
+        public List<FriendRecord> Friends = new List<FriendRecord>();
 
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
@@ -197,8 +201,9 @@ namespace Symbioz.World.Models
 
             var field = table.GetType().GetFields().FirstOrDefault(x => x.Name.ToLower() == (attribute as TableAttribute).tableName.ToLower());
             if (field == null || !field.IsStatic || !field.FieldType.IsGenericType)
+            {
                 return null;
-
+            }
             return field;
         }
 
@@ -891,8 +896,8 @@ namespace Symbioz.World.Models
             }
             else
                 MapsHandler.SendCurrentMapMessage(Client, Client.Character.Record.MapId);
-             Client.Character.RegenLife(10);
-             Client.Character.RefreshStats();
+            Client.Character.RegenLife(10);
+            Client.Character.RefreshStats();
         }
         public void EquipCompanion(short templateid)
         {
@@ -1150,10 +1155,10 @@ namespace Symbioz.World.Models
             {
                 this.Client.Send(new LifePointsRegenBeginMessage((byte)RegenRate));
                 RegenStartTime = DateTime.Now;
-                
+
                 this.RegenRate = RegenRate;
                 this.IsRegeneratingLife = true;
-            } 
+            }
         }
 
         public void CheckRegen()
@@ -1241,12 +1246,12 @@ namespace Symbioz.World.Models
                     Seconds++;
                     StartTime++;
                 }
-                    if (Seconds >= ConfigurationManager.Instance.TimeBetweenSalesMessage)
+                if (Seconds >= ConfigurationManager.Instance.TimeBetweenSalesMessage)
                     return true;
                 else
                 {
                     var Timeleft = ConfigurationManager.Instance.TimeBetweenSalesMessage - Seconds;
-                    this.Reply("Ce canal est restreint pour améliorer sa lisibilité. Vous pourrez envoyer un nouveau message dans " +  Timeleft + " secondes. Ceci ne vous autorise cependant pas pour autant à surcharger ce canal.");
+                    this.Reply("Ce canal est restreint pour améliorer sa lisibilité. Vous pourrez envoyer un nouveau message dans " + Timeleft + " secondes. Ceci ne vous autorise cependant pas pour autant à surcharger ce canal.");
                     return false;
                 }
             }
@@ -1285,6 +1290,81 @@ namespace Symbioz.World.Models
         public void UpdateLastSeekMessage()
         {
             this.LastSeekMessage = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+        }
+
+        public void SaveAllFriends()
+        {
+            foreach (var friend in this.Friends)
+            {
+                this.AddElement(friend);
+                SaveTask.AddElement(friend);
+            }
+        }
+
+        public bool AlreadyFriend(int characterId)
+        {
+            foreach (var Friend in this.Friends)
+            {
+                if (Friend.FriendCharacterId == characterId)
+                    return true;
+            }
+            return false;
+        }
+
+        public void LoadFriends()
+        {
+            foreach (var Friend in FriendRecord.CharactersFriends)
+            {
+                if (Friend.CharacterId == this.Record.Id && !this.Friends.Contains(Friend))
+                {
+                    this.Friends.Add(Friend);
+                    var character = CharacterRecord.GetCharacterRecordById(Friend.FriendCharacterId);
+                    var target = WorldServer.Instance.GetOnlineClient(character.Name);
+                    if (target != null && target.Character.Record.WarnOnFriendConnection == true)
+                        target.Character.Reply("<b>" + this.Record.Name + "</b> est en ligne.");
+                }
+            }
+        }
+
+        public int PopNextFriendId()
+        {
+            var Id = 0;
+            foreach (var Friend in FriendRecord.CharactersFriends)
+            {
+                if (Friend.Id > Id)
+                    Id = Friend.Id;
+            }
+            Id++;
+            Id += FriendRecord.IdToAdd;
+            FriendRecord.IdToAdd++;
+            return (Id);
+        }
+
+        public void AddFriend(int FriendCharacterId)
+        {
+            this.Friends.Add(new FriendRecord(PopNextFriendId(), this.Record.Id, FriendCharacterId));
+        }
+
+        public void RemoveFriend(int FriendCharacterId)
+        {
+            foreach (var friend in Friends)
+            {
+                if (friend.FriendCharacterId == FriendCharacterId)
+                {
+                    this.RemoveElement(friend);
+                    SaveTask.RemoveElement(friend);
+                    this.Friends.Remove(friend);
+                    break;
+                }
+            }
+        }
+
+        public bool isFriendWith(int characterId)
+        {
+            foreach (var friend in this.Friends)
+                if (friend.FriendCharacterId == characterId)
+                    return true;
+            return false;
         }
     }
 }

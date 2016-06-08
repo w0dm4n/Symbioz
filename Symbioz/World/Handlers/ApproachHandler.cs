@@ -256,6 +256,7 @@ namespace Symbioz.World.Handlers
             client.Character.RefreshStats();
             client.Character.GetLifeBackAtConnection();
             client.Character.RegenLife(10);
+            client.Character.LoadFriends();
             client.Character.Teleport(client.Character.Record.MapId);
 
             #region Dofus Cinematic

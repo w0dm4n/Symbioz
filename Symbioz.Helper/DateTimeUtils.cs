@@ -14,5 +14,10 @@ namespace Shader.Helper
             int secondsSinceEpoch = (int)timeSpan.TotalSeconds;
             return secondsSinceEpoch;
         }
+
+        public static int ToEpochTime(this DateTime input)
+        {
+            return DateTimeUtils.GetEpochFromDateTime(input);
+        }
     }
 }

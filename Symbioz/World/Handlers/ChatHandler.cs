@@ -76,7 +76,7 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Vous avez été muté, impossible d'envoyer votre message.");
                 return;
             }
-            if (message.receiver == client.Character.Record.Name)
+            if (message.receiver == client.Character.Record.Name || String.IsNullOrEmpty(message.content))
                 return;
             var target = WorldServer.Instance.GetOnlineClient(message.receiver);
             if (target != null)

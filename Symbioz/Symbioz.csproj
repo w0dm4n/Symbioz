@@ -138,6 +138,7 @@
     <Compile Include="RawData\RawMessages\RawMessage.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Handlers\ApproachHandler.cs" />
+    <Compile Include="World\Handlers\FriendsHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
     <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
@@ -313,6 +314,7 @@
     <Compile Include="World\Records\Companions\CompanionSpellRecord.cs" />
     <Compile Include="World\Records\DungeonsIdRecord.cs" />
     <Compile Include="World\Records\Emblems\EmblemSymbol.cs" />
+    <Compile Include="World\Records\Friends\FriendsRecord.cs" />
     <Compile Include="World\Records\Guilds\CharacterGuildRecord.cs" />
     <Compile Include="World\Records\Guilds\GuildRecord.cs" />
     <Compile Include="World\Records\Items\BankItemRecord.cs" />
