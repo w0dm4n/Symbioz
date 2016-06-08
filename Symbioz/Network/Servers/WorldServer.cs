@@ -97,7 +97,7 @@ namespace Symbioz.Network.Servers
                 if (client.Character.IsRegeneratingLife)
                     client.Character.StopRegenLife();
                 client.Character.Record.LastConnection = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                client.Character.Save();
+                client.Character.Save(false);
             }
             if (remove == true)
                 WorldClients.Remove(client);

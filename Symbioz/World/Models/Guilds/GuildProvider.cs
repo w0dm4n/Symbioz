@@ -27,7 +27,7 @@ namespace Symbioz.World.Models.Guilds
             GuildRecord guild = new GuildRecord(GuildRecord.PopNextId(), message.guildName, message.guildEmblem.symbolShape,
                    message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1, DateTime.Now, string.Empty);
             owner.AddElement(guild);
-            owner.Save();
+            owner.Save(false);
             JoinGuild(guild, owner, GuildRightsBitEnum.GUILD_RIGHT_BOSS, (ushort)GuildRightsBitEnum.GUILD_RIGHT_BOSS);
             return guild;
         }

@@ -125,7 +125,7 @@ namespace Symbioz.World.Handlers
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
-            client.Character.Save();
+            client.Character.Save(false);
             ProcessSelection(client);
         }
         [MessageHandler]

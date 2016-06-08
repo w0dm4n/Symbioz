@@ -21,14 +21,14 @@ namespace Symbioz.World.Records.Friends
 
         [Primary]
         public int Id;
-        public int CharacterId;
-        public int FriendCharacterId;
+        public int AccountId;
+        public int FriendAccountId;
 
-        public FriendRecord(int id, int characterId, int friendCharacterId)
+        public FriendRecord(int id, int accountId, int friendAccountId)
         {
             this.Id = id;
-            this.CharacterId = characterId;
-            this.FriendCharacterId = friendCharacterId;
+            this.AccountId = accountId;
+            this.FriendAccountId = friendAccountId;
         }
     }
 }

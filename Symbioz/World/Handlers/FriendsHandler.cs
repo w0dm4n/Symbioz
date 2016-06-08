@@ -20,50 +20,46 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleFriendsGetListMessage(FriendsGetListMessage message, WorldClient client)
         {
-            List<FriendInformations> Friends = new List<FriendInformations>();
-            List<string> FriendsAccount = new List<string>();
+            List <FriendInformations> Friends = new List<FriendInformations>();
+            bool currentFriendOnline = false;
             foreach (var Friend in client.Character.Friends)
             {
-                var characterBase = CharacterRecord.GetCharacterRecordById(Friend.FriendCharacterId);
-                var account = AccountsProvider.GetAccountFromDb(characterBase.AccountId);
-                var characters = CharacterRecord.GetAccountCharacters(characterBase.AccountId);
+                currentFriendOnline = false;
+                var characters = CharacterRecord.GetAccountCharacters(Friend.FriendAccountId);
+                var account = AccountsProvider.GetAccountFromDb(Friend.FriendAccountId);
                 foreach (var character in characters)
                 {
-                    if (character != null && account != null)
+                    var target = WorldServer.Instance.GetOnlineClient(character.Name);
+                    if (target != null)
                     {
-                        var target = WorldServer.Instance.GetOnlineClient(character.Name);
-                        if (target == null && !FriendsAccount.Contains(account.Username))
+                        currentFriendOnline = true;
+                        BasicGuildInformations guildInfo = null;
+                        if (target.Character.isFriendWith(client.Character.Record.AccountId) == true)
                         {
-                            Friends.Add(new FriendInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.NOT_CONNECTED, (ushort)character.LastConnection, 0));
-                            FriendsAccount.Add(account.Username);
-                        }
-                        else if (target != null)
-                        {
-                            if (target.Character.isFriendWith(client.Character.Record.Id) == true)
+                            if (target.Character.HasGuild)
                             {
-                                BasicGuildInformations guildInfo = null;
-                                if (target.Character.HasGuild)
-                                {
-                                    var guild = target.Character.GetGuild();
-                                    guildInfo = new BasicGuildInformations((uint)guild.Id, guild.Name);
-                                }
-                                else
-                                    guildInfo = new BasicGuildInformations(0, "-");
-                                var statusPlayer = new PlayerStatus(target.Character.PlayerStatus.statusId);
-                                Friends.Add(new FriendOnlineInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.UNKNOWN_STATE,
-                                    (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, character.Level, 0, character.Breed, character.Sex, guildInfo, 0, statusPlayer));
+                                var guild = target.Character.GetGuild();
+                                guildInfo = new BasicGuildInformations((uint)guild.Id, guild.Name);
                             }
                             else
-                            {
-                                var statusPlayer = new PlayerStatus((sbyte)PlayerStateEnum.UNKNOWN_STATE);
-                                Friends.Add(new FriendOnlineInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.UNKNOWN_STATE,
-                                    (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, 0, 0, character.Breed, character.Sex, new BasicGuildInformations(0, "-"), 0, statusPlayer));
-
-                            }
+                                guildInfo = new BasicGuildInformations(0, "-");
+                            var statusPlayer = new PlayerStatus(target.Character.PlayerStatus.statusId);
+                            Friends.Add(new FriendOnlineInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.UNKNOWN_STATE,
+                                (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, character.Level, 0, character.Breed, character.Sex, guildInfo, 0, statusPlayer));
+                        }
+                        else
+                        {
+                            var statusPlayer = new PlayerStatus((sbyte)PlayerStateEnum.UNKNOWN_STATE);
+                            Friends.Add(new FriendOnlineInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.UNKNOWN_STATE,
+                                (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, 0, 0, character.Breed, character.Sex, new BasicGuildInformations(0, "-"), 0, statusPlayer));
                         }
                     }
                 }
-           }
+                if (currentFriendOnline == false)
+                {
+                    Friends.Add(new FriendInformations(account.Id, account.Username, (sbyte)PlayerStateEnum.NOT_CONNECTED, 0, 0));
+                }
+            }
             client.Send(new FriendsListMessage(Friends));
         }
 
@@ -73,10 +69,11 @@ namespace Symbioz.World.Handlers
             var toAdd = WorldServer.Instance.GetOnlineClient(message.name);
             if (toAdd != null)
             {
-                if (!client.Character.AlreadyFriend(toAdd.Character.Record.Id))
+                if (!client.Character.AlreadyFriend(toAdd.Character.Record.AccountId))
                 {
-                    client.Character.AddFriend(toAdd.Character.Record.Id);
+                    client.Character.AddFriend(toAdd.Character.Record.AccountId);
                     client.Character.SaveAllFriends();
+                    client.Character.Save(false);
                     FriendsHandler.HandleFriendsGetListMessage(new FriendsGetListMessage(), client);
                 }
             }
@@ -87,15 +84,19 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleFriendDeleteRequestMessage(FriendDeleteRequestMessage message, WorldClient client)
         {
-            foreach (var Friend in client.Character.Friends)
+           foreach (var Friend in client.Character.Friends)
             {
-                var character = CharacterRecord.GetCharacterRecordById(Friend.FriendCharacterId);
-                if (character.AccountId == message.accountId)
+                var characters = CharacterRecord.GetAccountCharacters(Friend.FriendAccountId);
+                foreach (var character in characters)
                 {
-                    client.Character.RemoveFriend(character.Id);
-                    client.Send(new FriendDeleteResultMessage(true, character.Name));
-                    FriendsHandler.HandleFriendsGetListMessage(new FriendsGetListMessage(), client);
-                    break;
+                    var target = WorldServer.Instance.GetOnlineClient(character.Name);
+                    if (target != null)
+                    {
+                        client.Character.RemoveFriend(Friend.FriendAccountId);
+                        client.Send(new FriendDeleteResultMessage(true, character.Name));
+                        FriendsHandler.HandleFriendsGetListMessage(new FriendsGetListMessage(), client);
+                        return;
+                    }
                 }
             }
         }

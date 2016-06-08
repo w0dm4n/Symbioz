@@ -269,7 +269,7 @@ namespace Symbioz.World.Models
             catch (Exception e) { Logger.Error("[CLEAR SAVE CHARACTER " + this.Record.Name + "]" + e.Message); }
         }
 
-        public void Save()
+        public void Save(bool printMessage)
         {
             try
             {
@@ -330,7 +330,8 @@ namespace Symbioz.World.Models
                             _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
                     }
                 }
-                this.Reply("Votre personnage a été sauvegardé avec succès.");
+                if (printMessage == true)
+                    this.Reply("Votre personnage a été sauvegardé avec succès.");
                 Console.WriteLine(")) Character " + this.Record.Name + " was saved !");
             }
             catch (Exception e) { Logger.Error("[SAVING CHARACTER " + this.Record.Name + "]" + e.Message); }
@@ -1301,31 +1302,6 @@ namespace Symbioz.World.Models
             }
         }
 
-        public bool AlreadyFriend(int characterId)
-        {
-            foreach (var Friend in this.Friends)
-            {
-                if (Friend.FriendCharacterId == characterId)
-                    return true;
-            }
-            return false;
-        }
-
-        public void LoadFriends()
-        {
-            foreach (var Friend in FriendRecord.CharactersFriends)
-            {
-                if (Friend.CharacterId == this.Record.Id && !this.Friends.Contains(Friend))
-                {
-                    this.Friends.Add(Friend);
-                    var character = CharacterRecord.GetCharacterRecordById(Friend.FriendCharacterId);
-                    var target = WorldServer.Instance.GetOnlineClient(character.Name);
-                    if (target != null && target.Character.Record.WarnOnFriendConnection == true)
-                        target.Character.Reply("<b>" + this.Record.Name + "</b> est en ligne.");
-                }
-            }
-        }
-
         public int PopNextFriendId()
         {
             var Id = 0;
@@ -1340,31 +1316,60 @@ namespace Symbioz.World.Models
             return (Id);
         }
 
-        public void AddFriend(int FriendCharacterId)
+        public void AddFriend(int FriendAccountId)
         {
-            this.Friends.Add(new FriendRecord(PopNextFriendId(), this.Record.Id, FriendCharacterId));
+            this.Friends.Add(new FriendRecord(PopNextFriendId(), this.Record.AccountId, FriendAccountId));
         }
 
-        public void RemoveFriend(int FriendCharacterId)
+        public bool AlreadyFriend(int accountId)
+        {
+            foreach (var Friend in this.Friends)
+            {
+                if (Friend.FriendAccountId == accountId)
+                    return true;
+            }
+            return false;
+        }
+
+        public void RemoveFriend(int friendAccountId)
         {
             foreach (var friend in Friends)
             {
-                if (friend.FriendCharacterId == FriendCharacterId)
+                if (friend.FriendAccountId == friendAccountId)
                 {
                     this.RemoveElement(friend);
                     SaveTask.RemoveElement(friend);
                     this.Friends.Remove(friend);
+                    this.Save(true);
                     break;
                 }
             }
         }
 
-        public bool isFriendWith(int characterId)
+        public bool isFriendWith(int accountId)
         {
             foreach (var friend in this.Friends)
-                if (friend.FriendCharacterId == characterId)
+                if (friend.FriendAccountId == accountId)
                     return true;
             return false;
+        }
+
+        public void LoadFriends()
+        {
+            foreach (var Friend in FriendRecord.CharactersFriends)
+            {
+                if (Friend.AccountId == this.Record.AccountId && !this.Friends.Contains(Friend))
+                {
+                    this.Friends.Add(Friend);
+                    var characters = CharacterRecord.GetAccountCharacters(Friend.FriendAccountId);
+                    foreach (var character in characters)
+                    {
+                        var target = WorldServer.Instance.GetOnlineClient(character.Name);
+                        if (target != null && target.Character.Record.WarnOnFriendConnection == true)
+                            target.Character.Reply("<b>" + this.Record.Name + "</b> est en ligne.");
+                    }
+                }
+            }
         }
     }
 }

@@ -810,7 +810,7 @@ namespace Symbioz.World.Handlers
             if (client.Character.IsFighting)
                 client.Character.Reply("Impossible de sauvegarder votre personnage en combat !");
             else
-                client.Character.Save();
+                client.Character.Save(true);
         }
 
         [InGameCommand("saveworld", ServerRoleEnum.MODERATOR)]
