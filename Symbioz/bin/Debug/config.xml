@@ -28,5 +28,6 @@
   <CyclicFileGenerationPath>E:/UwAmp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
   <TimeBetweenSalesMessage>20</TimeBetweenSalesMessage>
   <TimeBetweenSeekMessage>20</TimeBetweenSeekMessage>
-  <TurnBeforeFightDisconnection>2</TurnBeforeFightDisconnection>
+  <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>
+  <TimeBetweenCharacterSave>60</TimeBetweenCharacterSave>
 </Configuration>

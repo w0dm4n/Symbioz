@@ -40,6 +40,8 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public bool UsingWeapon = false;
 
+        public bool AlreadyDropped = false;
+
         public Fight Fight { get; set; }
 
         public FightTeam Team { get; set; }
@@ -769,7 +771,6 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return (short)(Math.Floor((double)jet * (100 + statdata + FighterStats.Stats.AllDamagesBonusPercent) / 100) + FighterStats.Stats.AllDamagesBonus);
         }
-
         public bool IsAligned(Fighter fighter)
         {
             var direction = ShapesProvider.GetDirectionFromTwoCells(this.CellId, fighter.CellId);

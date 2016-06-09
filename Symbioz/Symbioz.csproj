@@ -139,6 +139,7 @@
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Handlers\ApproachHandler.cs" />
     <Compile Include="World\Handlers\FriendsHandler.cs" />
+    <Compile Include="World\Handlers\IgnoredHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
     <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
@@ -317,6 +318,7 @@
     <Compile Include="World\Records\Friends\FriendsRecord.cs" />
     <Compile Include="World\Records\Guilds\CharacterGuildRecord.cs" />
     <Compile Include="World\Records\Guilds\GuildRecord.cs" />
+    <Compile Include="World\Records\Ignored\IgnoredRecord.cs" />
     <Compile Include="World\Records\Items\BankItemRecord.cs" />
     <Compile Include="World\Records\Items\BidShopGainRecord.cs" />
     <Compile Include="World\Records\Items\BidShopItemRecord.cs" />

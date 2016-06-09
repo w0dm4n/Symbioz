@@ -60,7 +60,7 @@ namespace Symbioz.Providers
                     {
                         if (reply.ConditionExplanation != null && reply.ConditionExplanation != string.Empty)
                         {
-                            client.Character.ShowNotification("Critère: "+reply.ConditionExplanation);
+                            client.Character.Reply(reply.ConditionExplanation);
                         }
                     }
                 }

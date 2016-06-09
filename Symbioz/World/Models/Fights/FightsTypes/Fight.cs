@@ -53,6 +53,10 @@ namespace Symbioz.World.Models.Fights
         /// </summary>
         public abstract bool AddFightSword { get; }
 
+        public bool DeadItemsLoaded = false;
+
+        public List<ItemRecord> ListDeadItems = new List<ItemRecord>();
+
         /// <summary>
         /// Type de combat
         /// </summary>
@@ -565,6 +569,82 @@ namespace Symbioz.World.Models.Fights
                 }
             }
             return results;
+        }
+
+        public List<FightResultListEntry> GetFightResultsForLeaver(TeamColorEnum winner, int FighterContextualId)
+        {
+            List<FightResultListEntry> results = new List<FightResultListEntry>();
+            var fighters = GetAllFighters(true);
+            foreach (Fighter fighter in fighters)
+            {
+                if (fighter is CharacterFighter && fighter.FighterInformations.contextualId == FighterContextualId)
+                {
+                    results.Add(new FightResultPlayer(fighter as CharacterFighter, winner).GetEntry());
+                    break ;
+                }
+            }
+            return results;
+        }
+
+        public List<CharacterItemRecord> GetAllItems(int CharacterId)
+        {
+            List<CharacterItemRecord> AllItems = new List<CharacterItemRecord>();
+            foreach (var Record in CharacterItemRecord.CharactersItems)
+            {
+                if (Record.CharacterId == CharacterId)
+                    AllItems.Add(Record);
+            }
+            return (AllItems);
+        }
+
+        public void LoadDeadItems(List<CharacterFighter> Losers)
+        {
+            foreach (var Loser in Losers)
+            {
+                var character = CharacterRecord.GetCharacterRecordById(Loser.FighterStats.Stats.CharacterId);
+                var Items = this.GetAllItems(character.Id);
+                foreach (var item in Items)
+                {
+                    ItemRecord template = ItemRecord.GetItem(item.GID);
+                    this.ListDeadItems.Add(template);
+                }
+            }
+            this.DeadItemsLoaded = true;
+        }
+
+        public List<ItemRecord> GetItemRecordDropped(int[] Droppeds)
+        {
+            List<ItemRecord> ListDropped = new List<ItemRecord>();
+            var index = 0;
+            foreach (var Dropped in Droppeds)
+            {
+                index = 0;
+                foreach (var item in this.ListDeadItems)
+                {
+                    if (index == Dropped)
+                    {
+                        ListDropped.Add(item);
+                        break;
+                    }
+                    index++;
+                }
+            }
+            return ListDropped;
+        }
+
+        public void DeleteFromDeadItems(int itemId)
+        {
+            foreach (var item in this.ListDeadItems)
+            {
+                if (item != null)
+                {
+                    if (item.Id == itemId)
+                    {
+                        this.ListDeadItems.Remove(item);
+                        break;
+                    }
+                }
+           }
         }
     }
 }

@@ -35,6 +35,7 @@ using Symbioz.World.Models.Succes;
 using Shader.Helper;
 using Symbioz.Network.Servers;
 using Symbioz.Auth.Records;
+using Symbioz.World.Records.Ignored;
 
 namespace Symbioz.World.Models
 {
@@ -51,6 +52,7 @@ namespace Symbioz.World.Models
         public ushort SubAreaId { get; set; }
         public int LastSalesMessage = 0;
         public int LastSeekMessage = 0;
+        public int LastCharacterSave = 0;
         public DateTime RegenStartTime;
         public bool IsRegeneratingLife;
         public short RegenRate;
@@ -72,6 +74,7 @@ namespace Symbioz.World.Models
         public List<SuccesRewards> SuccesShortcuts = new List<SuccesRewards>();
         public PartyMember PartyMember;
         public List<FriendRecord> Friends = new List<FriendRecord>();
+        public List<IgnoredRecord> IgnoredList = new List<IgnoredRecord>();
 
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
@@ -1340,7 +1343,7 @@ namespace Symbioz.World.Models
                     this.RemoveElement(friend);
                     SaveTask.RemoveElement(friend);
                     this.Friends.Remove(friend);
-                    this.Save(true);
+                    this.Save(false);
                     break;
                 }
             }
@@ -1370,6 +1373,115 @@ namespace Symbioz.World.Models
                     }
                 }
             }
+        }
+
+        public bool CanSave()
+        {
+            if (this.LastCharacterSave == 0)
+                return true;
+            var StartTime = this.LastCharacterSave;
+            var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+            var seconds = 0;
+            while (StartTime <= CurrentTime)
+            {
+                seconds++;
+                StartTime++;
+            }
+            if (seconds < ConfigurationManager.Instance.TimeBetweenCharacterSave)
+            {
+                this.Reply("Vous devez attendre encore " + (ConfigurationManager.Instance.TimeBetweenCharacterSave - seconds) + " secondes pour pouvoir à nouveau sauvegarder votre personnage.");
+                return false;
+            }
+            else
+                return true;
+        }
+
+        public void AtConnection()
+        {
+            this.GetLifeBackAtConnection();
+            this.RegenLife(10);
+            this.LoadFriends();
+            this.LoadIgnored();
+        }
+
+        public int PopNextIgnoredId()
+        {
+            var Id = 0;
+            foreach (var Ignored in IgnoredRecord.CharactersIgnored)
+            {
+                if (Ignored.Id > Id)
+                    Id = Ignored.Id;
+            }
+            Id++;
+            Id += IgnoredRecord.IdToAdd;
+            IgnoredRecord.IdToAdd++;
+            return (Id);
+        }
+
+        public void AddIgnored(int IgnoredAccountId)
+        {
+            this.IgnoredList.Add(new IgnoredRecord(PopNextIgnoredId(), this.Record.AccountId, IgnoredAccountId));
+        }
+
+        public void LoadIgnored()
+        {
+            foreach (var Ignored in IgnoredRecord.CharactersIgnored)
+            {
+                if (Ignored.AccountId == this.Record.AccountId && !this.IgnoredList.Contains(Ignored))
+                    this.IgnoredList.Add(Ignored);
+            }
+        }
+
+        public bool AlreadyIgnored(int accountId)
+        {
+            foreach (var Ignored in this.IgnoredList)
+            {
+                if (Ignored.IgnoredAccountId == accountId)
+                    return true;
+            }
+            return false;
+        }
+
+        public void SaveAllIgnoreds()
+        {
+            foreach (var Ignored in this.IgnoredList)
+            {
+                this.AddElement(Ignored);
+                SaveTask.AddElement(Ignored);
+            }
+        }
+
+        public void RemoveIgnored(int ignoredAccountId)
+        {
+            foreach (var ignored in IgnoredList)
+            {
+                if (ignored.IgnoredAccountId == ignoredAccountId)
+                {
+                    this.RemoveElement(ignored);
+                    SaveTask.RemoveElement(ignored);
+                    this.IgnoredList.Remove(ignored);
+                    this.Save(false);
+                    break;
+                }
+            }
+        }
+
+        public bool isIgnoring(int AccountId)
+        {
+            var characters = CharacterRecord.GetAccountCharacters(AccountId);
+            foreach (var character in characters)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(character.Name);
+                if (target != null)
+                {
+                    foreach (var ignored in target.Character.IgnoredList)
+                    {
+                        if (ignored.IgnoredAccountId == this.Record.AccountId)
+                            return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

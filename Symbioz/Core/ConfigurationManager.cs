@@ -130,6 +130,8 @@ namespace Symbioz.Core
 
         public int TurnBeforeFightDisconnection { get; set; }
 
+        public int TimeBetweenCharacterSave { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -160,6 +162,7 @@ namespace Symbioz.Core
             config.TimeBetweenSalesMessage = 120;
             config.TimeBetweenSeekMessage = 120;
             config.TurnBeforeFightDisconnection = 20;
+            config.TimeBetweenCharacterSave = 120;
             return config;
         }
     }

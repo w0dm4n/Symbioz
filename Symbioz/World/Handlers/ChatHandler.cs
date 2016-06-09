@@ -81,7 +81,12 @@ namespace Symbioz.World.Handlers
             var target = WorldServer.Instance.GetOnlineClient(message.receiver);
             if (target != null)
             {
-                if(target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE)
+                if (client.Character.isIgnoring(target.Character.Record.AccountId))
+                {
+                    client.Character.Reply("Ce joueur vous ignore, impossible d'envoyer votre message.");
+                    return;
+                }
+                    if (target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE)
                 {
                     client.Character.ReplyImportant(target.Character.Record.Name + " est actuellement en mode privé.");
                     return;

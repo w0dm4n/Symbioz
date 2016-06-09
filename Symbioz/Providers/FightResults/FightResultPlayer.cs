@@ -35,13 +35,17 @@ namespace Symbioz.Providers.FightResults
         {
             this.PlayerLevel = fighter.Client.Character.Record.Level;
             WorldClient client = (Fighter as CharacterFighter).Client;
-            if (fighter.Fight is FightPvM && winner == fighter.Team.TeamColor)
+            if (winner == fighter.Team.TeamColor)
             {
-                GeneratePVMLoot();
-                if (ConfigurationManager.Instance.ServerId == 22)
+                if (ConfigurationManager.Instance.ServerId == 22 && fighter.Fight is FightDual)
                 {
-                    // heroique drop item
+                    if (!fighter.Fight.DeadItemsLoaded)
+                        fighter.Fight.LoadDeadItems((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.RedTeam.GetCharacterFighters(true) : fighter.Fight.BlueTeam.GetCharacterFighters(true));
+                    GeneratePlayerLoot((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.BlueTeam.GetCharacterFighters(true) : fighter.Fight.RedTeam.GetCharacterFighters(true), fighter);
+                    fighter.AlreadyDropped = true;
                 }
+                else if (fighter.Fight is FightPvM)
+                    GeneratePVMLoot();
             }
             else if (fighter.Fight is FightPvM && winner != fighter.Team.TeamColor)
             {
@@ -89,7 +93,6 @@ namespace Symbioz.Providers.FightResults
             if (fighter.Disconnected)
             {
                 CharactersDisconnected.remove(client.Character.Record.Name);
-                //client.Character.AddElement(client.Character.Record);
                 WorldServer.Instance.WorldClients.Remove(client);
             }
         }
@@ -103,6 +106,7 @@ namespace Symbioz.Providers.FightResults
         {
             if ((Fighter as CharacterFighter).HasLeft)
                 return;
+
             WorldClient client = (Fighter as CharacterFighter).Client;
             AsyncRandom random = new AsyncRandom();
 
@@ -124,6 +128,65 @@ namespace Symbioz.Providers.FightResults
                 AdditionalDatas.Add(expdatas);
                 client.Character.AddXp((ulong)earnedXp);
             }
+        }
+
+        public void GeneratePlayerLoot(List<CharacterFighter> Winners, CharacterFighter fighter)
+        {
+            WorldClient client = (Fighter as CharacterFighter).Client;
+            var WinnerNumber = Winners.Count;
+            var willDrop = fighter.Fight.ListDeadItems.Count / Winners.Count;
+            int[] dropped = new int[willDrop];
+            int index = 0;
+            Random rand = new Random();
+            while (willDrop != 0)
+            {
+                if (Winners.Count != 1)
+                {
+                    while (true)
+                    {
+                        var randomValue = rand.Next(0, fighter.Fight.ListDeadItems.Count);
+                        if (!ArrayUtils.InArray(dropped, randomValue))
+                        {
+                            dropped[index] = randomValue;
+                            break;
+                        }
+                    }
+                }
+                else
+                    dropped[index] = index;
+                index++;
+                willDrop--;
+            }
+            var ListDropped = fighter.Fight.GetItemRecordDropped(dropped);
+            foreach (var item in ListDropped)
+            {
+                if (item != null)
+                {
+                    ItemRecord template = ItemRecord.GetItem(item.Id);
+                    if (template != null)
+                    {
+                        FightLoot.objects.Add((ushort)item.Id);
+                        FightLoot.objects.Add(1);
+                        if (fighter.AlreadyDropped == false)
+                        {
+                            client.Character.Inventory.Add((ushort)item.Id, 1, false, false);
+                            fighter.Fight.DeleteFromDeadItems(item.Id);
+                        }
+                    }
+                    else
+                    {
+                        FightLoot.objects.Add((ushort)item.Id);
+                        FightLoot.objects.Add(1);
+                        if (fighter.AlreadyDropped == false)
+                        {
+                            client.Character.Inventory.Add((ushort)item.Id, 1, false, false);
+                            fighter.Fight.DeleteFromDeadItems(item.Id);
+                        }
+                    }
+                }
+             }
+            client.Character.Inventory.Refresh();
+            client.Character.RefreshShortcuts();
         }
 
         public void GeneratePVMLoot()

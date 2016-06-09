@@ -588,15 +588,28 @@ namespace Symbioz.World.Models
             }
             return actual;
         }
+
         public void InitializeForSaveTask()
         {
             Items.ForEach(x => SaveTask.UpdateElement(x));
             Items.ForEach(x => this.Character.UpdateElement(x));
         }
+
         public void Refresh()
         {
             Character.Client.Send(new InventoryContentMessage(ConvertAllObjectItems(), (uint)Character.Record.Kamas));
             Character.Client.Send(new InventoryWeightMessage(GetWeight(), 5000));
+        }
+
+        public List<CharacterItemRecord> GetAllItems()
+        {
+            List<CharacterItemRecord> AllItems = new List<CharacterItemRecord>();
+            foreach (var Record in CharacterItemRecord.CharactersItems)
+            {
+                if (Record.CharacterId == this.Character.Record.Id)
+                    AllItems.Add(Record);
+            }
+            return (AllItems);
         }
     }
 }

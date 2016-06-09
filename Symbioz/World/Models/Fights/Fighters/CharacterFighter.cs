@@ -195,7 +195,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                     }
                 }
                 if (Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
-                    Fight.ShowFightResults(Fight.GetFightResults(GetOposedTeam().TeamColor), Client);
+                    Fight.ShowFightResults(Fight.GetFightResultsForLeaver(GetOposedTeam().TeamColor, this.FighterInformations.contextualId), Client);
                 if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
                 {
                     Client.Send(new GameRolePlayArenaRegistrationStatusMessage(false, (sbyte)PvpArenaStepEnum.ARENA_STEP_UNREGISTER, ArenaProvider.FIGHTERS_PER_TEAM));

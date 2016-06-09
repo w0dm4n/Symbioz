@@ -45,7 +45,8 @@ namespace Symbioz.World.Handlers
                                 guildInfo = new BasicGuildInformations(0, "-");
                             var statusPlayer = new PlayerStatus(target.Character.PlayerStatus.statusId);
                             Friends.Add(new FriendOnlineInformations(character.AccountId, account.Username, (sbyte)PlayerStateEnum.UNKNOWN_STATE,
-                                (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, character.Level, 0, character.Breed, character.Sex, guildInfo, 0, statusPlayer));
+                                (ushort)character.LastConnection, 0, (uint)character.Id, character.Name, character.Level, 0, character.Breed, character.Sex, guildInfo,
+                                (target.Character.Record.MoodSmileyId != 0) ? (sbyte)target.Character.Record.MoodSmileyId : (sbyte)0, statusPlayer));
                         }
                         else
                         {
@@ -115,6 +116,13 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Vous recevez à nouveau des notifications lorsqu'un de vos ami se connecte !");
             }
             //client.Character.Record.WarnOnFriendConnection = (client.Character.Record.WarnOnFriendConnection) ? false : true;
+        }
+
+        [MessageHandler]
+        public static void HandleMoodSmileyRequestMessage(MoodSmileyRequestMessage message, WorldClient client)
+        {
+            if (client.Character.Record.MoodSmileyId != message.smileyId)
+                client.Character.Record.MoodSmileyId = message.smileyId;
         }
     }
 }

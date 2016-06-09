@@ -63,9 +63,9 @@ namespace Symbioz.World.Models.Fights
                 Map.Instance.OnFighterAdded(Id, mainFighter.Team.Id, newFighter.GetFightMemberInformations());
             }
         }
-        public override void ShowFightResults(List<FightResultListEntry> results,WorldClient client)
+        public override void ShowFightResults(List<FightResultListEntry> results, WorldClient client)
         {
-            client.Send(new GameFightEndMessage((ushort)TimeLine.m_round,0, 0, results, new NamedPartyTeamWithOutcome[0]));
+            client.Send(new GameFightEndMessage((ushort)TimeLine.m_round, 0, 0, results, new NamedPartyTeamWithOutcome[0]));
         }
     }
 }

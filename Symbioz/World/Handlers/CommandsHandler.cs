@@ -1,4 +1,5 @@
-﻿using Symbioz.Auth;
+﻿using Shader.Helper;
+using Symbioz.Auth;
 using Symbioz.Auth.Handlers;
 using Symbioz.Auth.Models;
 using Symbioz.Auth.Records;
@@ -809,8 +810,11 @@ namespace Symbioz.World.Handlers
         {
             if (client.Character.IsFighting)
                 client.Character.Reply("Impossible de sauvegarder votre personnage en combat !");
-            else
+            else if (client.Character.CanSave())
+            {
+                client.Character.LastCharacterSave = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                 client.Character.Save(true);
+            }
         }
 
         [InGameCommand("saveworld", ServerRoleEnum.MODERATOR)]

@@ -10,11 +10,11 @@ using Symbioz.DofusProtocol.Types;
 
 namespace Symbioz.Providers.FightResults
 {
-    public abstract class FightResult
+    public class FightResult
     {
         public Fighter Fighter { get; set; }
         public FightOutcomeEnum OutCome { get; set; }
-        public FightResult(Fighter fighter,TeamColorEnum winner)
+        public FightResult(Fighter fighter, TeamColorEnum winner)
         {
             this.Fighter = fighter;
             if (fighter.Team.TeamColor == winner)
@@ -23,7 +23,10 @@ namespace Symbioz.Providers.FightResults
                 OutCome = FightOutcomeEnum.RESULT_LOST;
       
         }
-        public abstract FightResultListEntry GetEntry();
-       
+
+        public virtual FightResultListEntry GetEntry()
+        {
+            return new FightResultFighterListEntry((ushort)OutCome, 0, new FightLoot(new List<ushort>(), 0), Fighter.ContextualId, !Fighter.Dead);
+        }
     }
 }
