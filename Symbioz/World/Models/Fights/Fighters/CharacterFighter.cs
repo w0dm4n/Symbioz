@@ -194,8 +194,10 @@ namespace Symbioz.World.Models.Fights.Fighters
                         Client.Character.Look = ContextActorLook.Parse("{24}");
                     }
                 }
-                if (Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
+                if (Fight.Started && Fight.FightType == FightTypeEnum.FIGHT_TYPE_CHALLENGE)
                     Fight.ShowFightResults(Fight.GetFightResultsForLeaver(GetOposedTeam().TeamColor, this.FighterInformations.contextualId), Client);
+                else if (Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
+                    Fight.ShowFightResults(Fight.GetFightResults(GetOposedTeam().TeamColor), Client);
                 if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
                 {
                     Client.Send(new GameRolePlayArenaRegistrationStatusMessage(false, (sbyte)PvpArenaStepEnum.ARENA_STEP_UNREGISTER, ArenaProvider.FIGHTERS_PER_TEAM));

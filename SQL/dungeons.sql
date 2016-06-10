@@ -1,3 +1,18 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost_3306
+Source Server Version : 50520
+Source Host           : localhost:3306
+Source Database       : symbioz
+
+Target Server Type    : MYSQL
+Target Server Version : 50520
+File Encoding         : 65001
+
+Date: 2016-06-10 14:26:33
+*/
+
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
@@ -142,12 +157,11 @@ INSERT INTO `dungeons` VALUES ('22283264', 'Cale de l Arche d Otomaï', '0', '0'
 INSERT INTO `dungeons` VALUES ('22283266', 'Cale de l Arche d Otomaï', '0', '0', '232');
 INSERT INTO `dungeons` VALUES ('22284290', 'Cale de l Arche d Otomaï', '0', '0', '232');
 INSERT INTO `dungeons` VALUES ('22285314', 'Cale de l Arche d Otomaï', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22806530', 'Goulet du Rasboul', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22807554', 'Goulet du Rasboul', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22808576', 'Goulet du Rasboul', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22808578', 'Goulet du Rasboul', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22809602', 'Goulet du Rasboul', '0', '0', '232');
-INSERT INTO `dungeons` VALUES ('22810626', 'Goulet du Rasboul', '0', '0', '232');
+INSERT INTO `dungeons` VALUES ('22806530', 'Goulet du Rasboul', '22807554', '522', '1026,1025,1068,1068,1068,1070,1070,1070');
+INSERT INTO `dungeons` VALUES ('22807554', 'Goulet du Rasboul', '22808578', '324', '1025,1026,1069,1069,1019,1019,1019,1019');
+INSERT INTO `dungeons` VALUES ('22808576', 'Goulet du Rasboul', '22806530', '320', '1026,1026,1026,1025,1025,1025,1070,1070');
+INSERT INTO `dungeons` VALUES ('22808578', 'Goulet du Rasboul', '22809602', '320', '1069,1069,1070,1070,1068,1068,1019,1019');
+INSERT INTO `dungeons` VALUES ('22809602', 'Goulet du Rasboul', '157193', '230', '1071,1026,1025,1069,1070,1070,1068,1019');
 INSERT INTO `dungeons` VALUES ('26738688', 'Antre du Kralamoure Géant', '0', '0', '232');
 INSERT INTO `dungeons` VALUES ('26739712', 'Antre du Kralamoure Géant', '0', '0', '232');
 INSERT INTO `dungeons` VALUES ('26740736', 'Antre du Kralamoure Géant', '0', '0', '232');

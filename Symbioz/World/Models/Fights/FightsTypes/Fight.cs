@@ -57,6 +57,8 @@ namespace Symbioz.World.Models.Fights
 
         public List<ItemRecord> ListDeadItems = new List<ItemRecord>();
 
+        public int ListDeadsItemsStartSize = 0;
+
         /// <summary>
         /// Type de combat
         /// </summary>
@@ -610,6 +612,7 @@ namespace Symbioz.World.Models.Fights
                 }
             }
             this.DeadItemsLoaded = true;
+            this.ListDeadsItemsStartSize = this.ListDeadItems.Count;
         }
 
         public List<ItemRecord> GetItemRecordDropped(int[] Droppeds)

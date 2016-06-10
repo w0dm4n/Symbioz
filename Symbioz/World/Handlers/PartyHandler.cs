@@ -22,7 +22,15 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void RequestParty(PartyInvitationRequestMessage message, WorldClient client)
         {
+            WorldClient target = WorldServer.Instance.GetOnlineClient(message.name); 
             Party p;
+
+            if (client.Character.isIgnoring(target.Character.Record.AccountId))
+            {
+                client.Character.Reply("Impossible car ce joueur vous ignore.");
+                return;
+            }
+
             if (client.Character.PartyMember == null)
             {
                 WorldServer.Instance.Parties.OrderBy(x => x.Id);

@@ -134,7 +134,7 @@ namespace Symbioz.Providers.FightResults
         {
             WorldClient client = (Fighter as CharacterFighter).Client;
             var WinnerNumber = Winners.Count;
-            var willDrop = fighter.Fight.ListDeadItems.Count / Winners.Count;
+            var willDrop = fighter.Fight.ListDeadsItemsStartSize / Winners.Count;
             int[] dropped = new int[willDrop];
             int index = 0;
             Random rand = new Random();

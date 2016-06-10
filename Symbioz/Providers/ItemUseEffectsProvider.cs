@@ -66,7 +66,13 @@ namespace Symbioz.Providers
                 }
                 else
                 {
-                    client.Character.NotificationError((EffectsEnum)effect.actionId + " n'est pas encore disponible !");
+                    if (item.GID == 7401) // Parchemin de recherche
+                        client.Character.Reply("Impossible d'utiliser un parchemin de recherche sur vous même, vous devez cibler quelqu'un !");
+                    else
+                    {
+                        if (client.Character.isDebugging)
+                            client.Character.NotificationError((EffectsEnum)effect.actionId + " n'est pas encore disponible !");
+                    }
                 }
             }
             return remove;

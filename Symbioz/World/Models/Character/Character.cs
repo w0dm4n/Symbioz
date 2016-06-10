@@ -36,6 +36,7 @@ using Shader.Helper;
 using Symbioz.Network.Servers;
 using Symbioz.Auth.Records;
 using Symbioz.World.Records.Ignored;
+using Symbioz.World.Records.Items;
 
 namespace Symbioz.World.Models
 {
@@ -75,6 +76,7 @@ namespace Symbioz.World.Models
         public PartyMember PartyMember;
         public List<FriendRecord> Friends = new List<FriendRecord>();
         public List<IgnoredRecord> IgnoredList = new List<IgnoredRecord>();
+        public List<KeyringRecord> Keyring = new List<KeyringRecord>();
 
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
@@ -1482,6 +1484,62 @@ namespace Symbioz.World.Models
                 }
             }
             return false;
+        }
+
+        public bool HaveKeyring()
+        {
+            var playerItems = this.Inventory.GetAllItems();
+            foreach (var item in playerItems)
+                if (item.GID == 10207)
+                    return true;
+           return false;
+        }
+
+        public void DeleteKeyIfExist(int TemplateId)
+        {
+            foreach (var Key in Keyring)
+            {
+                if (Key.KeyId == TemplateId)
+                {
+                    Keyring.Remove(Key);
+                    break;
+                }
+            }
+        }
+
+        public bool CanUseKeyring(int keyTemplateId)
+        {
+            foreach (var Key in Keyring)
+            {
+                if (Key.KeyId == keyTemplateId)
+                {
+                    var StartTime = Key.KeyTimeUse;
+                    var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                    var seconds = 0;
+                    while (StartTime <= CurrentTime)
+                    {
+                        seconds++;
+                        StartTime++;
+                    }
+                    if (seconds >= ConfigurationManager.Instance.TimeForUseKeyring)
+                        return true;
+                    else
+                    {
+                        var timeLeft = ConfigurationManager.Instance.TimeForUseKeyring - seconds;
+                        var Time = timeLeft / 60 + " minutes restantes";
+                        this.Reply("Vous ne possédez pas la clef pour rentrer dans ce donjon et il est encore trop tôt pour utiliser votre trousseau de clefs (<b>" + Time + "</b>)");
+                        return false;
+                    }
+              }
+            }
+            return true;
+        }
+
+        public void UseKeyring(int KeyTemplateId)
+        {
+            this.DeleteKeyIfExist(KeyTemplateId);
+            this.Keyring.Add(new KeyringRecord(KeyTemplateId, DateTimeUtils.GetEpochFromDateTime(DateTime.Now)));
+            Client.Character.Reply("Vous avez utilisé votre trousseaux de clefs pour rentrer dans ce donjon car vous ne possédiez pas la clef.");
         }
     }
 }

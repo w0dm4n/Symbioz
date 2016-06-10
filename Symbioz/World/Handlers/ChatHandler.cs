@@ -83,7 +83,7 @@ namespace Symbioz.World.Handlers
             {
                 if (client.Character.isIgnoring(target.Character.Record.AccountId))
                 {
-                    client.Character.Reply("Ce joueur vous ignore, impossible d'envoyer votre message.");
+                    client.Character.Reply("Impossible car ce joueur vous ignore.");
                     return;
                 }
                     if (target.Character.PlayerStatus.statusId == (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE)

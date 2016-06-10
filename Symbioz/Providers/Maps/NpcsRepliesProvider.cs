@@ -58,6 +58,21 @@ namespace Symbioz.Providers
                     }
                     else
                     {
+                        ItemRecord template = ItemRecord.GetItem(int.Parse(reply.OptionalValue1));
+                        if (template != null)
+                        {
+                            if (template.TypeId == 84) // Clef
+                            {
+                                if (client.Character.HaveKeyring())
+                                {
+                                    if (client.Character.CanUseKeyring(template.Id))
+                                    {
+                                        results.Add(reply);
+                                    }
+                                    return results;
+                                }
+                            }
+                        }
                         if (reply.ConditionExplanation != null && reply.ConditionExplanation != string.Empty)
                         {
                             client.Character.Reply(reply.ConditionExplanation);
@@ -77,8 +92,14 @@ namespace Symbioz.Providers
                 client.Character.Inventory.RemoveItem(item.UID, 1);
                 client.Character.Reply("Vous avez perdu 1 " + itemName);
             }
-            else
-                client.Character.NotificationError("Impossible de supprimer l'item : " + itemName + " car vous ne le possédez pas.");
+            ItemRecord template = ItemRecord.GetItem(int.Parse(reply.OptionalValue1));
+            if (template != null && template.TypeId == 84 && client.Character.HaveKeyring() && item == null)
+                client.Character.UseKeyring(template.Id);
+            else if (item == null)
+            {
+                if (client.Character.isDebugging)
+                    client.Character.NotificationError("Impossible de supprimer l'item : " + itemName + " car vous ne le possédez pas.");
+            }
         }
         static void Reset(WorldClient client,NpcReplyRecord reply)
         {

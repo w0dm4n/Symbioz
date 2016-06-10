@@ -62,6 +62,11 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible car le joueur est occupé.");
                 return;
             }
+            if (client.Character.isIgnoring(target.Character.Record.AccountId))
+            {
+                client.Character.Reply("Impossible car ce joueur vous ignore.");
+                return;
+            }
             if (message.friendly)
             {
 

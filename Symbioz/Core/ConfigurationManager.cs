@@ -132,6 +132,8 @@ namespace Symbioz.Core
 
         public int TimeBetweenCharacterSave { get; set; }
 
+        public int TimeForUseKeyring { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -163,6 +165,7 @@ namespace Symbioz.Core
             config.TimeBetweenSeekMessage = 120;
             config.TurnBeforeFightDisconnection = 20;
             config.TimeBetweenCharacterSave = 120;
+            config.TimeForUseKeyring = 7200;
             return config;
         }
     }

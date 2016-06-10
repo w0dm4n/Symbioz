@@ -30,4 +30,5 @@
   <TimeBetweenSeekMessage>20</TimeBetweenSeekMessage>
   <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>
   <TimeBetweenCharacterSave>60</TimeBetweenCharacterSave>
+  <TimeForUseKeyring>7200</TimeForUseKeyring>
 </Configuration>

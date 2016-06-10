@@ -140,6 +140,7 @@
     <Compile Include="World\Handlers\ApproachHandler.cs" />
     <Compile Include="World\Handlers\FriendsHandler.cs" />
     <Compile Include="World\Handlers\IgnoredHandler.cs" />
+    <Compile Include="World\Handlers\ObjectOnCellHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
     <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
@@ -326,6 +327,7 @@
     <Compile Include="World\Records\Breeds\BreedSpellRecord.cs" />
     <Compile Include="World\Records\Character\CharacterJobRecord.cs" />
     <Compile Include="World\Records\Character\SpellShortcutRecord.cs" />
+    <Compile Include="World\Records\Items\KeyringRecord.cs" />
     <Compile Include="World\Records\Items\WeaponRecord.cs" />
     <Compile Include="World\Records\Maps\MapPositionRecord.cs" />
     <Compile Include="World\Records\Maps\MapScrollActionRecord.cs" />
