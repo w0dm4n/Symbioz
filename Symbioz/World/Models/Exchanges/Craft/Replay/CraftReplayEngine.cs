@@ -11,8 +11,6 @@ namespace Symbioz.World.Models.Exchanges.Craft.Replay
 {
     public class CraftReplayEngine : ReplayEngine, IDisposable
     {
-
-
         CraftExchange Instance { get; set; }
 
         RecipeRecord Recipe { get; set; }

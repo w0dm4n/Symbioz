@@ -527,7 +527,7 @@ namespace Symbioz.World.Models.Fights
                 {
                     if (fighter.Client.Character.GetLifePoints == true)
                     {
-                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.Client.Character.StatsRecord.LifePoints;
+                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.Client.Character.CharacterStatsRecord.LifePoints;
                         fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
                         fighter.Client.Character.GetLifePoints = false;
                     }

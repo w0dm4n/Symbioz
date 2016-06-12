@@ -23,7 +23,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var statdefinition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("GlobalDamageReduction"),target.FighterStats.Stats);
+                var statdefinition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("GlobalDamageReduction"),target.FighterStats.Stats);
                 StatBuff buff = new StatBuff((uint)target.BuffIdProvider.Pop(), statdefinition, (uint)effect.BaseEffect.EffectId, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
             }
@@ -33,7 +33,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var statdefinition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("AirResistPercent"), fighter.FighterStats.Stats);
+                var statdefinition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("AirResistPercent"), fighter.FighterStats.Stats);
                 StatBuff buff = new StatBuff((uint)target.BuffIdProvider.Pop(), statdefinition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
             }
@@ -43,7 +43,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var statdefinition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("FireResistPercent"), fighter.FighterStats.Stats);
+                var statdefinition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("FireResistPercent"), fighter.FighterStats.Stats);
                 StatBuff buff = new StatBuff((uint)target.BuffIdProvider.Pop(), statdefinition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
             }
@@ -53,7 +53,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var statdefinition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("WaterResistPercent"), fighter.FighterStats.Stats);
+                var statdefinition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("WaterResistPercent"), fighter.FighterStats.Stats);
                 StatBuff buff = new StatBuff((uint)target.BuffIdProvider.Pop(), statdefinition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
             }
@@ -63,7 +63,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var statdefinition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("EarthResistPercent"), fighter.FighterStats.Stats);
+                var statdefinition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("EarthResistPercent"), fighter.FighterStats.Stats);
                 StatBuff buff = new StatBuff((uint)target.BuffIdProvider.Pop(), statdefinition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
             }

@@ -24,13 +24,13 @@ namespace Symbioz.World.Handlers
             var template = ItemRecord.GetItem(item.GID);
             if (template == null)
                 return;
-            if (client.Character.CurrentStats.LifePoints >= client.Character.StatsRecord.LifePoints)
+            if (client.Character.CurrentStats.LifePoints >= client.Character.CharacterStatsRecord.LifePoints)
             {
                 client.Character.Reply("Vos points de vie sont déjà au maximum !");
                 return;
             }
             var lifeBack = 0;
-            if (client.Character.CurrentStats.LifePoints <= client.Character.StatsRecord.LifePoints)
+            if (client.Character.CurrentStats.LifePoints <= client.Character.CharacterStatsRecord.LifePoints)
             {
                 var effects = item.Effects.Split('|');
                 if (effects == null || effects.Length == 0)
@@ -43,9 +43,9 @@ namespace Symbioz.World.Handlers
                 }
             }
             client.Character.CurrentStats.LifePoints += (uint)lifeBack;
-            if (client.Character.CurrentStats.LifePoints >= client.Character.StatsRecord.LifePoints)
+            if (client.Character.CurrentStats.LifePoints >= client.Character.CharacterStatsRecord.LifePoints)
             {
-                client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
+                client.Character.CurrentStats.LifePoints = (uint)client.Character.CharacterStatsRecord.LifePoints;
                 client.Character.Reply("Tous vos points de vie ont été restaurés !");
             }
             else

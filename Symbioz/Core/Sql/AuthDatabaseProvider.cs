@@ -13,7 +13,7 @@ namespace Symbioz.Core
 {
     public class AuthDatabaseProvider
     {
-        [StartupInvoke("Auth Connection",StartupInvokeType.Sql)]
+        [StartupInvoke("AuthConnection",StartupInvokeType.SQL)]
         public static void Initialize() 
         {
            m_connection = (MySqlConnection)DatabaseManager.GetInstance().UseProvider().Clone();

@@ -16,6 +16,7 @@ using Symbioz.World.Records;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Parties;
 using Shader.Helper;
+using Symbioz.ORM;
 
 namespace Symbioz.Network.Servers
 {
@@ -70,10 +71,6 @@ namespace Symbioz.Network.Servers
         {
             WorldClients.ForEach(x => x.Send(message));
         }
-        public void ClearAllOnlineCharacters()
-        {
-            GetAllClientsOnline().ForEach(x => x.Character.ClearSave());
-        }
         public void SendToOnlineCharacters(Message message)
         {
             GetAllClientsOnline().ForEach(x => x.Send(message));
@@ -84,7 +81,7 @@ namespace Symbioz.Network.Servers
         }
         public void RemoveClient(WorldClient client)
         {
-            Boolean remove = true;
+            bool remove = true;
             if (client != null && client.Character != null)
             {
                 if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
@@ -97,7 +94,8 @@ namespace Symbioz.Network.Servers
                 if (client.Character.IsRegeneratingLife)
                     client.Character.StopRegenLife();
                 client.Character.Record.LastConnection = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                client.Character.Save(false);
+                if (client.Character != null)
+                    client.Character.Dispose();
             }
             if (remove == true)
                 WorldClients.Remove(client);

@@ -96,7 +96,7 @@ namespace Symbioz.Providers
                 client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
                 return;
             }
-            ushort messageId =ushort.Parse(action.OptionalValue1);
+            ushort messageId = ushort.Parse(action.OptionalValue1);
 
             List<NpcReplyRecord> replies = NpcsRepliesProvider.GetPossibleReply(client, NpcReplyRecord.GetNpcReplies(messageId));
             client.Character.CurrentDialogType = DialogTypeEnum.DIALOG_DIALOG;

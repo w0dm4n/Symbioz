@@ -80,7 +80,7 @@ namespace Symbioz.Providers
         static bool AddVitality(WorldClient client, ObjectEffect effect, uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentVitality += value;
+            client.Character.CharacterStatsRecord.PermanentVitality += value;
             client.Character.Reply("Vous avez obtenu " + value + " en vitalité.");
             client.Character.RefreshStats();
             return true;
@@ -88,7 +88,7 @@ namespace Symbioz.Providers
         static bool AddWisdom(WorldClient client, ObjectEffect effect, uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentWisdom += value;
+            client.Character.CharacterStatsRecord.PermanentWisdom += value;
             client.Character.Reply("Vous avez obtenu " + value + " en sagesse.");
             client.Character.RefreshStats();
             return true;
@@ -105,7 +105,7 @@ namespace Symbioz.Providers
         static bool AddIntelligence(WorldClient client, ObjectEffect effect, uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentIntelligence += value;
+            client.Character.CharacterStatsRecord.PermanentIntelligence += value;
             client.Character.Reply("Vous avez obtenu " + value + " en intelligence.");
             client.Character.RefreshStats();
             return true;
@@ -113,7 +113,7 @@ namespace Symbioz.Providers
         static bool AddChance(WorldClient client, ObjectEffect effect, uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentChance += value;
+            client.Character.CharacterStatsRecord.PermanentChance += value;
             client.Character.Reply("Vous avez obtenu "+value+" en chance.");
             client.Character.RefreshStats();
             return true;
@@ -121,7 +121,7 @@ namespace Symbioz.Providers
         static bool AddAgility(WorldClient client, ObjectEffect effect, uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentAgility += value;
+            client.Character.CharacterStatsRecord.PermanentAgility += value;
             client.Character.Reply("Vous avez obtenu "+value+" en agilité.");
             client.Character.RefreshStats();
             return true;
@@ -129,7 +129,7 @@ namespace Symbioz.Providers
         static bool AddStrength(WorldClient client,ObjectEffect effect,uint id)
         {
             short value = (short)(effect as ObjectEffectInteger).value;
-            client.Character.StatsRecord.PermanentStrenght += value;
+            client.Character.CharacterStatsRecord.PermanentStrenght += value;
             client.Character.Reply("Vous avez obtenu "+value+" en force.");
             client.Character.RefreshStats();
             return true;

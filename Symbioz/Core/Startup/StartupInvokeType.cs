@@ -10,7 +10,7 @@ namespace Symbioz.Core.Startup
     {
         Config = 0,
         Base = 1,
-        Sql = 2,
+        SQL = 2,
         Internal = 3,
         Others = 4,
         Cyclics = 5,

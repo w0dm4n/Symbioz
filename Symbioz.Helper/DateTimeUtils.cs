@@ -19,5 +19,11 @@ namespace Shader.Helper
         {
             return DateTimeUtils.GetEpochFromDateTime(input);
         }
+
+        public static DateTime GetDateTimeFromEpoch(this int input)
+        {
+            DateTime dateTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return dateTimeOrigin.AddSeconds(input);
+        }
     }
 }

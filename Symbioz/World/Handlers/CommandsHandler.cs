@@ -813,7 +813,6 @@ namespace Symbioz.World.Handlers
             else if (client.Character.CanSave())
             {
                 client.Character.LastCharacterSave = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                client.Character.Save(true);
             }
         }
 
@@ -845,7 +844,7 @@ namespace Symbioz.World.Handlers
             {
                 if (!client.Character.Restrictions.isDead)
                 {
-                    client.Character.CurrentStats.LifePoints = (uint)client.Character.StatsRecord.LifePoints;
+                    client.Character.CurrentStats.LifePoints = (uint)client.Character.CharacterStatsRecord.LifePoints;
                     client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                     client.Character.RefreshStats();
                     client.Character.Reply("Vous avez récupérer vos points de vie !");

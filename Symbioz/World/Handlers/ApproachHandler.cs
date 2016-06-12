@@ -118,14 +118,13 @@ namespace Symbioz.World.Handlers
 
             client.Character = new Character(newCharacter, client);
             client.Character.IsNew = true;
-            StatsRecord.Create(client.Character);
+            CharacterStatsRecord.Create(client.Character);
             client.Character.SetLevel(ConfigurationManager.Instance.StartLevel);
             client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
-            client.Character.AddElement(client.Character.Record);
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
-            client.Character.Save(false);
+            SaveTask.AddElement(client.Character.Record, false);
             ProcessSelection(client);
         }
         [MessageHandler]
@@ -161,7 +160,7 @@ namespace Symbioz.World.Handlers
             CharacterRecord deletedCharacter = CharacterRecord.GetCharacterRecordById(message.characterId);
             if (deletedCharacter == null)
                 return;
-            StatsRecord.GetStatsRecord(message.characterId).RemoveElement();
+            CharacterStatsRecord.GetCharacterStatsRecord(message.characterId).RemoveElement();
             CharacterRecord.Characters.Remove(deletedCharacter);
             client.Characters.Remove(deletedCharacter);
             deletedCharacter.RemoveElement();
@@ -198,7 +197,7 @@ namespace Symbioz.World.Handlers
                 client.Send(new CharacterLoadingCompleteMessage());
                 return;
             }
-            StatsRecord.InitializeCharacter(client.Character);
+            CharacterStatsRecord.InitializeCharacter(client.Character);
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
             client.Character.RefreshEmotes();

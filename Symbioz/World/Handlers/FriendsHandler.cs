@@ -74,7 +74,6 @@ namespace Symbioz.World.Handlers
                 {
                     client.Character.AddFriend(toAdd.Character.Record.AccountId);
                     client.Character.SaveAllFriends();
-                    client.Character.Save(false);
                     FriendsHandler.HandleFriendsGetListMessage(new FriendsGetListMessage(), client);
                 }
             }

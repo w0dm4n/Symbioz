@@ -1,4 +1,5 @@
 ﻿using Symbioz.DofusProtocol.Messages;
+using Symbioz.Enums;
 using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
@@ -22,6 +23,7 @@ namespace Symbioz.World.Handlers
             if(AllianceProvider.CanCreateAlliance(client, message))
             {
                 AllianceProvider.CreateAlliance(client.Character.GetGuild(), message.allianceTag, message.allianceName, message.allianceEmblem);
+                client.Send(new AllianceCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_OK));
             }
         }
 

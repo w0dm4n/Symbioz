@@ -64,7 +64,7 @@ namespace Symbioz.World.Models
         public CharacterRecord Record { get; set; }
         public bool Busy { get { return ExchangeType != null; } }
         public Inventory Inventory { get; set; }
-        public StatsRecord StatsRecord { get { return StatsRecord.Stats.Find(x => x.CharacterId == Id); } }
+        public CharacterStatsRecord CharacterStatsRecord { get { return CharacterStatsRecord.CharactersStats.Find(x => x.CharacterId == Id); } }
         public BasicStats CurrentStats { get; set; }
         public List<HumanOption> HumanOptions { get; set; }
         public ActorRestrictionsInformations Restrictions = CharacterHelper.GetDefaultRestrictions();
@@ -86,10 +86,10 @@ namespace Symbioz.World.Models
         public BidShopExchange BidShopInstance { get; set; }
         public PlayerTradeExchange PlayerTradeInstance { get; set; }
         public CraftExchange CraftInstance { get; set; }
+        public PrismExchange PrismStorageInstance { get; set; }
         public GuildInvitationDialog GuildInvitationDialog { get; set; }
         public AllianceInvitationDialog AllianceInvitationDialog { get; set; }
         #endregion
-
 
         public bool IsFighting { get { return !FighterInstance.IsNull(); } }
 
@@ -106,240 +106,9 @@ namespace Symbioz.World.Models
         {
             get
             {
-                return (int)(StatsRecord.Strength + StatsRecord.Intelligence + StatsRecord.Agility +
-                    StatsRecord.Chance + StatsRecord.Initiative * (CurrentStats.LifePoints / StatsRecord.LifePoints));
+                return (int)(CharacterStatsRecord.Strength + CharacterStatsRecord.Intelligence + CharacterStatsRecord.Agility +
+                    CharacterStatsRecord.Chance + CharacterStatsRecord.Initiative * (CurrentStats.LifePoints / CharacterStatsRecord.LifePoints));
             }
-        }
-
-        public void AddElement(ITable element, bool addtolist = true)
-        {
-            lock (_newElements)
-            {
-                if (_newElements.ContainsKey(element.GetType()))
-                {
-                    if (!_newElements[element.GetType()].Contains(element))
-                        _newElements[element.GetType()].Add(element);
-                }
-                else
-                {
-                    _newElements.Add(element.GetType(), new List<ITable> { element });
-                }
-            }
-            if (addtolist)
-            {
-                #region Add value into array
-                var field = GetCache(element);
-                if (field == null)
-                {
-                    Logger.Error("Unable to add record value to the list, static list field wasnt finded");
-                    return;
-                }
-
-                var method = field.FieldType.GetMethod("Add");
-                if (method == null)
-                {
-                    Console.WriteLine("Unable to add record value to the list, add method wasnt finded");
-                    return;
-                }
-
-                method.Invoke(field.GetValue(null), new object[] { element });
-                #endregion
-            }
-        }
-
-        public void UpdateElement(ITable element)
-        {
-            lock (_updateElements)
-            {
-                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
-                    return;
-
-                if (_updateElements.ContainsKey(element.GetType()))
-                {
-                    if (!_updateElements[element.GetType()].Contains(element))
-                        _updateElements[element.GetType()].Add(element);
-                }
-                else
-                {
-                    _updateElements.Add(element.GetType(), new List<ITable> { element });
-                }
-            }
-        }
-
-        public void RemoveElement(ITable element, bool removefromlist = true)
-        {
-            if (element == null)
-                return;
-            lock (_removeElements)
-            {
-                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
-                {
-                    RemoveFromList(element);
-                    _newElements[element.GetType()].Remove(element);
-                    return;
-                }
-
-                if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
-                    _updateElements[element.GetType()].Remove(element);
-
-                if (_removeElements.ContainsKey(element.GetType()))
-                {
-                    if (!_removeElements[element.GetType()].Contains(element))
-                        _removeElements[element.GetType()].Add(element);
-                }
-                else
-                {
-                    _removeElements.Add(element.GetType(), new List<ITable> { element });
-                }
-            }
-            if (removefromlist)
-            {
-                RemoveFromList(element);
-            }
-        }
-
-        private static FieldInfo GetCache(ITable table)
-        {
-            var attribute = table.GetType().GetCustomAttribute(typeof(TableAttribute), false);
-            if (attribute == null)
-                return null;
-
-            var field = table.GetType().GetFields().FirstOrDefault(x => x.Name.ToLower() == (attribute as TableAttribute).tableName.ToLower());
-            if (field == null || !field.IsStatic || !field.FieldType.IsGenericType)
-            {
-                return null;
-            }
-            return field;
-        }
-
-        static void RemoveFromList(ITable element)
-        {
-            var field = GetCache(element);
-            if (field == null)
-            {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
-                return;
-            }
-
-            var method = field.FieldType.GetMethod("Remove");
-            if (method == null)
-            {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
-                return;
-            }
-
-            method.Invoke(field.GetValue(null), new object[] { element });
-        }
-
-        public void ClearSave()
-        {
-            try
-            {
-                var types = _removeElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-                    lock (_removeElements)
-                        elements = _removeElements[type];
-                    lock (_removeElements)
-                        _removeElements[type] = _removeElements[type].Skip(elements.Count).ToList();
-                }
-
-                types = _newElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-
-                    lock (_newElements)
-                        elements = _newElements[type];
-                    lock (_newElements)
-                        _newElements[type] = _newElements[type].Skip(elements.Count).ToList();
-                }
-
-                types = _updateElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-                    lock (_updateElements)
-                        elements = _updateElements[type];
-                    lock (_updateElements)
-                    {
-                        var attribute = (TableAttribute)type.GetCustomAttribute(typeof(TableAttribute));
-
-                        if (attribute != null && !attribute.letInUpdateField)
-                            _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
-                    }
-                }
-            }
-            catch (Exception e) { Logger.Error("[CLEAR SAVE CHARACTER " + this.Record.Name + "]" + e.Message); }
-        }
-
-        public void Save(bool printMessage)
-        {
-            try
-            {
-                var types = _removeElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-                    lock (_removeElements)
-                        elements = _removeElements[type];
-
-                    try
-                    {
-                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Remove, elements.ToArray());
-                    }
-                    catch (Exception e) { Logger.Error(e.Message); }
-
-                    lock (_removeElements)
-                        _removeElements[type] = _removeElements[type].Skip(elements.Count).ToList();
-
-                }
-
-                types = _newElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-
-                    lock (_newElements)
-                        elements = _newElements[type];
-
-                    try
-                    {
-                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, elements.ToArray());
-                    }
-                    catch (Exception e) { Logger.Error(e.ToString()); }
-
-                    lock (_newElements)
-                        _newElements[type] = _newElements[type].Skip(elements.Count).ToList();
-
-                }
-
-                types = _updateElements.Keys.ToList();
-                foreach (var type in types)
-                {
-                    List<ITable> elements;
-                    lock (_updateElements)
-                        elements = _updateElements[type];
-                    try
-                    {
-                        var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, elements.ToArray());
-                    }
-                    catch (Exception e) { Logger.Error(e.ToString()); }
-
-                    lock (_updateElements)
-                    {
-                        var attribute = (TableAttribute)type.GetCustomAttribute(typeof(TableAttribute));
-
-                        if (attribute != null && !attribute.letInUpdateField)
-                            _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
-                    }
-                }
-                if (printMessage == true)
-                    this.Reply("Votre personnage a été sauvegardé avec succès.");
-                Console.WriteLine(")) Character " + this.Record.Name + " was saved !");
-            }
-            catch (Exception e) { Logger.Error("[SAVING CHARACTER " + this.Record.Name + "]" + e.Message); }
         }
 
         public PlayerStatus PlayerStatus;
@@ -613,10 +382,8 @@ namespace Symbioz.World.Models
             {
                 var spellRecord = new CharacterSpellRecord(CharacterSpellRecord.CharactersSpells.PopNextId<CharacterSpellRecord>(x => x.Id), Id, spell.spellId, 1);
                 var shortcutRecord = new SpellShortcutRecord(SpellShortcutRecord.SpellsShortcuts.PopNextId<SpellShortcutRecord>(x => x.Id), Id, (ushort)spell.spellId, SpellShortcutRecord.GetFreeSlotId(Id));
-                SaveTask.AddElement(spellRecord);
-                SaveTask.AddElement(shortcutRecord);
-                this.AddElement(spellRecord);
-                this.AddElement(shortcutRecord);
+                SaveTask.AddElement(spellRecord, false);
+                SaveTask.AddElement(shortcutRecord, false);
             }
             if (sendpackets)
             {
@@ -709,10 +476,10 @@ namespace Symbioz.World.Models
                 this.GetLifePoints = true;
                 if (Record.Level == 100)
                 {
-                    StatsRecord.ActionPoints++;
+                    CharacterStatsRecord.ActionPoints++;
                     LearnEmote(22, sendpackets);
                 }
-                StatsRecord.LifePoints += 5;
+                CharacterStatsRecord.LifePoints += 5;
                 CurrentStats.LifePoints += 5;
                 Record.CurrentLifePoint = CurrentStats.LifePoints;
                 Record.SpellPoints += 1;
@@ -788,7 +555,6 @@ namespace Symbioz.World.Models
             else
                 job.JobExp += amount;
             SaveTask.UpdateElement(job);
-            this.UpdateElement(job);
             RefreshJobs();
         }
         public void OpenPaddock()
@@ -1001,7 +767,7 @@ namespace Symbioz.World.Models
         /// </summary>
         public void RefreshStats()
         {
-            Client.Send(new CharacterStatsListMessage(StatsRecord.GetCharacterCharacteristics(StatsRecord, this)));
+            Client.Send(new CharacterStatsListMessage(CharacterStatsRecord.GetCharacterCharacteristics(CharacterStatsRecord, this)));
             this.RefreshGroupInformations();
         }
         public void LeaveDialog()
@@ -1063,11 +829,9 @@ namespace Symbioz.World.Models
                 DungeonPartyProvider.Instance.RemoveCharacter(this);
             Client.Character.Look.UnsetAura();
             Record.Look = Look.ConvertToString();
-            SaveTask.UpdateElement(Record);
-            SaveTask.UpdateElement(StatsRecord);
-            this.UpdateElement(Record);
-            this.UpdateElement(StatsRecord);
-            Inventory.InitializeForSaveTask();
+            SaveTask.UpdateElement(Record, false);
+            SaveTask.UpdateElement(CharacterStatsRecord, false);
+            Inventory.SaveItems();
         }
 
         public void RefreshGroupInformations()
@@ -1157,7 +921,7 @@ namespace Symbioz.World.Models
 
         public void RegenLife(short RegenRate)
         {
-            if (this.CurrentStats.LifePoints < this.StatsRecord.LifePoints)
+            if (this.CurrentStats.LifePoints < this.CharacterStatsRecord.LifePoints)
             {
                 this.Client.Send(new LifePointsRegenBeginMessage((byte)RegenRate));
                 RegenStartTime = DateTime.Now;
@@ -1173,7 +937,7 @@ namespace Symbioz.World.Models
             {
                 if (this.RegenRate == 3)
                 {
-                    if (this.CurrentStats.LifePoints < this.StatsRecord.LifePoints)
+                    if (this.CurrentStats.LifePoints < this.CharacterStatsRecord.LifePoints)
                     {
                         this.StopRegenLife();
                         this.RegenLife(10);
@@ -1192,15 +956,15 @@ namespace Symbioz.World.Models
             var LifePointsToAdd = 0;
             while (StartTime < CurrentTime)
             {
-                if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.StatsRecord.LifePoints)
+                if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.CharacterStatsRecord.LifePoints)
                     break;
                 LifePointsToAdd++;
                 StartTime++;
             }
             //LifePointsToAdd = LifePointsToAdd / 2; If we wanna reduce the rate of life back at the reconnection
             this.CurrentStats.LifePoints += (uint)LifePointsToAdd;
-            if (this.CurrentStats.LifePoints > this.StatsRecord.LifePoints)
-                this.CurrentStats.LifePoints = (uint)this.StatsRecord.LifePoints;
+            if (this.CurrentStats.LifePoints > this.CharacterStatsRecord.LifePoints)
+                this.CurrentStats.LifePoints = (uint)this.CharacterStatsRecord.LifePoints;
             this.Record.CurrentLifePoint = this.CurrentStats.LifePoints;
             if (LifePointsToAdd != 0 && this.CurrentStats.LifePoints != AtBegin)
             {
@@ -1219,7 +983,7 @@ namespace Symbioz.World.Models
                 var LifePointsToAdd = 0;
                 while (StartTime < CurrentTime)
                 {
-                    if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.StatsRecord.LifePoints)
+                    if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.CharacterStatsRecord.LifePoints)
                         break;
                     if (this.RegenRate == 10)
                         LifePointsToAdd++;
@@ -1230,8 +994,8 @@ namespace Symbioz.World.Models
                 if (this.RegenRate == 3)
                     LifePointsToAdd++;
                 this.CurrentStats.LifePoints += (uint)LifePointsToAdd;
-                if (this.CurrentStats.LifePoints > this.StatsRecord.LifePoints)
-                    this.CurrentStats.LifePoints = (uint)this.StatsRecord.LifePoints;
+                if (this.CurrentStats.LifePoints > this.CharacterStatsRecord.LifePoints)
+                    this.CurrentStats.LifePoints = (uint)this.CharacterStatsRecord.LifePoints;
                 this.Record.CurrentLifePoint = this.CurrentStats.LifePoints;
                 this.RefreshStats();
                 this.IsRegeneratingLife = false;
@@ -1302,8 +1066,7 @@ namespace Symbioz.World.Models
         {
             foreach (var friend in this.Friends)
             {
-                this.AddElement(friend);
-                SaveTask.AddElement(friend);
+                SaveTask.AddElement(friend, false);
             }
         }
 
@@ -1342,10 +1105,8 @@ namespace Symbioz.World.Models
             {
                 if (friend.FriendAccountId == friendAccountId)
                 {
-                    this.RemoveElement(friend);
-                    SaveTask.RemoveElement(friend);
+                    SaveTask.RemoveElement(friend, false);
                     this.Friends.Remove(friend);
-                    this.Save(false);
                     break;
                 }
             }
@@ -1448,8 +1209,7 @@ namespace Symbioz.World.Models
         {
             foreach (var Ignored in this.IgnoredList)
             {
-                this.AddElement(Ignored);
-                SaveTask.AddElement(Ignored);
+                SaveTask.AddElement(Ignored, false);
             }
         }
 
@@ -1459,10 +1219,8 @@ namespace Symbioz.World.Models
             {
                 if (ignored.IgnoredAccountId == ignoredAccountId)
                 {
-                    this.RemoveElement(ignored);
-                    SaveTask.RemoveElement(ignored);
+                    SaveTask.RemoveElement(ignored, false);
                     this.IgnoredList.Remove(ignored);
-                    this.Save(false);
                     break;
                 }
             }

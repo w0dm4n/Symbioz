@@ -15,7 +15,7 @@ namespace Symbioz.ORM
         public static event Action OnSaveStarted;
         public delegate void OnSaveEndedDel(int elapsed);
         public static event OnSaveEndedDel OnSaveEnded;
-        private static Timer _timer;
+        private static Timer SaveTaskTimer;
        
         private static Dictionary<Type, List<ITable>> _newElements = new Dictionary<Type, List<ITable>>();
         private static Dictionary<Type, List<ITable>> _updateElements = new Dictionary<Type, List<ITable>>();
@@ -23,129 +23,147 @@ namespace Symbioz.ORM
 
         public static void Initialize(int seconds)
         {
-            _timer = new Timer(seconds * 1000);
-            _timer.Elapsed +=_timer_Elapsed;
-            _timer.AutoReset = true;
-            _timer.Start();
-
+            SaveTaskTimer = new Timer(seconds * 1000);
+            SaveTaskTimer.Elapsed += SaveTaskTimer_Elapsed;
+            SaveTaskTimer.AutoReset = true;
+            SaveTaskTimer.Start();
         }
-        
-        public static void AddElement(ITable element,bool addtolist = true)
+
+        public static void AddElement(ITable element, bool waitingNextWorldSave = true)
         {
-            lock (_newElements)
+            if (waitingNextWorldSave)
             {
-                if (_newElements.ContainsKey(element.GetType()))
+                lock (_newElements)
                 {
-                    if (!_newElements[element.GetType()].Contains(element))
-                        _newElements[element.GetType()].Add(element);
-                }
-                else
-                {
-                    _newElements.Add(element.GetType(), new List<ITable> { element });
+                    if (_newElements.ContainsKey(element.GetType()))
+                    {
+                        if (!_newElements[element.GetType()].Contains(element))
+                            _newElements[element.GetType()].Add(element);
+                    }
+                    else
+                    {
+                        _newElements.Add(element.GetType(), new List<ITable> { element });
+                    }
                 }
             }
-            if (addtolist)
+            else
             {
-                #region Add value into array
-                var field = GetCache(element);
-                if (field == null)
-                {
-                    Logger.Error("Unable to add record value to the list, static list field wasnt finded");
-                    return;
-                }
-
-                var method = field.FieldType.GetMethod("Add");
-                if (method == null)
-                {
-                    Console.WriteLine("Unable to add record value to the list, add method wasnt finded");
-                    return;
-                }
-
-                method.Invoke(field.GetValue(null), new object[] { element });
-                #endregion
+                Insert(element.GetType(), element);
             }
+
+            #region Add value into array
+            var field = GetCache(element);
+            if (field == null)
+            {
+                Logger.Error("Unable to add record value to the list, static list field wasnt finded");
+                return;
+            }
+
+            var method = field.FieldType.GetMethod("Add");
+            if (method == null)
+            {
+                Console.WriteLine("Unable to add record value to the list, add method wasnt finded");
+                return;
+            }
+
+            method.Invoke(field.GetValue(null), new object[] { element });
+            #endregion
         }
 
-        public static void UpdateElement(ITable element)
+        public static void UpdateElement(ITable element, bool waitingNextWorldSave = true)
         {
-            lock (_updateElements)
+            if (waitingNextWorldSave)
             {
-                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
-                    return;
+                lock (_updateElements)
+                {
+                    if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                        return;
 
-                if (_updateElements.ContainsKey(element.GetType()))
-                {
-                    if (!_updateElements[element.GetType()].Contains(element))
-                        _updateElements[element.GetType()].Add(element);
+                    if (_updateElements.ContainsKey(element.GetType()))
+                    {
+                        if (!_updateElements[element.GetType()].Contains(element))
+                            _updateElements[element.GetType()].Add(element);
+                    }
+                    else
+                    {
+                        _updateElements.Add(element.GetType(), new List<ITable> { element });
+                    }
                 }
-                else
-                {
-                    _updateElements.Add(element.GetType(), new List<ITable> { element });
-                }
+            }
+            else
+            {
+                Update(element.GetType(), element);
             }
         }
 
-        public static void RemoveElement(ITable element,bool removefromlist = true)
+        public static void RemoveElement(ITable element, bool waitingNextWorldSave = true)
         {
             if (element == null)
                 return;
-            lock (_removeElements)
+
+            if (waitingNextWorldSave)
             {
-                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                lock (_removeElements)
                 {
-                    RemoveFromList(element);
-                    _newElements[element.GetType()].Remove(element);
-                    return;
-                }
+                    if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                    {
+                        RemoveFromList(element);
+                        _newElements[element.GetType()].Remove(element);
+                        return;
+                    }
 
-                if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
-                    _updateElements[element.GetType()].Remove(element);
+                    if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
+                        _updateElements[element.GetType()].Remove(element);
 
-                if (_removeElements.ContainsKey(element.GetType()))
-                {
-                    if (!_removeElements[element.GetType()].Contains(element))
-                        _removeElements[element.GetType()].Add(element);
-                }
-                else
-                {
-                    _removeElements.Add(element.GetType(), new List<ITable> { element });
+                    if (_removeElements.ContainsKey(element.GetType()))
+                    {
+                        if (!_removeElements[element.GetType()].Contains(element))
+                            _removeElements[element.GetType()].Add(element);
+                    }
+                    else
+                    {
+                        _removeElements.Add(element.GetType(), new List<ITable> { element });
+                    }
                 }
             }
-            if (removefromlist)
+            else
             {
-                RemoveFromList(element);
+                Remove(element.GetType(), element);
             }
+
+            RemoveFromList(element);
         }
+
         static void RemoveFromList(ITable element)
         {
             var field = GetCache(element);
             if (field == null)
             {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                Console.WriteLine("[Remove] Error ! Field unknown for type '" + element.GetType() + "'");
                 return;
             }
 
             var method = field.FieldType.GetMethod("Remove");
             if (method == null)
             {
-                Console.WriteLine("[Remove] Erreur ! Field unknown");
+                Console.WriteLine("[Remove] Error ! Field unknown for type '" + element.GetType() + "'");
                 return;
             }
 
             method.Invoke(field.GetValue(null), new object[] { element });
         }
 
-        private static void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private static void SaveTaskTimer_Elapsed(object sender, ElapsedEventArgs e)
         { 
             Save(); 
         }
 
         public static void Save()
         {
-            Stopwatch w = Stopwatch.StartNew();
+            Stopwatch stopWatch = Stopwatch.StartNew();
             if (OnSaveStarted != null)
                 OnSaveStarted();
-            _timer.Stop();  
+            SaveTaskTimer.Stop();  
             try
             {
                 var types = _removeElements.Keys.ToList();
@@ -163,7 +181,6 @@ namespace Symbioz.ORM
 
                     lock (_removeElements)
                         _removeElements[type] = _removeElements[type].Skip(elements.Count).ToList();
-                  
                 }
           
                 types = _newElements.Keys.ToList();
@@ -205,12 +222,52 @@ namespace Symbioz.ORM
                             _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
                     }
                 }
-                _timer.Start();
+                SaveTaskTimer.Start();
                 if (OnSaveEnded != null)
-                    OnSaveEnded(w.Elapsed.Seconds);
+                    OnSaveEnded(stopWatch.Elapsed.Seconds);
             }
             catch (Exception e) { Logger.Error("[SAVING WORLD] " + e.Message); }
         }
+
+        #region SingleQueryActions
+
+        public static void Insert(Type type, ITable element)
+        {
+            try
+            {
+                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, new ITable[1] { element });
+            }
+            catch(Exception e)
+            {
+                Logger.Error("Unable to insert (" + element.GetType() + ") : " + e.Message);
+            }
+        }
+
+        public static void Update(Type type, ITable element)
+        {
+            try
+            {
+                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, new ITable[1] { element });
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Unable to update (" + element.GetType() + ") : " + e.Message);
+            }
+        }
+
+        public static void Remove(Type type, ITable element)
+        {
+            try
+            {
+                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Remove, new ITable[1] { element });
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Unable to remove (" + element.GetType() + ") : " + e.Message);
+            }
+        }
+
+        #endregion
 
         private static FieldInfo GetCache(ITable table)
         {

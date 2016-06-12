@@ -18,7 +18,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affected)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("WeaponDamagesBonusPercent"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("WeaponDamagesBonusPercent"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
@@ -27,7 +27,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextAgility"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextAgility"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
 
@@ -37,7 +37,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextIntelligence"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextIntelligence"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
@@ -46,7 +46,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextChance"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextChance"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
@@ -55,7 +55,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextStrength"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextStrength"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
@@ -64,7 +64,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("CriticalHit"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("CriticalHit"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
 
@@ -77,7 +77,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("CriticalHit"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("CriticalHit"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId,(short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
             }
         }
@@ -97,7 +97,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
           
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("_Range"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("_Range"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, (short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
             }
         }
@@ -106,7 +106,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("AllDamagesBonus"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("AllDamagesBonus"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, (short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
             }
         }
@@ -115,7 +115,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(StatsRecord.GetFieldInfo("DodgePM"), target.FighterStats.Stats);
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("DodgePM"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, (short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
             }
         }

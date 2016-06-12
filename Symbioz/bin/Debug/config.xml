@@ -14,7 +14,7 @@
   <DutyMapId>99091983</DutyMapId>
   <DutyCellId>300</DutyCellId>
   <StartKamas>0</StartKamas>
-  <WelcomeMessage>Bienvenue sur le serveur de test héroique</WelcomeMessage>
+  <WelcomeMessage>Bienvenue sur <b>Kryone 2.0</b></WelcomeMessage>
   <ShowProtocolMessages>True</ShowProtocolMessages>
   <KamasDropRatio>1</KamasDropRatio>
   <ExperienceRatio>10</ExperienceRatio>
@@ -25,7 +25,7 @@
   <RealHost />
   <SafeRun>False</SafeRun>
   <CyclicFileGenerationInterval>900000</CyclicFileGenerationInterval>
-  <CyclicFileGenerationPath>E:/UwAmp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
+  <CyclicFileGenerationPath>C:/wamp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
   <TimeBetweenSalesMessage>20</TimeBetweenSalesMessage>
   <TimeBetweenSeekMessage>20</TimeBetweenSeekMessage>
   <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>

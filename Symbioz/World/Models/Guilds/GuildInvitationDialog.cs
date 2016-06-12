@@ -19,10 +19,12 @@ namespace Symbioz.World.Models.Guilds
         {
             this.Recruter = recruter;
             this.Recruted = recruted;
+            this.Recruter.Character.CurrentDialogType = DialogTypeEnum.DIALOG_GUILD_INVITATION;
             this.Recruter.Character.GuildInvitationDialog = this;
+            this.Recruted.Character.CurrentDialogType = DialogTypeEnum.DIALOG_GUILD_INVITATION;
             this.Recruted.Character.GuildInvitationDialog = this;
-
         }
+
         public void Request()
         {
             Recruted.Send(new GuildInvitedMessage((uint)Recruter.Character.Id, Recruter.Character.Record.Name, Recruter.Character.GetGuild().GetBasicInformations()));

@@ -176,6 +176,12 @@ namespace Symbioz.World.Records.Alliances
             }
         }
 
+        [BeforeSave]
+        public static void BeforeSave()
+        {
+            Alliances.ForEach(x => SaveTask.UpdateElement(x));
+        }
+
         #region Extended
 
         public void Send(Message message)

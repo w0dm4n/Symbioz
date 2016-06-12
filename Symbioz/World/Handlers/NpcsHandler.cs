@@ -8,6 +8,8 @@ using Symbioz.Network.Messages;
 using Symbioz.Network.Clients;
 using Symbioz.Providers;
 using Symbioz.World.Records;
+using Symbioz.World.Records.Alliances.Prisms;
+using Symbioz.World.Models.Alliances.Prisms;
 
 namespace Symbioz.World.Handlers
 {
@@ -16,9 +18,21 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleNpcGenericAction(NpcGenericActionRequestMessage message, WorldClient client)
         {
-            NpcSpawnRecord record = NpcSpawnRecord.GetNpcByContextualId(message.npcId);
-            if (record != null)
-                NpcsActionsProvider.Handle(client, record, message.npcActionId);
+            if (client.Character.Map.Id == message.npcMapId)
+            {
+                switch (message.npcId)
+                {
+                    case PrismRecord.ConstantContextualId:
+                        PrismsManager.Instance.TalkToPrism(client, message.npcMapId);
+                        break;
+
+                    default:
+                        NpcSpawnRecord record = NpcSpawnRecord.GetNpcByContextualId(message.npcId);
+                        if (record != null)
+                            NpcsActionsProvider.Handle(client, record, message.npcActionId);
+                        break;
+                }
+            }
         }
 
         [MessageHandler]

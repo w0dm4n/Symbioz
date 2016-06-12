@@ -51,7 +51,6 @@ namespace Symbioz.World.Handlers
                 {
                     client.Character.AddIgnored(toAdd.Character.Record.AccountId);
                     client.Character.SaveAllIgnoreds();
-                    client.Character.Save(false);
                     IgnoredHandler.HandleIgnoredGetListMessage(new IgnoredGetListMessage(), client);
                 }
             }

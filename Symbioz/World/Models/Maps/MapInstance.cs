@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Symbioz.Enums;
+using Symbioz.World.Records.Alliances.Prisms;
+using Symbioz.World.PathProvider;
 
 namespace Symbioz.World.Models
 {
@@ -24,6 +26,7 @@ namespace Symbioz.World.Models
         public List<FightCommonInformations> Fights = new List<FightCommonInformations>();
         public List<InteractiveRecord> Interactives = new List<InteractiveRecord>();
         public List<NpcSpawnRecord> Npcs = new List<NpcSpawnRecord>();
+        public PrismRecord Prism = null;
 
         internal List<WorldClient> Clients = new List<WorldClient>();
         internal List<MonsterGroup> MonstersGroups = new List<MonsterGroup>();
@@ -43,7 +46,7 @@ namespace Symbioz.World.Models
             if (!Clients.Contains(client))
                 Clients.Add(client);
         }
-        public void RemoveClient(WorldClient client) // Leaving Map
+        public void RemoveClient(WorldClient client) // OnLeavingMap
         {
             client.Character.Map = null;
             Clients.Remove(client);
@@ -73,15 +76,19 @@ namespace Symbioz.World.Models
         {
             return Interactives.ConvertAll<InteractiveElement>(x => x.GetInteractiveElement());
         }
-        List<GameRolePlayNpcInformations> GetNpcsInformations()
+        public List<GameRolePlayNpcInformations> GetNpcsInformations()
         {
             return Npcs.ConvertAll<GameRolePlayNpcInformations>(x => x.GetGameRolePlayNpcInformations());
         }
-        public List<GameRolePlayActorInformations> GetActors()
+        public List<GameRolePlayActorInformations> GetActors(WorldClient client)
         {
             List<GameRolePlayActorInformations> actors = new List<GameRolePlayActorInformations>();
             actors.AddRange(GetMonsters());
             actors.AddRange(GetNpcsInformations());
+            if(this.Prism != null)
+            {
+                actors.Add(this.Prism.GetGameRolePlayPrismInformations(client));
+            }
             actors.AddRange(GetPlayers());
             return actors;
         }
@@ -173,5 +180,61 @@ namespace Symbioz.World.Models
         {
             return MonsterGroup.GetActorsInformations(Record, MonstersGroups);
         }
+
+        #region AlliancePrims
+
+        public void AddPrism(PrismRecord prismRecord, short playerSenderCellId = -1)
+        {
+            if (this.Prism == null)
+            {
+                this.Prism = prismRecord;
+                this.RandomizePrismPosition(this.Prism, playerSenderCellId);
+            }
+            else
+            {
+                throw new Exception("Un prisme est déjà présent sur cette carte !");
+            }
+        }
+
+        private void RandomizePrismPosition(PrismRecord prismRecord, short playerSenderCellId = -1, short moveCellsCount = 2)
+        {
+            var random = new AsyncRandom();
+            var map = prismRecord.Map.Record;
+
+            short cellId = -1;
+            if(playerSenderCellId != -1)
+            {
+                cellId = playerSenderCellId;
+            }
+            else
+            {
+                cellId = this.Record.RandomWalkableCell();
+            }
+
+            if (playerSenderCellId != -1)
+            {
+                List<short> cells = Pathfinding.GetCircleCells(cellId, moveCellsCount);
+                cells.Remove((short)cellId);
+                cells.RemoveAll(x => !map.WalkableCells.Contains(x));
+                if (cells.Count != 0)
+                {
+                    var newCell = cells[random.Next(0, cells.Count())];
+                    prismRecord.CellId = (ushort)newCell;
+                }
+                else
+                {
+                    Logger.Error("Impossible de trouver une cellule disponible pour placer le prisme '" + prismRecord.Id + "' (carte : " + this.Record.Id + ")");
+                    prismRecord.CellId = cellId;
+                }
+            }
+            else
+            {
+                prismRecord.CellId = cellId;
+            }
+
+            this.Clients.ForEach(x => x.Send(new GameRolePlayShowActorMessage(prismRecord.GetGameRolePlayPrismInformations(x))));
+        }
+
+        #endregion
     }
 }

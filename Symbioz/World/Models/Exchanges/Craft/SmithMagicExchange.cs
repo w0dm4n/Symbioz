@@ -161,8 +161,6 @@ namespace Symbioz.World.Models.Exchanges.Craft
                     }
                 }
             }
-
-
         }
         public override void RemoveItemFromPanel(CharacterItemRecord obj, int quantity)
         {

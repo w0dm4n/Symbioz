@@ -102,10 +102,11 @@ namespace Symbioz.ORM
                 }
                 catch (Exception ex)
                 {
-                    
+                    Logger.Log("Error (AddElements) : " + ex.ToString());
                 }
             }
         }
+
         private void UpdateElements(ITable[] elements)
         {
             foreach (var element in elements)
@@ -122,11 +123,12 @@ namespace Symbioz.ORM
                     }
                     catch (Exception ex)
                     {
-                       
+                        Logger.Log("Error (UpdateElements) : " + ex.ToString());
                     }
                 }
             }
         }
+
         private void DeleteElements(ITable[] elements)
         {
             foreach (var element in elements)
@@ -135,6 +137,7 @@ namespace Symbioz.ORM
                 {
                     var command = string.Format(REMOVE_ELEMENTS, this.m_tableName, this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
                     var sw = System.Diagnostics.Stopwatch.StartNew();
+
                     try
                     {
                         this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
@@ -142,7 +145,7 @@ namespace Symbioz.ORM
                     }
                     catch (Exception ex)
                     {
-                        
+                        Logger.Log("Error (DeleteElements) : " + ex.ToString());
                     }
                 }
             }
@@ -241,10 +244,12 @@ namespace Symbioz.ORM
             }
             return fields.First();
         }
+
         public static List<FieldInfo> GetUpdateFields(Type type)
         {
             return type.GetFields().Where(field => !field.IsStatic && field.GetCustomAttribute(typeof(IgnoreAttribute), false) == null && field.GetCustomAttribute(typeof(UpdateAttribute), false) != null).OrderBy(x => x.MetadataToken).ToList();
         }
+
         public static List<FieldInfo> GetAddFields(Type type)
         {
             return type.GetFields().Where(field => !field.IsStatic && field.GetCustomAttribute(typeof(IgnoreAttribute), false) == null).OrderBy(x => x.MetadataToken).ToList();

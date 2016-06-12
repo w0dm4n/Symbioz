@@ -2,21 +2,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Generated on 06/04/2015 18:45:12
 using System;
 using System.Collections.Generic;
@@ -27,39 +12,25 @@ using Symbioz.Utils;
 namespace Symbioz.DofusProtocol.Messages
 {
 
-public class PrismModuleExchangeRequestMessage : Message
-{
+    public class PrismModuleExchangeRequestMessage : Message
+    {
 
-public const ushort Id = 6531;
-public override ushort MessageId
-{
-    get { return Id; }
-}
+        public const ushort Id = 6531;
+        public override ushort MessageId
+        {
+            get { return Id; }
+        }
 
+        public PrismModuleExchangeRequestMessage()
+        {
+        }
 
+        public override void Serialize(ICustomDataOutput writer)
+        {
+        }
 
-public PrismModuleExchangeRequestMessage()
-{
-}
-
-
-
-public override void Serialize(ICustomDataOutput writer)
-{
-
-
-
-}
-
-public override void Deserialize(ICustomDataInput reader)
-{
-
-
-
-}
-
-
-}
-
-
+        public override void Deserialize(ICustomDataInput reader)
+        {
+        }
+    }
 }

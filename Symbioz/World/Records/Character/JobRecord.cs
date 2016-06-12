@@ -16,12 +16,14 @@ namespace Symbioz.World.Records
         public sbyte Id;
         public int NameId;
         public string Name { get; set; }
+
         public JobRecord(sbyte id,int nameid)
         {
             this.Id = id;
             this.NameId = nameid;
             this.Name = LangManager.GetText(nameid);
         }
+
         public static string GetJobName(sbyte id)
         {
             var job = Jobs.Find(x => x.Id == id);

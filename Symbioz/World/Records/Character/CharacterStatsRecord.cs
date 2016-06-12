@@ -18,11 +18,10 @@ using System.Threading.Tasks;
 
 namespace Symbioz.World.Records
 {
-    [Table("Stats", true)]
-    public class StatsRecord : ITable
+    [Table("CharactersStats", true)]
+    public class CharacterStatsRecord : ITable
     {
-        public static List<StatsRecord> Stats = new List<StatsRecord>();
-
+        public static List<CharacterStatsRecord> CharactersStats = new List<CharacterStatsRecord>();
 
         [Primary]
         public int CharacterId;
@@ -179,9 +178,9 @@ namespace Symbioz.World.Records
         public short APAttack { get { return (short)(Wisdom / 10); } }
         [Ignore]
         public short MPAttack { get { return (short)(Agility / 10); } }
-        public StatsRecord Clone()
+        public CharacterStatsRecord Clone()
         {
-            return new StatsRecord(CharacterId, LifePoints, MaxEnergyPoints, Initiative, Prospecting,
+            return new CharacterStatsRecord(CharacterId, LifePoints, MaxEnergyPoints, Initiative, Prospecting,
                 ActionPoints, MovementPoints, ContextStrength, ContextVitality, ContextWisdom, ContextChance,
                 ContextAgility, ContextIntelligence, _Range, SummonableCreaturesBoost, Reflect, CriticalHit, CriticalHitWeapon,
                 HealBonus, AllDamagesBonus, AllDamagesBonusPercent, WeaponDamagesBonusPercent, TrapBonus,
@@ -194,7 +193,7 @@ namespace Symbioz.World.Records
                 PvPEarthReduction, PvPWaterReduction, PvPAirReduction, PvPFireReduction, GlobalDamageReduction,BaseStrength,BaseAgility,
                 BaseChance,BaseVitality,BaseIntelligence,BaseWisdom,PermanentStrenght,PermanentAgility,PermanentChance,PermanentVitality,PermanentWisdom,PermanentIntelligence,ContextAPReduction);
         }
-        public StatsRecord(int characterid, short lifePoints, short maxenegryPoints, short initiative, short prospecting, short ap, short mp, short strenght, short vitality,
+        public CharacterStatsRecord(int characterid, short lifePoints, short maxenegryPoints, short initiative, short prospecting, short ap, short mp, short strenght, short vitality,
             short wisdom, short chance, short agility, short shortelligence, short range, short summonablecboos, short reflect, short criticalhit, short criticalhitweapon, short healbonus,
             short alldamagebonus, short alldamagebonuspercent, short weapondamagesbonuspercent, short trapbonus, short trapbonuspercent, short glyphbonuspercent, short pushdamagebonus, short criticaldamagebonus, short neutraldamagebonus,
             short earthdamagebonus, short waterdamagebonus, short airdamagebonus, short firedamagebonus, short dodgepa,
@@ -274,13 +273,13 @@ namespace Symbioz.World.Records
             this.PermanentIntelligence = permanentIntelligence;
             this.ContextAPReduction = contextAPReduction;
     }
-        public static CharacterCharacteristicsInformations GetCharacterCharacteristics(StatsRecord stats, Character character) // voir les GetBase(0)
+        public static CharacterCharacteristicsInformations GetCharacterCharacteristics(CharacterStatsRecord stats, Character character) // voir les GetBase(0)
         {
             var align = character.GetActorExtendedAlignement();
             var expFloor = ExperienceRecord.GetExperienceForLevel(character.Record.Level);
 
-            var mpMax = character.StatsRecord.MovementPoints;
-            var apMax = character.StatsRecord.ActionPoints;
+            var mpMax = character.CharacterStatsRecord.MovementPoints;
+            var apMax = character.CharacterStatsRecord.ActionPoints;
           
 
             if (character.FighterInstance != null && character.IsRegeneratingLife == false)
@@ -290,7 +289,7 @@ namespace Symbioz.World.Records
            
             }
             var expNextFloor = ExperienceRecord.GetExperienceForLevel((uint)(character.Record.Level + 1));
-            if (character.Record.CurrentLifePoint > character.StatsRecord.LifePoints)
+            if (character.Record.CurrentLifePoint > character.CharacterStatsRecord.LifePoints)
                 character.Record.CurrentLifePoint = 1;
             character.CurrentStats.LifePoints = (uint)character.Record.CurrentLifePoint;
             var detailedstats = new CharacterCharacteristicsInformations(character.Record.Exp, expFloor, expNextFloor, character.Record.Kamas, character.Record.StatsPoints, 0, character.Record.SpellPoints, align,
@@ -325,24 +324,23 @@ namespace Symbioz.World.Records
             var breed = BreedRecord.GetBreed(character.Record.Breed);
             character.Record.SpellPoints = (ushort)ConfigurationManager.Instance.StartLevel;
             character.Record.StatsPoints = 0;
-            var stats = new StatsRecord(character.Id, breed.StartLifePoints, (short)(ConfigurationManager.Instance.StartLevel * 10), breed.StartLifePoints, breed.StartProspecting, 6, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+            var stats = new CharacterStatsRecord(character.Id, breed.StartLifePoints, (short)(ConfigurationManager.Instance.StartLevel * 10), breed.StartLifePoints, breed.StartProspecting, 6, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0);
             character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
             character.Record.CurrentLifePoint = character.CurrentStats.LifePoints;
-            SaveTask.AddElement(stats);
-            character.AddElement(stats);
+            SaveTask.AddElement(stats, false);
         }
         public static void InitializeCharacter(Character character)
         {
-            var stats = StatsRecord.Stats.Find(x => x.CharacterId == character.Id);
+            var stats = CharacterStatsRecord.CharactersStats.Find(x => x.CharacterId == character.Id);
             character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
         }
-        public static StatsRecord GetStatsRecord(int characterid)
+        public static CharacterStatsRecord GetCharacterStatsRecord(int characterid)
         {
-            return Stats.Find(x => x.CharacterId == characterid);
+            return CharactersStats.Find(x => x.CharacterId == characterid);
         }
         public static FieldInfo GetFieldInfo(string name)
         {
-            var field= typeof(StatsRecord).GetField(name);
+            var field= typeof(CharacterStatsRecord).GetField(name);
             if (field == null)
                 throw new Exception("Field " + name + " dosent exist in StatRecord");
             return field;

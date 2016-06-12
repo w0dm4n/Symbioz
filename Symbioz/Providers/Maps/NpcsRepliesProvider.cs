@@ -103,15 +103,15 @@ namespace Symbioz.Providers
         }
         static void Reset(WorldClient client,NpcReplyRecord reply)
         {
-            client.Character.StatsRecord.BaseAgility = 0;
-            client.Character.StatsRecord.BaseChance = 0;
-            client.Character.StatsRecord.BaseIntelligence = 0;
-            client.Character.StatsRecord.BaseStrength = 0;
-            client.Character.StatsRecord.LifePoints -= (short)(client.Character.StatsRecord.BaseVitality);
-            client.Character.CurrentStats.LifePoints -= (uint)(client.Character.StatsRecord.BaseVitality);
-            client.Character.StatsRecord.BaseVitality = 0;
+            client.Character.CharacterStatsRecord.BaseAgility = 0;
+            client.Character.CharacterStatsRecord.BaseChance = 0;
+            client.Character.CharacterStatsRecord.BaseIntelligence = 0;
+            client.Character.CharacterStatsRecord.BaseStrength = 0;
+            client.Character.CharacterStatsRecord.LifePoints -= (short)(client.Character.CharacterStatsRecord.BaseVitality);
+            client.Character.CurrentStats.LifePoints -= (uint)(client.Character.CharacterStatsRecord.BaseVitality);
+            client.Character.CharacterStatsRecord.BaseVitality = 0;
           
-            client.Character.StatsRecord.BaseWisdom = 0;
+            client.Character.CharacterStatsRecord.BaseWisdom = 0;
             client.Character.Record.StatsPoints = (ushort)((client.Character.Record.Level * 5) -5);
             client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
             client.Character.RefreshStats();

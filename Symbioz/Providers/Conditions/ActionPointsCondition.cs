@@ -12,7 +12,7 @@ namespace Symbioz.Providers.Conditions
     {
         public override bool Eval(WorldClient client)
         {
-            return BasicEval(ConditionValue, ComparaisonSymbol, client.Character.StatsRecord.ActionPoints);
+            return BasicEval(ConditionValue, ComparaisonSymbol, client.Character.CharacterStatsRecord.ActionPoints);
         }
     }
 }

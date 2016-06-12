@@ -3,6 +3,7 @@ using Symbioz.Enums;
 using Symbioz.ORM;
 using Symbioz.World.PathProvider;
 using Symbioz.World.Records;
+using Symbioz.World.Records.Alliances.Prisms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,7 @@ namespace Symbioz.World.Models.Maps
         {
             return Interactive.FindAll(x => x.MapId == mapid);
         }
-        public static ushort GetTeleporterCellId(int mapid,TeleporterTypeEnum tptype)
+        public static ushort GetTeleporterCellId(int mapid, TeleporterTypeEnum tptype)
         {
             var map = MapRecord.GetMap(mapid);
             string actionType = string.Empty;
@@ -70,12 +71,23 @@ namespace Symbioz.World.Models.Maps
                 default:
                     break;
             }
-            var interactive = GetInteractivesByActionType(actionType).Find(x => x.MapId == mapid);
-            if (interactive != null)
+            if (tptype == TeleporterTypeEnum.TELEPORTER_ZAAP || tptype == TeleporterTypeEnum.TELEPORTER_SUBWAY)
             {
-                var mapElements = MapElementRecord.GetMapElementByMap(interactive.MapId);
-                var ele = mapElements.Find(x => x.ElementId == interactive.ElementId);
-                return (ushort)map.CloseCell((short)ele.CellId);
+                var interactive = GetInteractivesByActionType(actionType).Find(x => x.MapId == mapid);
+                if (interactive != null)
+                {
+                    var mapElements = MapElementRecord.GetMapElementByMap(interactive.MapId);
+                    var ele = mapElements.Find(x => x.ElementId == interactive.ElementId);
+                    return (ushort)map.CloseCell((short)ele.CellId);
+                }
+            }
+            else if(tptype == TeleporterTypeEnum.TELEPORTER_PRISM)
+            {
+                var prism = PrismRecord.GetPrismByMapId(mapid);
+                if(prism != null)
+                {
+                    return (ushort)prism.Map.Record.CloseCell((short)prism.CellId);
+                }
             }
             return (ushort)map.RandomWalkableCell();
           

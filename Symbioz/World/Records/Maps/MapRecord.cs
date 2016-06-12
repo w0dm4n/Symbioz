@@ -35,8 +35,11 @@ namespace Symbioz.World.Records
         public List<short> WalkableCells;
         public List<short> BlueCells;
         public List<short> RedCells;
+        public int WorldX;
+        public int WorldY;
         public bool DugeonMap { get { return DungeonRecord.IsDungeonMap(this.Id); } }
         public bool HaveZaap { get { return Zaap != null; } }
+
 
         public InteractiveRecord Zaap
         {
@@ -50,7 +53,7 @@ namespace Symbioz.World.Records
 
         public string Name { get { return MapPositionRecord.GetMapName(Id); } }
 
-        public MapRecord(int id, int subareaid, int topmap, int downmap, int leftmap, int rightmap, List<short> walkable, List<short> bluecells, List<short> redcells)
+        public MapRecord(int id, int subareaid, int topmap, int downmap, int leftmap, int rightmap, List<short> walkable, List<short> bluecells, List<short> redcells, int worldX, int worldY)
         {
             this.Id = id;
             this.SubAreaId = subareaid;
@@ -61,6 +64,8 @@ namespace Symbioz.World.Records
             this.WalkableCells = walkable;
             this.BlueCells = bluecells;
             this.RedCells = redcells;
+            this.WorldX = worldX;
+            this.WorldY = worldY;
         }
 
         public bool Walkable(short cellid)
@@ -143,8 +148,8 @@ namespace Symbioz.World.Records
             }
         }
 
-        [StartupInvoke("MapInstances", StartupInvokeType.Others)]
-        public static void CreateInstances()
+        [StartupInvoke("CreateMapInstances", StartupInvokeType.Others)]
+        public static void CreateMapInstances()
         {
             foreach (var mapRecord in Maps)
             {

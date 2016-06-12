@@ -20,6 +20,7 @@ namespace Symbioz.World.Records.Guilds
 
         public static List<GuildRecord> Guilds = new List<GuildRecord>();
 
+        [Primary]
         public int Id;
 
         public string Name;
@@ -32,14 +33,18 @@ namespace Symbioz.World.Records.Guilds
 
         public int BackgroundColor;
 
+        [Update]
         public ushort Level;
 
+        [Update]
         public ulong Experience;
 
+        [Update]
         public int MaxTaxCollectors;
 
         public DateTime CreationDate;
 
+        [Update]
         public string GuildWelcomeMessage;
 
         public GuildRecord(int id, string name, ushort symbolShape, int symbolColor,
@@ -116,6 +121,12 @@ namespace Symbioz.World.Records.Guilds
                 }
             }
             return null;
+        }
+
+        [BeforeSave]
+        public static void BeforeSave()
+        {
+            Guilds.ForEach(x => SaveTask.UpdateElement(x));
         }
 
         #region Extended

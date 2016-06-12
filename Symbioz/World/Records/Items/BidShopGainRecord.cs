@@ -45,7 +45,6 @@ namespace Symbioz.World.Records
         {
             var bidShopRecord = new BidShopGainRecord(PopNextUID(), selledItem.OwnerId, selledItem.GID, selledItem.Quantity, selledItem.Price);
             SaveTask.AddElement(bidShopRecord);
-            WorldServer.Instance.GetOnlineClient(selledItem.OwnerId).Character.AddElement(bidShopRecord);
         }
         public static void RemoveAll(int characterid)
         {

@@ -87,23 +87,23 @@ namespace Symbioz.Provider
         }
         static void NeutralDamagesBonus(WorldClient client, short value)
         {
-            client.Character.StatsRecord.NeutralDamageBonus += value;
+            client.Character.CharacterStatsRecord.NeutralDamageBonus += value;
         }
         static void EarthDamagesBonus(WorldClient client, short value)
         {
-            client.Character.StatsRecord.EarthDamageBonus += value;
+            client.Character.CharacterStatsRecord.EarthDamageBonus += value;
         }
         static void AirDamagesBonus(WorldClient client, short value)
         {
-            client.Character.StatsRecord.AirDamageBonus += value;
+            client.Character.CharacterStatsRecord.AirDamageBonus += value;
         }
         static void FireDamagesBonus(WorldClient client, short value)
         {
-            client.Character.StatsRecord.FireDamageBonus += value;
+            client.Character.CharacterStatsRecord.FireDamageBonus += value;
         }
         static void WaterDamagesBonus(WorldClient client,short value)
         {
-            client.Character.StatsRecord.WaterDamageBonus += value;
+            client.Character.CharacterStatsRecord.WaterDamageBonus += value;
         }
         private static void Companion(WorldClient client,short value)
         {
@@ -122,60 +122,60 @@ namespace Symbioz.Provider
         }
         private static void DmgsBonusPercent(WorldClient client,short value)
         {
-            client.Character.StatsRecord.AllDamagesBonusPercent += value;
+            client.Character.CharacterStatsRecord.AllDamagesBonusPercent += value;
         }
         private static void Initiative(WorldClient client,short value)
         {
-            client.Character.StatsRecord.Initiative += value;
+            client.Character.CharacterStatsRecord.Initiative += value;
         }
         private static void NeutralResist(WorldClient client, short value)
         {
             // 50 MAX
-            client.Character.StatsRecord.NeutralResistPercent += value;
+            client.Character.CharacterStatsRecord.NeutralResistPercent += value;
         }
         private static void FireResist(WorldClient client, short value)
         {
-            client.Character.StatsRecord.FireResistPercent += value;
+            client.Character.CharacterStatsRecord.FireResistPercent += value;
         }
         private static void AirResist(WorldClient client, short value)
         {
-            client.Character.StatsRecord.AirResistPercent += value;
+            client.Character.CharacterStatsRecord.AirResistPercent += value;
         }
         private static void WaterResist(WorldClient client, short value)
         {
-            client.Character.StatsRecord.WaterResistPercent += value;
+            client.Character.CharacterStatsRecord.WaterResistPercent += value;
         }
         private static void EarthResist(WorldClient client,short value)
         {
-            client.Character.StatsRecord.EarthResistPercent += value;
+            client.Character.CharacterStatsRecord.EarthResistPercent += value;
         }
         private static void FireReduction(WorldClient client, short value)
         {
-            client.Character.StatsRecord.FireReduction += value;
+            client.Character.CharacterStatsRecord.FireReduction += value;
         }
         private static void WaterReduction(WorldClient client, short value)
         {
-            client.Character.StatsRecord.WaterReduction += value;
+            client.Character.CharacterStatsRecord.WaterReduction += value;
         }
         private static void EarthReduction(WorldClient client, short value)
         {
-            client.Character.StatsRecord.EarthReduction += value;
+            client.Character.CharacterStatsRecord.EarthReduction += value;
         }
         private static void AirReduction(WorldClient client,short value)
         {
-            client.Character.StatsRecord.AirReduction += value;
+            client.Character.CharacterStatsRecord.AirReduction += value;
         }
         private static void Prospecting(WorldClient client,short value)
         {
-            client.Character.StatsRecord.Prospecting += value;
+            client.Character.CharacterStatsRecord.Prospecting += value;
         }
         private static void DmgsBonus(WorldClient client,short value)
         {
-            client.Character.StatsRecord.AllDamagesBonus += value;
+            client.Character.CharacterStatsRecord.AllDamagesBonus += value;
         }
         private static void SummonLimit(WorldClient client, short value)
         {
-            client.Character.StatsRecord.SummonableCreaturesBoost += value;
+            client.Character.CharacterStatsRecord.SummonableCreaturesBoost += value;
         }
         private static void Title(WorldClient client, short value)
         {
@@ -190,23 +190,23 @@ namespace Symbioz.Provider
         }
         private static void CritHit(WorldClient client, short value)
         {
-            client.Character.StatsRecord.CriticalHit += value;
+            client.Character.CharacterStatsRecord.CriticalHit += value;
         }
         private static void SubMp(WorldClient client,short value)
         {
-            client.Character.StatsRecord.MovementPoints -= value;
+            client.Character.CharacterStatsRecord.MovementPoints -= value;
         }
         private static void AddMp(WorldClient client, short value)
         {
-            client.Character.StatsRecord.MovementPoints += value;
+            client.Character.CharacterStatsRecord.MovementPoints += value;
         }
         private static void Ap(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ActionPoints  += value;
+            client.Character.CharacterStatsRecord.ActionPoints  += value;
         }
         private static void Chance(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextChance += value;
+            client.Character.CharacterStatsRecord.ContextChance += value;
         }
         private static void Followed(WorldClient client, short value)
         {
@@ -221,54 +221,54 @@ namespace Symbioz.Provider
         }
         private static void Wisdom(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextWisdom += value;
+            client.Character.CharacterStatsRecord.ContextWisdom += value;
         }
         private static void Agility(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextAgility += value;
+            client.Character.CharacterStatsRecord.ContextAgility += value;
         }
         private static void Strenght(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextStrength += value;
+            client.Character.CharacterStatsRecord.ContextStrength += value;
         }
         private static void Vitality(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextVitality += value;
+            client.Character.CharacterStatsRecord.ContextVitality += value;
             client.Character.CurrentStats.LifePoints += (uint)value;
-            client.Character.StatsRecord.LifePoints += value;
+            client.Character.CharacterStatsRecord.LifePoints += value;
             client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
         }
         private static void Intelligence(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextIntelligence += value;
+            client.Character.CharacterStatsRecord.ContextIntelligence += value;
         }
 
         private static void SubIntelligence(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextIntelligence -= value;
+            client.Character.CharacterStatsRecord.ContextIntelligence -= value;
         }
         private static void SubChance(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextChance -= value;
+            client.Character.CharacterStatsRecord.ContextChance -= value;
         }
         private static void SubVitality(WorldClient client,short value)
         {
-            client.Character.StatsRecord.ContextVitality -= value;
+            client.Character.CharacterStatsRecord.ContextVitality -= value;
             client.Character.CurrentStats.LifePoints -= (uint)value;
-            client.Character.StatsRecord.LifePoints -= value;
+            client.Character.CharacterStatsRecord.LifePoints -= value;
             client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
         }
         private static void SubAgility(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextAgility -= value;
+            client.Character.CharacterStatsRecord.ContextAgility -= value;
         }
         private static void SubStrength(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextStrength -= value;
+            client.Character.CharacterStatsRecord.ContextStrength -= value;
         }
         private static void APReduction(WorldClient client, short value)
         {
-            client.Character.StatsRecord.ContextAPReduction += value;
+            client.Character.CharacterStatsRecord.ContextAPReduction += value;
         }
     }
 }

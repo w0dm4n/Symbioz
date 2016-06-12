@@ -92,7 +92,7 @@ namespace Symbioz.Auth.Handlers
             else
             {
                 if (WorldServer.Instance.ServerState == ServerStatusEnum.ONLINE)
-                SelectedServer(null, client);
+                    SelectedServer(null, client);
                 else
                     SendServerListMessage(client, characters.Count);
             }

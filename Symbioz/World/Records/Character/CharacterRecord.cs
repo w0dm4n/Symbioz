@@ -172,9 +172,7 @@ namespace Symbioz.World.Records
                 client.Character.Look.UnsetAura();
                 client.Character.Record.Look = client.Character.Look.ConvertToString();
                 SaveTask.UpdateElement(client.Character.Record);
-                SaveTask.UpdateElement(client.Character.StatsRecord);
-                client.Character.UpdateElement(client.Character.Record);
-                client.Character.UpdateElement(client.Character.StatsRecord);
+                SaveTask.UpdateElement(client.Character.CharacterStatsRecord);
             }
         }
 

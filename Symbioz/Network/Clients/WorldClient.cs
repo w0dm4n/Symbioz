@@ -17,7 +17,7 @@ namespace Symbioz.Network.Clients
 
         public List<CharacterRecord> Characters { get; set; }
 
-        public WorldClient(Socket socket):base(socket)
+        public WorldClient(Socket socket) : base(socket)
         {
             this.SSyncClient.OnClosed += SSyncClient_OnClosed;
             Send(new HelloGameMessage());
@@ -25,10 +25,7 @@ namespace Symbioz.Network.Clients
 
         void SSyncClient_OnClosed()
         {
-            if (Character != null)
-                Character.Dispose();
             WorldServer.Instance.RemoveClient(this);
         }
-        
     }
 }

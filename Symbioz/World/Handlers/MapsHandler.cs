@@ -16,6 +16,8 @@ using Symbioz.Provider;
 using Symbioz.World.Records.Monsters;
 using Symbioz.World.Records.Maps;
 using Shader.Helper;
+using Symbioz.World.Records.Alliances.Prisms;
+using System.Drawing;
 
 namespace Symbioz.World.Handlers
 {
@@ -37,9 +39,10 @@ namespace Symbioz.World.Handlers
             client.Character.SubAreaId = MapRecord.GetSubAreaId(message.mapId);
 
             client.Send(new MapComplementaryInformationsDataMessage(client.Character.SubAreaId, message.mapId, new List<HouseInformations>(),
-               client.Character.Map.Instance.GetActors(), client.Character.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
+               client.Character.Map.Instance.GetActors(client), client.Character.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
                 new List<MapObstacle>(), client.Character.Map.Instance.Fights));
-            //TODO
+
+            //TODO:TaxCollectors
             client.Character.Map.Instance.ShowFightsCount(client);
             client.Character.CheckMapTip(message.mapId);
             client.Character.Map.Instance.AddClient(client);
@@ -179,41 +182,85 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleTeleportRequestMessage(TeleportRequestMessage message, WorldClient client)
         {
+            bool canUse = false;
+
             if ((TeleporterTypeEnum)message.teleporterType == TeleporterTypeEnum.TELEPORTER_ZAAP)
             {
-                InteractiveRecord destinationZaap = MapRecord.GetMap(message.mapId).Zaap;
                 if (client.Character.Map != null)
                 {
-                    InteractiveRecord currentZaap = client.Character.Map.Zaap;
-                    if (destinationZaap.OptionalValue1 != currentZaap.OptionalValue1)
+                    if (client.Character.Map.Zaap != null)
+                    {
+                        InteractiveRecord destinationZaap = MapRecord.GetMap(message.mapId).Zaap;
+                        InteractiveRecord currentZaap = client.Character.Map.Zaap;
+                        if (destinationZaap.OptionalValue1 != currentZaap.OptionalValue1)
+                            return;
+                    }
+                    else if (client.Character.Map.Instance.Prism != null)
+                    {
+                        if (client.Character.HasGuild && client.Character.HasAlliance)
+                        {
+                            InteractiveRecord destinationZaap = MapRecord.GetMap(message.mapId).Zaap;
+                            if (destinationZaap.OptionalValue1 != "Global" || client.Character.Map.Instance.Prism.AllianceId !=
+                                client.Character.AllianceId)
+                                return;
+                        }
+                    }
+                }
+                else
+                    return;
+            }
+
+            if ((TeleporterTypeEnum)message.teleporterType == TeleporterTypeEnum.TELEPORTER_PRISM)
+            {
+                if (client.Character.HasGuild && client.Character.HasAlliance)
+                {
+                    if (client.Character.Map.Instance.Prism != null || client.Character.Map.Instance.Prism.AllianceId == client.Character.AllianceId)
+                    {
+                        PrismRecord destinationPrism = PrismRecord.GetPrismByMapId(message.mapId);
+                        if (destinationPrism == null || destinationPrism.AllianceId != client.Character.AllianceId)
+                        {
+                            client.Character.Reply("Impossible d'utiliser ce prisme car vous n'appartenez pas à l'alliance propriétaire de celui-ci.", Color.Red);
+                            return;
+                        }
+                    }
+                    else
                         return;
                 }
                 else
                     return;
             }
 
-            client.Character.Teleport(message.mapId, (short)InteractiveRecord.GetTeleporterCellId(message.mapId, (TeleporterTypeEnum)message.teleporterType));
-
             switch ((TeleporterTypeEnum)message.teleporterType)
             {
-                case TeleporterTypeEnum.TELEPORTER_ZAAP:
-                    client.Character.RemoveKamas(InteractiveActionProvider.ZaapCost, true);
-                    break;
                 case TeleporterTypeEnum.TELEPORTER_SUBWAY:
-                    client.Character.RemoveKamas(InteractiveActionProvider.ZaapiCost, true);
+                    canUse = client.Character.RemoveKamas(InteractiveActionProvider.ZaapiCost, true);
                     break;
+
+                case TeleporterTypeEnum.TELEPORTER_ZAAP:
+                    canUse = client.Character.RemoveKamas(InteractiveActionProvider.GetTeleportationCost(client.Character.Map, MapRecord.GetMap(message.mapId)), true);
+                    break;
+                
                 case TeleporterTypeEnum.TELEPORTER_PRISM:
+                    canUse = client.Character.RemoveKamas(InteractiveActionProvider.GetTeleportationCost(client.Character.Map, MapRecord.GetMap(message.mapId)), true);
                     break;
             }
 
-            client.Character.LeaveDialog();
-            client.Character.Reply("Vous avez été téleporté.");
+            if (canUse)
+            {
+                client.Character.Teleport(message.mapId, (short)InteractiveRecord.GetTeleporterCellId(message.mapId, (TeleporterTypeEnum)message.teleporterType));
+                client.Character.LeaveDialog();
+                client.Character.Reply("Vous avez été téleporté.");
+            }
+            else
+            {
+                client.Character.Reply("Vous n'avez pas assez de kamas pour réaliser cette action.", Color.Red);
+            }
         }
 
         [MessageHandler]
         public static void HandleMapNotFound(ErrorMapNotFoundMessage message, WorldClient client)
         {
-            client.Character.Reply("Cette carte (" + message.mapId + ") n'existe pas ...");
+            client.Character.Reply("Cette carte (id : " + message.mapId + ") n'existe pas ...");
             client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);
         }
 

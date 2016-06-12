@@ -109,7 +109,14 @@ namespace Symbioz.World.Handlers
                     client.Character.BidShopInstance.MoveItem(message.objectUID, message.quantity);
                     break;
                 case ExchangeTypeEnum.STORAGE:
-                    client.Character.BankInstance.MoveItem(message.objectUID, message.quantity);
+                    if (client.Character.BankInstance != null)
+                    {
+                        client.Character.BankInstance.MoveItem(message.objectUID, message.quantity);
+                    }
+                    if (client.Character.PrismStorageInstance != null)
+                    {
+                        client.Character.PrismStorageInstance.MoveItem(message.objectUID, message.quantity);
+                    }
                     break;
                 case ExchangeTypeEnum.RUNES_TRADE:
                     client.Character.SmithMagicInstance.MoveItem(message.objectUID, message.quantity);

@@ -117,6 +117,7 @@ namespace Symbioz.World.Models
         {
             if (this.DisplayingAllianceBanner)
             {
+                //TODO:AlliancesEmblems
                 this.RemoveSkin((ushort)(2569 + iconId));
                 this.DisplayingAllianceBanner = false;
             }
@@ -332,6 +333,14 @@ namespace Symbioz.World.Models
                 col[i] = i + 1 << 24 | color.ToArgb() & 16777215;
             }
             return col.ToList();
+        }
+
+        public static void AddEmptiesColors(List<int> colorsList, int emptiesColorToAdd)
+        {
+            for(int i = 1; i <= emptiesColorToAdd; i++)
+            {
+                colorsList.Add(ContextActorLook.EMPTY_COLOR);
+            }
         }
 
     }

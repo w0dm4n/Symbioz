@@ -20,9 +20,9 @@ namespace Symbioz.World.Handlers
 {
     class ContextRolePlayHandler
     {
-        static UInt16ReflectedStat GetReflectedStat(StatsRecord stats, StatsBoostTypeEnum type)
+        static UInt16ReflectedStat GetReflectedStat(CharacterStatsRecord stats, StatsBoostTypeEnum type)
         {
-            var fieldInfo = StatsRecord.GetFieldInfo("Base"+type.ToString());
+            var fieldInfo = CharacterStatsRecord.GetFieldInfo("Base"+type.ToString());
             return new UInt16ReflectedStat(fieldInfo, stats);
         }
         [MessageHandler]
@@ -40,7 +40,7 @@ namespace Symbioz.World.Handlers
             }
             if (message.boostPoint > 0)
             {
-                UInt16ReflectedStat linkedStat = GetReflectedStat(client.Character.StatsRecord,statId);
+                UInt16ReflectedStat linkedStat = GetReflectedStat(client.Character.CharacterStatsRecord,statId);
 
                 BreedRecord breed = BreedRecord.GetBreed(client.Character.Record.Breed);
                 int num = linkedStat.GetValue();
@@ -81,8 +81,8 @@ namespace Symbioz.World.Handlers
                     {
                         var previousVitality = linkedStat.GetValue();
                         linkedStat.SetValue((short)num);
-                        client.Character.StatsRecord.LifePoints += (short)(client.Character.StatsRecord.BaseVitality - previousVitality);
-                        client.Character.CurrentStats.LifePoints += (uint)(client.Character.StatsRecord.BaseVitality - previousVitality);
+                        client.Character.CharacterStatsRecord.LifePoints += (short)(client.Character.CharacterStatsRecord.BaseVitality - previousVitality);
+                        client.Character.CurrentStats.LifePoints += (uint)(client.Character.CharacterStatsRecord.BaseVitality - previousVitality);
                         client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                     }
                     else
@@ -117,7 +117,6 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleLeaveDialog(LeaveDialogRequestMessage message, WorldClient client)
         {
-
             if (client.Character.CurrentDialogType == DialogTypeEnum.DIALOG_EXCHANGE)
             {
                 client.Character.LeaveExchange();

@@ -19,19 +19,17 @@ namespace Symbioz.Core
 
 
 
-        [StartupInvoke("World Connection",StartupInvokeType.Base)]
+        [StartupInvoke("WorldConnection",StartupInvokeType.Base)]
         public static void Connect()
         {
-
             _database = new DatabaseManager(ConfigurationManager.Instance.DatabaseHost,
                                            ConfigurationManager.Instance.DatabaseName,
                                             ConfigurationManager.Instance.DatabaseUser,
                                            ConfigurationManager.Instance.DatabasePassword);
             _database.UseProvider();
-
         }
 
-        [StartupInvoke(StartupInvokeType.Sql)]
+        [StartupInvoke(StartupInvokeType.SQL)]
         public static void Load()
         {
             _database.LoadTables(GetTypes());

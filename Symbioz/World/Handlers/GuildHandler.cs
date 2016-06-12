@@ -29,7 +29,7 @@ namespace Symbioz.World.Handlers
             }
             if (GuildRecord.CanCreateGuild(message.guildName))
             {
-                GuildRecord newGuild = GuildProvider.Instance.CreateGuild(client.Character, message);
+                GuildProvider.Instance.CreateGuild(client.Character, message);
                 client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_OK));
             }
             else
@@ -108,6 +108,7 @@ namespace Symbioz.World.Handlers
                 case GuildInformationsTypeEnum.INFO_TAX_COLLECTOR_GUILD_ONLY:
                     break;
                 case GuildInformationsTypeEnum.INFO_TAX_COLLECTOR_ALLIANCE:
+                    //SendGuildInformationsTaxCollectorAlliance(client);
                     break;
                 case GuildInformationsTypeEnum.INFO_TAX_COLLECTOR_LEAVE:
                     break;
@@ -133,8 +134,7 @@ namespace Symbioz.World.Handlers
         public static void SendGuildInformationsMembers(WorldClient client)
         {
             var members = CharacterGuildRecord.GetMembers(client.Character.GuildId);
-            client.Send(new GuildInformationsMembersMessage(
-                       members));
+            client.Send(new GuildInformationsMembersMessage(members));
         }
 
         public static void SendGuildInformationsGeneral(WorldClient client)
@@ -149,6 +149,11 @@ namespace Symbioz.World.Handlers
                 (byte)guild.Level, expFloor, guild.Experience, expNextFloor, DateTimeUtils.GetEpochFromDateTime(guild.CreationDate),
                 (ushort)CharacterGuildRecord.MembersCount(guild.Id),
                 (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id)));
+        }
+
+        public static void SendGuildInformationsTaxCollectorAlliance(WorldClient client)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

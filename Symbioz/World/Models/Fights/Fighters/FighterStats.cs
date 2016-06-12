@@ -15,9 +15,9 @@ namespace Symbioz.World.Models
 
         public int ShieldPoints { get; set; }
 
-        public StatsRecord RealStats { get; set; }
+        public CharacterStatsRecord RealStats { get; set; }
 
-        public StatsRecord Stats { get; set; }
+        public CharacterStatsRecord Stats { get; set; }
 
         public bool Summoned { get; set; }
 
@@ -37,7 +37,7 @@ namespace Symbioz.World.Models
 
         public int ErodedLife { get; set; }
 
-        public FighterStats(StatsRecord record, bool summoned = false, int summonerid = 0, BasicStats current = null)
+        public FighterStats(CharacterStatsRecord record, bool summoned = false, int summonerid = 0, BasicStats current = null)
         {
             this.RealStats = record.Clone();
             this.Stats = RealStats.Clone();
@@ -64,7 +64,7 @@ namespace Symbioz.World.Models
         }
         public CharacterCharacteristicsInformations GetCharacterCharacteristics(Character character)
         {
-            return StatsRecord.GetCharacterCharacteristics(Stats, character);
+            return CharacterStatsRecord.GetCharacterCharacteristics(Stats, character);
         }
     }
 }

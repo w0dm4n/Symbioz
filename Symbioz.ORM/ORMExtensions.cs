@@ -12,17 +12,17 @@ namespace Symbioz
     public static class ORMExtensions
     {
 
-        public static void UpdateElement(this ITable table)
+        public static void UpdateElement(this ITable table, bool waitingNextWorldSave = true)
         {
-            SaveTask.UpdateElement(table);
+            SaveTask.UpdateElement(table, waitingNextWorldSave);
         }
-        public static void AddElement(this ITable table, bool addtolist = true)
+        public static void AddElement(this ITable table, bool waitingNextWorldSave = true)
         {
-            SaveTask.AddElement(table, addtolist);
+            SaveTask.AddElement(table, waitingNextWorldSave);
         }
-        public static void RemoveElement(this ITable table, bool removefromlist = true)
+        public static void RemoveElement(this ITable table, bool waitingNextWorldSave = true)
         {
-            SaveTask.RemoveElement(table, removefromlist);
+            SaveTask.RemoveElement(table, waitingNextWorldSave);
         }
     }
 }

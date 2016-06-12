@@ -83,16 +83,16 @@ namespace Symbioz.World.Records.Companions
         public FighterStats GetFighterStats(Character master) 
         {
             List<object> constructorDatas = new List<object>();
-            foreach (var field in typeof(StatsRecord).GetFields().ToList().FindAll(x=>!x.IsStatic).OrderBy(x=>x.MetadataToken))
+            foreach (var field in typeof(CharacterStatsRecord).GetFields().ToList().FindAll(x=>!x.IsStatic).OrderBy(x=>x.MetadataToken))
             {
                 constructorDatas.Add(GetStatData(master, field.Name));
             }
-            StatsRecord stats = (StatsRecord)Activator.CreateInstance(typeof(StatsRecord), constructorDatas.ToArray());
+            CharacterStatsRecord stats = (CharacterStatsRecord)Activator.CreateInstance(typeof(CharacterStatsRecord), constructorDatas.ToArray());
             stats.Initiative = (short)(master.Initiative - 1);
-            stats.Strength = master.StatsRecord.Strength;
-            stats.Agility = master.StatsRecord.Agility;
-            stats.Intelligence = master.StatsRecord.Intelligence;
-            stats.Chance = master.StatsRecord.Chance;
+            stats.Strength = master.CharacterStatsRecord.Strength;
+            stats.Agility = master.CharacterStatsRecord.Agility;
+            stats.Intelligence = master.CharacterStatsRecord.Intelligence;
+            stats.Chance = master.CharacterStatsRecord.Chance;
          
             return new FighterStats(stats);
         }

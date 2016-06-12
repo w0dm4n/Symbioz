@@ -19,7 +19,9 @@ namespace Symbioz.World.Models.Alliances
         {
             this.Recruter = recruter;
             this.Recruted = recruted;
+            this.Recruter.Character.CurrentDialogType = DialogTypeEnum.DIALOG_ALLIANCE_INVITATION;
             this.Recruter.Character.AllianceInvitationDialog = this;
+            this.Recruted.Character.CurrentDialogType = DialogTypeEnum.DIALOG_ALLIANCE_INVITATION;
             this.Recruted.Character.AllianceInvitationDialog = this;
 
         }

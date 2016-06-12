@@ -11,7 +11,7 @@ namespace Symbioz.World.Models
     {
         public CharacterItemRecord newItem { get; set; }
         public CharacterItemRecord BaseItem { get; set; }
-        public ItemCut(CharacterItemRecord item,uint quantity,byte newItempos)
+        public ItemCut(CharacterItemRecord item, uint quantity, byte newItempos)
         {
             
             newItem = item.CloneAndGetNewUID();
@@ -22,7 +22,7 @@ namespace Symbioz.World.Models
             BaseItem = item;
             SaveTask.UpdateElement(BaseItem);
         }
-        public static ItemCut Cut(CharacterItemRecord item,uint quantity,byte newItempos)
+        public static ItemCut Cut(CharacterItemRecord item,uint quantity, byte newItempos)
         {
             return new ItemCut(item, quantity,newItempos);
         }

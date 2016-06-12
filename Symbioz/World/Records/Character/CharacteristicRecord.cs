@@ -36,10 +36,10 @@ namespace Symbioz.World.Records
             return Characteristics.Find(x => x.Id == id);
         }
        
-        public static UInt16ReflectedStat GetReflectedStat(StatsRecord host,int characteristicid)
+        public static UInt16ReflectedStat GetReflectedStat(CharacterStatsRecord host,int characteristicid)
         {
             CharacteristicRecord record = Characteristics.Find(x => x.Id == characteristicid);
-            return new UInt16ReflectedStat(StatsRecord.GetFieldInfo(record.Keyword), host);
+            return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo(record.Keyword), host);
         }
     }
 }

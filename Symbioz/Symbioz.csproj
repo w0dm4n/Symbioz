@@ -145,6 +145,8 @@
     <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
     <Compile Include="Network\CharactersDisconnected.cs" />
+    <Compile Include="World\Models\Alliances\Prisms\PrismsManager.cs" />
+    <Compile Include="World\Models\Exchanges\PrismExchange.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAgression.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAvA.cs" />
     <Compile Include="World\Models\Parties\Dungeon\DungeonPartyProvider.cs" />
@@ -306,6 +308,9 @@
     <Compile Include="World\PathProvider\ShapesProvider.cs" />
     <Compile Include="World\Records\Alliances\AllianceRecord.cs" />
     <Compile Include="World\Records\Alliances\GuildAllianceRecord.cs" />
+    <Compile Include="World\Records\Alliances\Prisms\AlliancePrismRequestResult.cs" />
+    <Compile Include="World\Records\Alliances\Prisms\Modules\PrismModuleRecord.cs" />
+    <Compile Include="World\Records\Alliances\Prisms\PrismRecord.cs" />
     <Compile Include="World\Records\Character\CharacteristicRecord.cs" />
     <Compile Include="World\Records\Character\EmoteRecord.cs" />
     <Compile Include="World\Records\Character\GeneralShortcutRecord.cs" />
@@ -364,13 +369,14 @@
     <Compile Include="World\Records\Npcs\NpcSpawnRecord.cs" />
     <Compile Include="World\Records\Npcs\NpcTemplateRecord.cs" />
     <Compile Include="World\Records\Items\RecipeRecord.cs" />
-    <Compile Include="World\Records\Character\StatsRecord.cs" />
+    <Compile Include="World\Records\Character\CharacterStatsRecord.cs" />
     <Compile Include="World\Records\Spells\ExtendedSpellEffect.cs" />
     <Compile Include="World\Records\Spells\AbstractSpellEffectRecord.cs" />
     <Compile Include="World\Records\Spells\SpellCriticalEffectRecord.cs" />
     <Compile Include="World\Records\Spells\SpellEffectRecord.cs" />
     <Compile Include="World\Records\Spells\SpellLevelRecord.cs" />
     <Compile Include="World\Records\Spells\SpellRecord.cs" />
+    <Compile Include="World\Records\SubAreas\SubAreaRecord.cs" />
     <Compile Include="World\Records\Succes\Succes.cs" />
   </ItemGroup>
   <ItemGroup>

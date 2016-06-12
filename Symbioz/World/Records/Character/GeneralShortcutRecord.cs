@@ -35,12 +35,11 @@ namespace Symbioz.World.Records
         }
         public static void RemoveAll(int characterid)
         {
-           GeneralShortcuts.FindAll(x=>x.CharacterId == characterid).ForEach(x => SaveTask.RemoveElement(x));
+           GeneralShortcuts.FindAll(x=>x.CharacterId == characterid).ForEach(x => SaveTask.RemoveElement(x, false));
         }
         public static void RemoveShortcut(int characterid,sbyte slot)
         {
-            SaveTask.RemoveElement(GetShorcut(characterid, slot));
-            WorldServer.Instance.GetOnlineClient(characterid).Character.RemoveElement(GetShorcut(characterid, slot));
+            SaveTask.RemoveElement(GetShorcut(characterid, slot), false);
         }
         public static void AddShortcut(int characterid,sbyte slotid,int shortcuttype,int value1,int value2)
         {
@@ -48,8 +47,7 @@ namespace Symbioz.World.Records
             if (existing != null)
                 RemoveShortcut(existing.CharacterId,existing.SlotId);
             var shortcut = new GeneralShortcutRecord(GeneralShortcuts.PopNextId<GeneralShortcutRecord>(x => x.Id), characterid, shortcuttype, value1, value2, slotid);
-            SaveTask.AddElement(shortcut);
-            WorldServer.Instance.GetOnlineClient(characterid).Character.AddElement(shortcut);
+            SaveTask.AddElement(shortcut, false);
         }
         static GeneralShortcutRecord GetShorcut(int characterid, sbyte slotid)
         {
@@ -70,12 +68,10 @@ namespace Symbioz.World.Records
                     shortcut2.SlotId = secondslot;
                 else
                     shortcut2.SlotId = firstslot;
-                SaveTask.UpdateElement(shortcut2);
-                WorldServer.Instance.GetOnlineClient(characterid).Character.UpdateElement(shortcut2);
+                SaveTask.UpdateElement(shortcut2, false);
             }
             else if (shortcut1 != null)
                 shortcut1.SlotId = secondslot;
-            WorldServer.Instance.GetOnlineClient(characterid).Character.UpdateElement(shortcut1);
         }
         public static List<Shortcut> GetCharacterShortcuts(int characterid)
         {

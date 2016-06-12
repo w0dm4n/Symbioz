@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Symbioz.World.Records
 {
-    [Table("Items",true)]
+    [Table("Items", true)]
     public class ItemRecord : ITable
     {
         public static List<ItemRecord> Items = new List<ItemRecord>();

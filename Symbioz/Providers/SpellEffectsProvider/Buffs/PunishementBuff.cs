@@ -72,17 +72,17 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
             switch (PunishementAction)
             {
                 case 118:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextStrength"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextStrength"), Fighter.FighterStats.Stats);
                 case 119:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextAgility"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextAgility"), Fighter.FighterStats.Stats);
                 case 123:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextChance"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextChance"), Fighter.FighterStats.Stats);
                 case 124:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextWisdom"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextWisdom"), Fighter.FighterStats.Stats);
                 case 126:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("ContextIntelligence"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("ContextIntelligence"), Fighter.FighterStats.Stats);
                 case 407:
-                    return new UInt16ReflectedStat(StatsRecord.GetFieldInfo("LifePoints"), Fighter.FighterStats.Stats);
+                    return new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("LifePoints"), Fighter.FighterStats.Stats);
             }
             return null;
         }

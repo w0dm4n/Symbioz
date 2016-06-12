@@ -10,14 +10,14 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
 {
     public class UInt16ReflectedStat
     {
-        public UInt16ReflectedStat(FieldInfo field,StatsRecord host)
+        public UInt16ReflectedStat(FieldInfo field, CharacterStatsRecord host)
         {
             this.Field = field;
             this.Host = host;
         }
         public string FieldName { get { return Field.Name; } }
         public FieldInfo Field { get; set; }
-        public StatsRecord Host { get; set; }
+        public CharacterStatsRecord Host { get; set; }
         public void AddValue(short value)
         {
             var added = (short)((short)(Field.GetValue(Host)) + value);

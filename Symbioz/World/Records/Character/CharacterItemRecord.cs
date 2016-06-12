@@ -11,10 +11,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Symbioz.World.Records.Items;
+using Symbioz.World.Records.Alliances.Prisms.Modules;
 
 namespace Symbioz.World.Models
 {
-    [Table("CharactersItems",true)]
+    [Table("CharactersItems", true)]
     public class CharacterItemRecord : ITable
     {
         static ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
@@ -71,7 +72,11 @@ namespace Symbioz.World.Models
         }
         public BankItemRecord GetBankItem(int accountId)
         {
-            return new BankItemRecord(UID, GID,accountId, Quantity, EffectsLinkedToList);
+            return new BankItemRecord(UID, GID, accountId, Quantity, EffectsLinkedToList);
+        }
+        public PrismModuleRecord GetPrismModule(int prismId)
+        {
+            return new PrismModuleRecord((int)UID, GID, prismId);
         }
         public ObjectItem GetObjectItem()
         {
@@ -81,23 +86,19 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.RemoveAll(x => x.actionId == (ushort)effect);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this);
-            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
-
+            SaveTask.UpdateElement(this, false);
         }
         public void RemoveAllEffects()
         {
             m_realEffect.Clear();
             this.Effects = string.Empty;
-            SaveTask.UpdateElement(this);
-            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
+            SaveTask.UpdateElement(this, false);
         }
         public void SetEffects(List<ObjectEffect> effects)
         {
             this.m_realEffect = effects;
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this);
-            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
+            SaveTask.UpdateElement(this, false);
         }
         public T GetFirstEffect<T>(EffectsEnum effect) where T : ObjectEffect
         {
@@ -114,8 +115,7 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.AddRange(effects);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this);
-            WorldServer.Instance.GetOnlineClient(this.CharacterId).Character.UpdateElement(this);
+            SaveTask.UpdateElement(this, false);
         }
         public List<ObjectEffect> GetEffects()
         {
@@ -141,8 +141,7 @@ namespace Symbioz.World.Models
         }
         public static void RemoveAll(int characterid)
         {
-            GetCharacterItems(characterid).ForEach(x => SaveTask.RemoveElement(x));
-            GetCharacterItems(characterid).ForEach(x => WorldServer.Instance.GetOnlineClient(characterid).Character.RemoveElement(x));
+            GetCharacterItems(characterid).ForEach(x => SaveTask.RemoveElement(x, false));
         }
         public static CharacterItemRecord GetItemByUID(uint uid)
         {
@@ -165,7 +164,6 @@ namespace Symbioz.World.Models
              {
                  Locker.ExitReadLock();
              }
-            
         }
         public static string EffectsToString(List<ObjectEffect> effects) 
         {

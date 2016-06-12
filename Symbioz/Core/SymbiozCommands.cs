@@ -35,7 +35,7 @@ namespace Symbioz.Core
         {
             commands.Add("help", HelpRequest);
             commands.Add("infos", Infos);
-            commands.Add("saveworld",SaveTask.Save);
+            commands.Add("saveworld", SaveTask.Save);
             commands.Add("off", Offline);
             commands.Add("on", Online);
             commands.Add("restore", Restore);
@@ -104,7 +104,7 @@ namespace Symbioz.Core
         internal static void Restore()
         {
             AuthDatabaseProvider.Clean(new string[] { "Characters", "CharactersItems", "CharactersJobs",
-                "Stats", "BidShopsItems", "SpellsShortcuts", "CharactersSpells", "GeneralShortcuts", "Guilds", "CharactersGuilds", "Alliances", "GuildsAlliances" });
+                "CharactersStats", "BidShopsItems", "SpellsShortcuts", "CharactersSpells", "GeneralShortcuts", "Guilds", "CharactersGuilds", "Alliances", "GuildsAlliances", "Prisms", "PrismsModules", "BankItems", "AccountsInformations"});
             Logger.Init("Database restored !");
             System.Threading.Thread.Sleep(2000);
             Environment.Exit(0);

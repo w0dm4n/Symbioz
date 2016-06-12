@@ -12,7 +12,7 @@ namespace Symbioz.Providers.Conditions
     {
         public override bool Eval(WorldClient client)
         {
-            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.StatsRecord.PermanentVitality);
+            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.CharacterStatsRecord.PermanentVitality);
         }
     }
     [Condition("CV")]
@@ -20,7 +20,7 @@ namespace Symbioz.Providers.Conditions
     {
         public override bool Eval(WorldClient client)
         {
-            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.StatsRecord.Vitality);
+            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.CharacterStatsRecord.Vitality);
         }
     }
 }

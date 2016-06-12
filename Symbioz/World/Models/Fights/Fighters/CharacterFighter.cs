@@ -48,7 +48,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             ContextualId = Client.Character.Id;
             FighterLook = Client.Character.Look.CloneContextActorLook();
             RealFighterLook = FighterLook.CloneContextActorLook();
-            FighterStats = new FighterStats(Client.Character.StatsRecord, false, 0, Client.Character.CurrentStats);
+            FighterStats = new FighterStats(Client.Character.CharacterStatsRecord, false, 0, Client.Character.CurrentStats);
 
             FighterInformations = new GameFightCharacterInformations(ContextualId, FighterLook.ToEntityLook(),
                 new EntityDispositionInformations(CellId, Direction), (sbyte)Team.TeamColor,

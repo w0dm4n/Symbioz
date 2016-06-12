@@ -12,7 +12,7 @@ namespace Symbioz.Providers.Conditions
     {
         public override bool Eval(WorldClient client)
         {
-            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.StatsRecord.PermanentStrenght);
+            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.CharacterStatsRecord.PermanentStrenght);
         }
     }
     [ConditionAttribute("CS")]
@@ -20,7 +20,7 @@ namespace Symbioz.Providers.Conditions
     {
         public override bool Eval(WorldClient client)
         {
-            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.StatsRecord.Strength);
+            return Condition.BasicEval(ConditionValue, ComparaisonSymbol, client.Character.CharacterStatsRecord.Strength);
         }
     }
 }

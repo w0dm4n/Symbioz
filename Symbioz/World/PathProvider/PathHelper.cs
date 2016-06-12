@@ -9,7 +9,7 @@ namespace Symbioz.PathProvider
 {
     public class PathHelper  
     {
-        #region constants
+        #region Constants
         private static readonly Point VECTOR_RIGHT = new Point(1, 1);
         private static readonly Point VECTOR_DOWN_RIGHT = new Point(1, 0);
         private static readonly Point VECTOR_DOWN = new Point(1, -1);
@@ -514,7 +514,10 @@ namespace Symbioz.PathProvider
             {
                 for (int k = i; k <= i + MAP_WIDTH; k++)
                 {
-                    DiagonalsCells.Add((short)k, new Point((k - i) * 2, i / 14));
+                    if(!DiagonalsCells.ContainsKey((short)k))
+                    {
+                        DiagonalsCells.Add((short)k, new Point((k - i) * 2, i / 14));
+                    }
                 }
             }
 

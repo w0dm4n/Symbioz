@@ -214,12 +214,12 @@ namespace Symbioz.Providers.FightResults
 
                 #region items
                 List<CharacterFighter> charactersFighters = Fighter.Team.GetFighters().FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x);
-                int prospectingSum = charactersFighters.Sum((CharacterFighter entry) => entry.Client.Character.StatsRecord.Prospecting);
+                int prospectingSum = charactersFighters.Sum((CharacterFighter entry) => entry.Client.Character.CharacterStatsRecord.Prospecting);
 
                 foreach (var item in template.Drops.FindAll(x => x.ProspectingLock <= prospectingSum))
                 {
                     int D = random.Next(0, 201);
-                    double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.StatsRecord.Prospecting / 100) / 3) * ConfigurationManager.Instance.ItemsDropRatio);
+                    double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.CharacterStatsRecord.Prospecting / 100) / 3) * ConfigurationManager.Instance.ItemsDropRatio);
 
                     if (D <= dropchancePercent)
                     {
@@ -287,7 +287,7 @@ namespace Symbioz.Providers.FightResults
             }
             var team = Fighter.Team.GetFighters().FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x); ;
             ExperienceFormulas formulas = new ExperienceFormulas();
-            formulas.InitXpFormula(new PlayerData(client.Character.Record.Level, client.Character.StatsRecord.Wisdom, client.Character.Record.DeathMaxLevel), monsters, team.ConvertAll<GroupMemberData>(x => new GroupMemberData(x.Client.Character.Record.Level, false)), pvmfight.MonsterGroup.AgeBonus);
+            formulas.InitXpFormula(new PlayerData(client.Character.Record.Level, client.Character.CharacterStatsRecord.Wisdom, client.Character.Record.DeathMaxLevel), monsters, team.ConvertAll<GroupMemberData>(x => new GroupMemberData(x.Client.Character.Record.Level, false)), pvmfight.MonsterGroup.AgeBonus);
             if (client.Character.Record.Level >= 200)
                 formulas._xpSolo = 0;
             client.Character.AddXp((ulong)formulas._xpSolo);

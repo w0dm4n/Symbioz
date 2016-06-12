@@ -25,7 +25,7 @@ namespace Symbioz.World.Models.Parties
         public PartyMemberInformations GetPartyMemberInformations()
         {
             CharacterRecord record = this.Character.Record;
-            StatsRecord stats = this.Character.StatsRecord;
+            CharacterStatsRecord stats = this.Character.CharacterStatsRecord;
             BasicStats current = this.Character.CurrentStats;
             int id = record.Id;
             int level = (int)record.Level;
@@ -47,7 +47,7 @@ namespace Symbioz.World.Models.Parties
         public PartyInvitationMemberInformations GetPartyInvitationMemberInformations()
         {
             CharacterRecord record = this.Character.Record;
-            StatsRecord stats = this.Character.StatsRecord;
+            CharacterStatsRecord stats = this.Character.CharacterStatsRecord;
             BasicStats current = this.Character.CurrentStats;
             int id = record.Id;
             int level = (int)record.Level;

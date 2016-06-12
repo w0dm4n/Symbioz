@@ -7,6 +7,7 @@ using Symbioz.Utils;
 using Symbioz.World.Models.Alliances;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records.Alliances;
+using Symbioz.World.Records.Alliances.Prisms;
 using Symbioz.World.Records.Guilds;
 using System;
 using System.Collections.Generic;
@@ -121,7 +122,7 @@ namespace Symbioz.Providers.DataWriter
             foreach (var alliance in AllianceRecord.Alliances)
             {
                 AllianceVersatileInformations allianceVersatileInformation = new AllianceVersatileInformations((uint)alliance.Id,
-                    (ushort)AllianceProvider.GetGuildsCount(alliance.Id), (ushort)AllianceProvider.GetMembersCount(alliance.Id), 0);
+                    (ushort)AllianceProvider.GetGuildsCount(alliance.Id), (ushort)AllianceProvider.GetMembersCount(alliance.Id), (ushort)PrismRecord.GetAlliancePrisms(alliance.Id).Count);
                 allianceVersatileInformations.Add(allianceVersatileInformation);
             }
 
