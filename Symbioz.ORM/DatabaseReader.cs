@@ -30,7 +30,6 @@ namespace Symbioz.ORM
         public DatabaseReader()
         {
             this.m_elements = new List<T>();
-
             this.Initialize();
         }
 
@@ -72,12 +71,14 @@ namespace Symbioz.ORM
 
         public void Read(MySqlConnection connection)
         {
-            this.ReadTable(connection, string.Format("SELECT * FROM `{0}` WHERE 1", this.m_tableName));
+            this.ReadTable(connection, string.Format("SELECT * FROM {0}", this.m_tableName));
+            connection.Close();
         }
 
         public void Read(MySqlConnection connection, string condition)
         {
-            this.ReadTable(connection, string.Format("SELECT * FROM `{0}` WHERE {1}", this.m_tableName, condition));
+            this.ReadTable(connection, string.Format("SELECT * FROM {0} WHERE {1}", this.m_tableName, condition));
+            connection.Close();
         }
 
         private void VerifyFieldsType(object[] obj)
@@ -158,9 +159,13 @@ namespace Symbioz.ORM
                     continue;
                 }
 
-                try { obj[i] = Convert.ChangeType(obj[i], this.m_fields[i].FieldType); }
-                catch
+                try
                 {
+                    obj[i] = Convert.ChangeType(obj[i], this.m_fields[i].FieldType);
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception(ex.ToString());
                     string exeption = string.Format("Unknown constructor for '{0}', ({1})", this.m_fields[i].FieldType.Name, this.m_fields[i].Name);
                     Console.WriteLine(exeption);
                     throw new Exception(exeption);

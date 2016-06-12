@@ -26,25 +26,33 @@ namespace Symbioz.World.Records.Alliances
 
         [Primary]
         public int Id;
+        [Update]
         public string Name;
+        [Update]
         public string Tag;
+        [Update]
         public int SymbolColor;
+        [Update]
         public ushort SymbolShape;
-        public sbyte BackgroundShape;
+        [Update]
         public int BackgroundColor;
+        [Update]
+        public sbyte BackgroundShape;
+        [Update]
         public int LeaderGuildId;
         public DateTime CreationDate;
+        [Update]
         public string AllianceWelcomeMessage;
 
-        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, sbyte backgroundShape, int backgroundColor, int leader, DateTime creationDate, string allianceWelcomeMessage)
+        public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, int backgroundColor, sbyte backgroundShape, int leader, DateTime creationDate, string allianceWelcomeMessage)
         {
             this.Id = id;
             this.Name = name;
             this.Tag = tag;
             this.SymbolColor = symbolColor;
             this.SymbolShape = symbolShape;
-            this.BackgroundShape = backgroundShape;
             this.BackgroundColor = backgroundColor;
+            this.BackgroundShape = backgroundShape;
             this.LeaderGuildId = leader;
             this.CreationDate = creationDate;
             this.AllianceWelcomeMessage = allianceWelcomeMessage;

@@ -63,7 +63,7 @@ namespace Symbioz.World.Models.Alliances
 
         public static void CreateAlliance(GuildRecord creator, string tag, string name, GuildEmblem emblem)
         {
-            AllianceRecord newAlliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundShape, emblem.backgroundColor, creator.Id, DateTime.Now, string.Empty);
+            AllianceRecord newAlliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundColor, emblem.backgroundShape, creator.Id, DateTime.Now, string.Empty);
             SaveTask.AddElement(newAlliance, false);
             JoinAlliance(creator, newAlliance, null);
         }

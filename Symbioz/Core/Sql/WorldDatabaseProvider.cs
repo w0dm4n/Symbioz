@@ -12,32 +12,20 @@ namespace Symbioz.Core
 {
     internal static class WorldDatabaseProvider
     {
-        public static MySqlConnection Connection { get { return _database.UseProvider(); } }
-        private static DatabaseManager _database;
-
-        public static DatabaseManager GetCurrentDatabase { get { return _database; } }
-
-
-
         [StartupInvoke("WorldConnection",StartupInvokeType.Base)]
         public static void Connect()
         {
-            _database = new DatabaseManager(ConfigurationManager.Instance.DatabaseHost,
-                                           ConfigurationManager.Instance.DatabaseName,
-                                            ConfigurationManager.Instance.DatabaseUser,
-                                           ConfigurationManager.Instance.DatabasePassword);
-            _database.UseProvider();
+            DatabaseManager.Initialize(ConfigurationManager.Instance.DatabaseHost,
+                string.Empty,
+                ConfigurationManager.Instance.DatabaseName,
+                ConfigurationManager.Instance.DatabaseUser,
+                ConfigurationManager.Instance.DatabasePassword);
         }
 
         [StartupInvoke(StartupInvokeType.SQL)]
         public static void Load()
         {
-            _database.LoadTables(GetTypes());
-        }
-
-        public static void Disconnect()
-        {
-            _database.CloseProvider();
+            DatabaseManager.LoadTables(GetTypes());
         }
 
         public static Type[] GetTypes()

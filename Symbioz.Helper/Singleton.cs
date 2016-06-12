@@ -3,10 +3,6 @@ using System.Reflection;
 
 namespace Symbioz.Helper
 {
-    /// <summary>
-    /// From Bouh2 - WCell
-    /// </summary>
-    /// <typeparam name="T">Class</typeparam>
     public abstract class Singleton<T> where T : class
     {
         internal static class SingletonAllocator

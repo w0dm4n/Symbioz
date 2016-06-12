@@ -13,28 +13,29 @@ namespace Symbioz.Core
 {
     public class AuthDatabaseProvider
     {
+        private static MySqlConnection AuthConnection { get; set; }
+
         [StartupInvoke("AuthConnection",StartupInvokeType.SQL)]
         public static void Initialize() 
         {
-           m_connection = (MySqlConnection)DatabaseManager.GetInstance().UseProvider().Clone();
-           m_connection.Open();
+            AuthConnection = DatabaseManager.GetNewProvider();
+            AuthConnection.Open();
         }
         private static void CheckConnectionState()
         {
-            if (!m_connection.Ping())
+            if (!AuthConnection.Ping())
             {
-                m_connection.Close();
-                m_connection.Open();
+                AuthConnection.Close();
+                AuthConnection.Open();
             }
         }
-        private static MySqlConnection m_connection { get; set; }
 
         public static MySqlConnection Connection
         {
             get
             {
                 CheckConnectionState();
-                return m_connection;
+                return AuthConnection;
             }
         }
 
@@ -66,9 +67,9 @@ namespace Symbioz.Core
         public static void Execute(string query)
         {
             CheckConnectionState();
-            if (m_connection.State == ConnectionState.Open)
+            if (AuthConnection.State == ConnectionState.Open)
             {
-                MySqlCommand cmd = new MySqlCommand(query,m_connection);
+                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
                 try
                 {
                     cmd.ExecuteNonQuery();
@@ -101,7 +102,7 @@ namespace Symbioz.Core
             CheckConnectionState();
             string query = "SELECT * FROM " + table + " WHERE " + where + " = '" + wherevalue + "'";
             string result = "";
-            MySqlCommand cmd = new MySqlCommand(query, m_connection);
+            MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
             {

@@ -39,7 +39,6 @@ namespace Symbioz.World.Models.Exchanges
 
         public void OpenPanel()
         {
-            PrismModules.ForEach(x => Console.WriteLine("PMD : " + x.UID + "/" + x.GID));
             Client.Send(new ExchangeStartedWithStorageMessage((sbyte)ExchangeTypeEnum.STORAGE, 300));
             Client.Send(new StorageInventoryContentMessage(PrismModules.GetObjects(), 0));
             Client.Character.CurrentDialogType = DialogTypeEnum.DIALOG_EXCHANGE;
@@ -81,7 +80,7 @@ namespace Symbioz.World.Models.Exchanges
                 {
                     var newPrismModule = obj.GetPrismModule(this.Prism.Id);
                     Client.Send(new StorageObjectUpdateMessage(newPrismModule.GetObjectItem()));
-                    SaveTask.AddElement(newPrismModule);
+                    SaveTask.AddElement(newPrismModule, false);
                     Client.Character.Inventory.RemoveItem(obj.UID, obj.Quantity);
                 }
                 else
@@ -101,12 +100,12 @@ namespace Symbioz.World.Models.Exchanges
             if (obj.IsNull())
                 return;
 
-            SaveTask.RemoveElement(obj);
+            SaveTask.RemoveElement(obj, false);
             var existing = Client.Character.Inventory.Items.ExistingItem(obj);
             if (existing != null)
             {
                 existing.Quantity += (uint)-quantity;
-                SaveTask.UpdateElement(existing);
+                SaveTask.UpdateElement(existing, false);
                 Client.Character.Inventory.Refresh();
             }
             else

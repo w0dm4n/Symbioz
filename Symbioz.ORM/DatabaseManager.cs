@@ -5,42 +5,51 @@ using System.Reflection;
 using System.Linq;
 using System.Collections;
 using Symbioz;
+using Symbioz.Helper;
 
 namespace Symbioz.ORM
 {
-    public class DatabaseManager
+    public static class DatabaseManager
     {
-        private static DatabaseManager _self;
+        private static string Host;
+        private static string Port = null;
+        private static string Database;
+        private static string User;
+        private static string Password;
 
-        internal MySqlConnection m_provider;
-
-        public DatabaseManager(string host, string database, string user, string password)
+        public static void Initialize(string host, string port, string database, string user, string password)
         {
-            if (_self == null)
-                _self = this;
-
-            this.m_provider = new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", host, user, password, database));
-        }
-        public DatabaseManager(string host, string port, string database, string user, string password)
-        {
-            if (_self == null)
-                _self = this;
-
-            this.m_provider = new MySqlConnection(string.Format("Server={0};Port={1};UserId={2};Password={3};Database={4}", host, port, user, password, database));
-        }
-
-        public MySqlConnection UseProvider()
-        {
-            if (!this.m_provider.Ping())
+            Host = host;
+            if (!string.IsNullOrEmpty(port))
             {
-                this.m_provider.Close();
-                this.m_provider.Open();
+                Port = port;
             }
-
-            return this.m_provider;
+            Database = database;
+            User = user;
+            Password = password;
         }
 
-        public void LoadTables(Type[] tables)
+        public static MySqlConnection GetNewProvider(bool openProvider = false)
+        {
+            MySqlConnection newProvider = null;
+            if(Port != null)
+            {
+                newProvider = new MySqlConnection(string.Format("Server={0};Port={1};UserId={2};Password={3};Database={4}", Host,
+                    Port, User, Password, Database));
+            }
+            else
+            {
+                newProvider = new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
+                    Password, Database));
+            }
+            if(openProvider)
+            {
+                newProvider.Open();
+            }
+            return newProvider;
+        }
+        
+        public static void LoadTables(Type[] tables)
         {
             var orderedTables = new Type[tables.Length];
             var dontCatch = new List<Type>();
@@ -87,7 +96,7 @@ namespace Symbioz.ORM
                 var tableName = (string)reader.GetType().GetProperty("TableName").GetValue(reader);
                 Logger.Log("[SQL] Chargement de " + tableName + " ...");
                 var method = reader.GetType().GetMethods().FirstOrDefault(x => x.Name == "Read" && x.GetParameters().Length == 1);
-                method.Invoke(reader, new object[] { this.UseProvider() });
+                method.Invoke(reader, new object[] { GetNewProvider(true) });
 
                 var elements = reader.GetType().GetProperty("Elements").GetValue(reader);
 
@@ -96,16 +105,6 @@ namespace Symbioz.ORM
                 if (field != null)
                     field.SetValue(null, elements);
             }
-        }
-
-        public void CloseProvider()
-        {
-            this.m_provider.Close();
-        }
-
-        public static DatabaseManager GetInstance()
-        {
-            return _self;
         }
     }
 }

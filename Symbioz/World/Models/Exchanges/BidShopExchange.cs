@@ -55,12 +55,12 @@ namespace Symbioz.World.Models.Exchanges
             if (existing == null)
             {
                 var BidShopRecord = new BidShopItemRecord(BidShopId, price, quantity, item);
-                SaveTask.AddElement(BidShopRecord);
+                SaveTask.AddElement(BidShopRecord, false);
             }
             else
             {
                 var BidShopRecord = new BidShopItemRecord(BidShopId, price, quantity, item.CloneAndGetNewUID());
-                SaveTask.AddElement(BidShopRecord);
+                SaveTask.AddElement(BidShopRecord, false);
             }
             OpenSellPanel();
         }
@@ -68,13 +68,14 @@ namespace Symbioz.World.Models.Exchanges
         {
             var item = CharacterBidItems.Find(x => x.objectUID == uid);
             var realItem = BidShopItemRecord.GetBidShopItem(uid);
-            SaveTask.RemoveElement(realItem);
+            SaveTask.RemoveElement(realItem, false);
             Client.Character.Inventory.Add(new CharacterItemRecord(realItem.UID, 63, realItem.GID, Client.Character.Id, realItem.Quantity, realItem.GetEffects()));
             OpenSellPanel();
         }
         #endregion
 
         #region Buy
+
         public void BuyItem(uint uid, uint quantity, uint price)
         {
             if (Client.Character.RemoveKamas((int)price, true))
@@ -90,6 +91,7 @@ namespace Symbioz.World.Models.Exchanges
            
          
         }
+
         public void RemoveItem(BidShopItemRecord item)
         {
             item.RemoveElement();
@@ -99,16 +101,19 @@ namespace Symbioz.World.Models.Exchanges
                 DeleteGIDFromBidShop(item.GID);
             }
         }
+
         public void OpenBuyPanel()
         {
             Client.Character.CurrentDialogType = DialogTypeEnum.DIALOG_EXCHANGE;
             Client.Character.ExchangeType = ExchangeTypeEnum.BIDHOUSE_BUY;
             Client.Send(new ExchangeStartedBidBuyerMessage(Descriptor));
         }
+
         void DeleteGIDFromBidShop(ushort gid)
         {
             BidShopInstance.ForEach(x => x.Send(new ExchangeBidHouseGenericItemRemovedMessage(gid)));
         }
+
         public void ShowBidHouseType(uint itemtype)
         {
             List<uint> gids = new List<uint>();
@@ -120,6 +125,7 @@ namespace Symbioz.World.Models.Exchanges
             }
             Client.Send(new ExchangeTypesExchangerDescriptionForUserMessage(gids));
         }
+
         public void ShowItemList(ushort itemgid, bool toInstance = false)
         {
             WatchingItemGID = itemgid;
@@ -134,9 +140,11 @@ namespace Symbioz.World.Models.Exchanges
                 Client.Send(new ExchangeTypesItemsExchangerDescriptionForUserMessage(SortedItems(GetAllItemsByGID(itemgid))));
             }
         }
+
         #endregion
 
         #region ItemsSort
+
         bool ItemGIDExistInBid(ushort gid)
         {
             if (BidShopItems.Find(x => x.GID == gid) == null)
@@ -144,11 +152,13 @@ namespace Symbioz.World.Models.Exchanges
             else
                 return true;
         }
+
         List<BidShopItemRecord> GetAllItemsByGID(ushort gid)
         {
             return BidShopItems.FindAll(x => x.GID == gid);
 
         }
+
         Dictionary<List<BidShopItemRecord>, string> GetItemSortedByEffects(List<BidShopItemRecord> items)
         {
             Dictionary<List<BidShopItemRecord>, string> dic = new Dictionary<List<BidShopItemRecord>, string>();
@@ -164,6 +174,7 @@ namespace Symbioz.World.Models.Exchanges
             }
             return dic;
         }
+
         List<BidExchangerObjectInfo> SortedItems(List<BidShopItemRecord> items)
         {
             List<BidExchangerObjectInfo> result = new List<BidExchangerObjectInfo>();
@@ -207,6 +218,7 @@ namespace Symbioz.World.Models.Exchanges
             }
             return result;
         }
+
         #endregion
 
         public void CancelExchange()

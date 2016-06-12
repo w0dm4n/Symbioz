@@ -12,9 +12,9 @@ namespace Symbioz.ORM
     {
         // FIELDS
         private const short MAX_ADDING_LINES = 250;
-        private const string ADD_ELEMENTS = "INSERT INTO `{0}` VALUES\n{1}";
-        private const string UPDATE_ELEMENTS = "UPDATE `{0}` SET {1} WHERE `{2}` = {3}";
-        private const string REMOVE_ELEMENTS = "DELETE FROM `{0}` WHERE `{1}` = {2}";
+        private const string ADD_ELEMENTS = "INSERT INTO {0} VALUES {1}";
+        private const string UPDATE_ELEMENTS = "UPDATE {0} SET {1} WHERE {2} = {3}";
+        private const string REMOVE_ELEMENTS = "DELETE FROM {0} WHERE {1} = {2}";
 
         private const string LIST_SPLITTER = ",";
         private const string DICTIONARY_SPLITTER = ";";
@@ -34,7 +34,6 @@ namespace Symbioz.ORM
 
             switch (action)
             {
-
                 case DatabaseAction.Add:
                     this.AddElements(elements);
                     return;
@@ -45,10 +44,9 @@ namespace Symbioz.ORM
                 case DatabaseAction.Remove:
                     this.DeleteElements(elements);
                     return;
-
-
             }
         }
+
         private void Initialize(DatabaseAction action)
         {
             if (action == DatabaseAction.Add)
@@ -63,7 +61,6 @@ namespace Symbioz.ORM
 
             if (action != DatabaseAction.Add)
                 this.GetPrimaryField();
-
         }
 
         private void AddElements(ITable[] elements)
@@ -97,8 +94,11 @@ namespace Symbioz.ORM
 
                 try
                 {
-                    this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
+                    Console.WriteLine("Query : " + command);
+                    var commandProvider = DatabaseManager.GetNewProvider(true);
+                    this.m_command = new MySqlCommand(command, commandProvider);
                     this.m_command.ExecuteNonQuery();
+                    commandProvider.Close();
                 }
                 catch (Exception ex)
                 {
@@ -114,16 +114,25 @@ namespace Symbioz.ORM
                 lock (element)
                 {
                     var values = this.m_fields.ConvertAll<string>(field => string.Format("{0} = {1}", field.Name, this.GetFieldValue(field, element)));
-                    var command = string.Format(UPDATE_ELEMENTS, this.m_tableName, string.Join(", ", values), this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
+                    if (values.Count > 0)
+                    {
+                        var command = string.Format(UPDATE_ELEMENTS, this.m_tableName, string.Join(", ", values), this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
 
-                    try
-                    {
-                        this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
-                        this.m_command.ExecuteNonQuery();
+                        try
+                        {
+                            var commandProvider = DatabaseManager.GetNewProvider(true);
+                            this.m_command = new MySqlCommand(command, commandProvider);
+                            this.m_command.ExecuteNonQuery();
+                            commandProvider.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Error (UpdateElements) : " + ex.ToString());
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Logger.Log("Error (UpdateElements) : " + ex.ToString());
+                        Logger.Error("Missing [UpdateAttribute] for table '" + this.m_tableName + "' !");
                     }
                 }
             }
@@ -140,8 +149,10 @@ namespace Symbioz.ORM
 
                     try
                     {
-                        this.m_command = new MySqlCommand(command, DatabaseManager.GetInstance().UseProvider());
+                        var commandProvider = DatabaseManager.GetNewProvider(true);
+                        this.m_command = new MySqlCommand(command, commandProvider);
                         this.m_command.ExecuteNonQuery();
+                        commandProvider.Close();
                     }
                     catch (Exception ex)
                     {
