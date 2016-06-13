@@ -82,8 +82,5 @@ namespace Symbioz.World.Records
                 Exchange.GetOnlineClientsExchanging(ExchangeTypeEnum.BIDHOUSE_BUY).ForEach(x => x.Character.BidShopInstance.RemoveItem(item));
             }
         }
-        
-        
-
     }
 }

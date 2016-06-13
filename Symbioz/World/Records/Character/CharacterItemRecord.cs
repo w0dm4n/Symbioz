@@ -36,7 +36,7 @@ namespace Symbioz.World.Models
         [Update]
         public string Effects;
         public string EffectsLinkedToList { get { return EffectsToString(m_realEffect); } }
-        public CharacterItemRecord(uint uid,byte position,ushort gid,int characterid,uint qty,string effects)
+        public CharacterItemRecord(uint uid, byte position, ushort gid, int characterid, uint qty, string effects)
         {
             this.UID = uid;
             this.Position = position;
@@ -50,7 +50,7 @@ namespace Symbioz.World.Models
             else
                 this.m_realEffect = new List<ObjectEffect>();
         }
-        public CharacterItemRecord(uint uid,byte position,ushort gid, int characterid, uint qty,IEnumerable<ObjectEffect> effects)
+        public CharacterItemRecord(uint uid, byte position, ushort gid, int characterid, uint qty, IEnumerable<ObjectEffect> effects)
         {
             this.UID = uid;
             this.Position = position;
@@ -60,7 +60,7 @@ namespace Symbioz.World.Models
             this.m_realEffect = effects.ToList();
             this.Effects = EffectsToString(m_realEffect);
         }
-        public CharacterItemRecord(ObjectItem objitem,int characterid)
+        public CharacterItemRecord(ObjectItem objitem, int characterid)
         {
             this.UID = objitem.objectUID;
             this.Position = objitem.position;
@@ -86,19 +86,19 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.RemoveAll(x => x.actionId == (ushort)effect);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public void RemoveAllEffects()
         {
             m_realEffect.Clear();
             this.Effects = string.Empty;
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public void SetEffects(List<ObjectEffect> effects)
         {
             this.m_realEffect = effects;
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public T GetFirstEffect<T>(EffectsEnum effect) where T : ObjectEffect
         {
@@ -115,7 +115,7 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.AddRange(effects);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public List<ObjectEffect> GetEffects()
         {
@@ -133,15 +133,15 @@ namespace Symbioz.World.Models
 
         public CharacterItemRecord ToMimicry(int newskinid)
         {
-            return ItemEditor.AddEffectsAndClone(this, new List<ObjectEffect>() { new ObjectEffectInteger((ushort)EffectsEnum.Eff_Mimicry, (ushort)newskinid) },1);
+            return ItemEditor.AddEffectsAndClone(this, new List<ObjectEffect>() { new ObjectEffectInteger((ushort)EffectsEnum.Eff_Mimicry, (ushort)newskinid) }, 1);
         }
         public static List<CharacterItemRecord> GetCharacterItems(int characterid)
         {
             return CharactersItems.FindAll(x => x.CharacterId == characterid);
         }
-        public static void RemoveAll(int characterid)
+        public static void RemoveAll(int characterId)
         {
-            GetCharacterItems(characterid).ForEach(x => SaveTask.RemoveElement(x, false));
+            GetCharacterItems(characterId).ForEach(x => SaveTask.RemoveElementWithoutDelay(x));
         }
         public static CharacterItemRecord GetItemByUID(uint uid)
         {
@@ -149,23 +149,23 @@ namespace Symbioz.World.Models
         }
         public static uint PopNextUID()
         {
-             Locker.EnterReadLock(); 
-             try
-             {
-                 List<uint> uids = CharactersItems.ConvertAll<uint>(x => x.UID);
-                 uids.AddRange(BidShopItemRecord.GetAllItemsUIDs());
-                 uids.AddRange(BankItemRecord.GetAllItemsUIDs());
-                 uids.Sort();
-                 if (uids.Count == 0)
-                     return 1;
-                 return uids.Last() + 1;
-             }
-             finally
-             {
-                 Locker.ExitReadLock();
-             }
+            Locker.EnterReadLock();
+            try
+            {
+                List<uint> uids = CharactersItems.ConvertAll<uint>(x => x.UID);
+                uids.AddRange(BidShopItemRecord.GetAllItemsUIDs());
+                uids.AddRange(BankItemRecord.GetAllItemsUIDs());
+                uids.Sort();
+                if (uids.Count == 0)
+                    return 1;
+                return uids.Last() + 1;
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
         }
-        public static string EffectsToString(List<ObjectEffect> effects) 
+        public static string EffectsToString(List<ObjectEffect> effects)
         {
             string str = string.Empty;
             foreach (var effect in effects)
@@ -173,18 +173,18 @@ namespace Symbioz.World.Models
                 if (effect is ObjectEffectInteger)
                 {
                     var eff = (ObjectEffectInteger)effect;
-                    str += ObjectEffectInteger.Id + "#" + eff.actionId + "#" + eff.value+"|";
+                    str += ObjectEffectInteger.Id + "#" + eff.actionId + "#" + eff.value + "|";
                 }
                 if (effect is ObjectEffectDice)
                 {
                     var eff = (ObjectEffectDice)effect;
-                    str += ObjectEffectDice.Id + "#" + eff.actionId+"#"+ + eff.diceNum + "#" + eff.diceSide + "#" + eff.diceConst + "|";
+                    str += ObjectEffectDice.Id + "#" + eff.actionId + "#" + +eff.diceNum + "#" + eff.diceSide + "#" + eff.diceConst + "|";
                 }
-               
+
             }
             return str;
         }
-      
+
         public static List<ObjectEffect> StringToObjectEffects(string str)
         {
             if (str == string.Empty)
@@ -206,16 +206,15 @@ namespace Symbioz.World.Models
             }
             return results;
         }
-       
 
         public CharacterItemRecord CloneAndGetNewUID()
         {
             return new CharacterItemRecord(PopNextUID(), 63, GID, CharacterId, Quantity, Effects);
         }
+
         public CharacterItemRecord CloneWithUID()
         {
             return new CharacterItemRecord(UID, 63, GID, CharacterId, Quantity, Effects);
         }
-        
     }
 }

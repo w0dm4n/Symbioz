@@ -48,7 +48,7 @@ namespace Symbioz.World.Records
         }
         public static void RemoveAll(int characterid)
         {
-            GetAllCharacterBidShopGains(characterid).ForEach(x => x.RemoveElement());
+            GetAllCharacterBidShopGains(characterid).ForEach(x => x.RemoveElementWithoutDelay());
         }
     }
 }

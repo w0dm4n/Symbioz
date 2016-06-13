@@ -15,6 +15,19 @@ namespace Symbioz.Network.Clients
     {
         public Character Character { get; set; }
 
+        public int CharacterId
+        {
+            get
+            {
+                int res = -1;
+                if (this.Character != null)
+                {
+                    res = this.Character.Id;
+                }
+                return res;
+            }
+        }
+
         public List<CharacterRecord> Characters { get; set; }
 
         public WorldClient(Socket socket) : base(socket)

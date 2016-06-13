@@ -64,7 +64,7 @@ namespace Symbioz.World.Models.Alliances
         public static void CreateAlliance(GuildRecord creator, string tag, string name, GuildEmblem emblem)
         {
             AllianceRecord newAlliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundColor, emblem.backgroundShape, creator.Id, DateTime.Now, string.Empty);
-            SaveTask.AddElement(newAlliance, false);
+            SaveTask.AddElement(newAlliance, creator.Id);
             JoinAlliance(creator, newAlliance, null);
         }
 
@@ -72,21 +72,21 @@ namespace Symbioz.World.Models.Alliances
         {
             AllianceRecord currentAlliance = AllianceProvider.GetAlliance(id);
             List<GuildAllianceRecord> allianceMembers = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == id);
-            foreach(GuildAllianceRecord member in allianceMembers)
+            foreach (GuildAllianceRecord member in allianceMembers)
             {
                 LeaveAlliance(member.GuildId);
-                member.RemoveElement(false);
+                member.RemoveElement();
             }
-            currentAlliance.RemoveElement(false);
+            currentAlliance.RemoveElement();
         }
 
         public static void JoinAlliance(GuildRecord Guild, AllianceRecord Alliance, WorldClient Inviter = null)
         {
             GuildAllianceRecord guildAllianceMember = new GuildAllianceRecord(Guild.Id, Alliance.Id);
-            guildAllianceMember.AddElement(false);
-            if(Inviter != null)
+            guildAllianceMember.AddElement();
+            if (Inviter != null)
                 Inviter.Send(new AllianceInvitationAnswerMessage(true));
-            foreach(CharacterGuildRecord member in CharacterGuildRecord.CharactersGuilds.FindAll(x => x.GuildId == Guild.Id))
+            foreach (CharacterGuildRecord member in CharacterGuildRecord.CharactersGuilds.FindAll(x => x.GuildId == Guild.Id))
             {
                 AllianceRecord.OnCharacterJoinAlliance(CharacterRecord.GetCharacterRecordById(member.CharacterId), Alliance);
             }
@@ -95,13 +95,13 @@ namespace Symbioz.World.Models.Alliances
         public static void LeaveAlliance(int guildId)
         {
             GuildAllianceRecord AllianceMember = GuildAllianceRecord.GuildsAlliances.Find(x => x.GuildId == guildId);
-            List<CharacterGuildRecord> guildMembers = CharacterGuildRecord.CharactersGuilds.FindAll(x=>x.GuildId == guildId);
-            foreach(CharacterGuildRecord guildMember in guildMembers)
+            List<CharacterGuildRecord> guildMembers = CharacterGuildRecord.CharactersGuilds.FindAll(x => x.GuildId == guildId);
+            foreach (CharacterGuildRecord guildMember in guildMembers)
             {
                 Character record = WorldServer.Instance.GetOnlineClient(guildMember.CharacterId).Character;
                 AllianceRecord.OnCharacterLeftAlliance(record);
             }
-            AllianceMember.RemoveElement(false);
+            AllianceMember.RemoveElement();
         }
 
         public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int allianceId)
@@ -112,7 +112,7 @@ namespace Symbioz.World.Models.Alliances
             var allianceGuildLeader = AllianceProvider.GetLeader(allianceId);
 
             List<GuildAllianceRecord> records = GuildAllianceRecord.GuildsAlliances.FindAll(x => x.AllianceId == allianceId);
-            foreach(GuildAllianceRecord record in records)
+            foreach (GuildAllianceRecord record in records)
             {
                 GuildRecord guild = GuildRecord.GetGuild(record.GuildId);
                 GuildInsiderFactSheetInformations guildInsiderFactSheetInformations = new GuildInsiderFactSheetInformations((uint)guild.Id, guild.Name,
@@ -120,7 +120,7 @@ namespace Symbioz.World.Models.Alliances
                     CharacterRecord.GetCharacterRecordById(guild.GetLeader().CharacterId).Name, (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id),
                     0, 0, true);
 
-                if(allianceGuildLeader.Id == guild.Id)
+                if (allianceGuildLeader.Id == guild.Id)
                 {
                     leaderGuildInformations = guildInsiderFactSheetInformations;
                 }
@@ -130,7 +130,7 @@ namespace Symbioz.World.Models.Alliances
                 }
             }
 
-            if(leaderGuildInformations != null)
+            if (leaderGuildInformations != null)
             {
                 guilds.Insert(0, leaderGuildInformations);
             }
@@ -157,7 +157,7 @@ namespace Symbioz.World.Models.Alliances
             GuildAllianceRecord allianceMember = GuildAllianceRecord.GetCharacterAlliance(guildId);
             if (allianceMember == null)
                 return null;
-           return AllianceProvider.GetAlliance(allianceMember.AllianceId);
+            return AllianceProvider.GetAlliance(allianceMember.AllianceId);
         }
 
         public static GuildRecord GetLeader(int allianceId)
@@ -170,7 +170,7 @@ namespace Symbioz.World.Models.Alliances
         {
             bool isLeader = false;
             var guildLeader = GetLeader(allianceId);
-            if(guildLeader != null)
+            if (guildLeader != null)
             {
                 var characterGuild = GuildRecord.GetGuild(guildId);
                 if (guildLeader == characterGuild && GuildProvider.IsLeader(characterId, characterGuild.Id))
@@ -235,7 +235,7 @@ namespace Symbioz.World.Models.Alliances
         public static bool GuildIsInAlliance(int guildId, int allianceId)
         {
             bool isInAlliance = false;
-            if(GuildAllianceRecord.GuildsAlliances.FirstOrDefault(x => x.AllianceId == allianceId && x.GuildId == guildId) != null)
+            if (GuildAllianceRecord.GuildsAlliances.FirstOrDefault(x => x.AllianceId == allianceId && x.GuildId == guildId) != null)
             {
                 isInAlliance = true;
             }

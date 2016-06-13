@@ -78,7 +78,7 @@ namespace Symbioz.World.Records
         }
         public static void RemoveAll(int characterid)
         {
-            CharactersJobs.FindAll(x => x.CharacterId == characterid).ForEach(x => x.RemoveElement());
+            CharactersJobs.FindAll(x => x.CharacterId == characterid).ForEach(x => x.RemoveElementWithoutDelay());
         }
       
     }

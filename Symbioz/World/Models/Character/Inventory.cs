@@ -47,7 +47,7 @@ namespace Symbioz.World.Models
             var item = GetItemByPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_COMPANION);
             if (item != null)
             {
-                var companionEffect= item.GetFirstEffect<ObjectEffectInteger>(EffectsEnum.Eff_Companion);
+                var companionEffect = item.GetFirstEffect<ObjectEffectInteger>(EffectsEnum.Eff_Companion);
                 Character.EquipedCompanion = CompanionRecord.GetCompanion(companionEffect.value);
             }
             #endregion
@@ -74,20 +74,21 @@ namespace Symbioz.World.Models
         }
         public void Add(CharacterItemRecord item, bool refresh = true)
         {
-
             var existingItem = Items.ExistingItem(item);
             if (existingItem == null)
             {
                 Items.Add(item);
                 if (!CharacterItemRecord.CharactersItems.Contains(item))
                 {
-                    SaveTask.AddElement(item, false);
+                    Console.WriteLine("UID : " + item.UID);
+                    SaveTask.AddElement(item, this.Character.Id);
                 }
             }
             else
             {
                 existingItem.Quantity += item.Quantity;
-                SaveTask.UpdateElement(existingItem, false);
+                Console.WriteLine("UpdateElement");
+                SaveTask.UpdateElement(existingItem, this.Character.Id);
             }
             if (refresh)
             {
@@ -109,7 +110,12 @@ namespace Symbioz.World.Models
             ItemCustomEffects.Instance.Init(newItem);
             Add(newItem, refresh);
             if (notif)
-                Character.Reply("Vous avez obtenu " + quantity + " " + template.Name);
+                Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + "!");
+
+            foreach (var i in CharacterItemRecord.CharactersItems)
+            {
+                Console.WriteLine("Item : " + i.UID);
+            }
             return newItem;
         }
 
@@ -343,12 +349,12 @@ namespace Symbioz.World.Models
             if (equiped != null)
             {
                 UnequipItem(equiped, 63, equiped.GetTemplate(), quantity);
-                SaveTask.UpdateElement(equiped, false);
+                SaveTask.UpdateElement(equiped, this.Character.Id);
             }
             if (item.Quantity == 1)
             {
                 item.Position = newposition;
-                SaveTask.UpdateElement(item, false);
+                SaveTask.UpdateElement(item, this.Character.Id);
                 AddItemSkin(item, template);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
 
@@ -384,12 +390,12 @@ namespace Symbioz.World.Models
             if (equiped != null)
             {
                 UnequipWeapon(equiped, 63, equiped.GetWeaponTemplate(), quantity);
-                SaveTask.UpdateElement(equiped, false);
+                SaveTask.UpdateElement(equiped, this.Character.Id);
             }
             if (item.Quantity == 1)
             {
                 item.Position = newposition;
-                SaveTask.UpdateElement(item, false);
+                SaveTask.UpdateElement(item, this.Character.Id);
                 ItemEffectsProvider.AddEffects(Character.Client, item.GetEffects());
                 AddWeaponSkin(item, template);
             }
@@ -409,7 +415,7 @@ namespace Symbioz.World.Models
             if (existing == null)
             {
                 item.Position = newposition;
-                SaveTask.UpdateElement(item, false);
+                SaveTask.UpdateElement(item, this.Character.Id);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                 if (template != null)
                     RemoveItemSkin(item, template);
@@ -433,7 +439,7 @@ namespace Symbioz.World.Models
             if (existing == null)
             {
                 item.Position = newposition;
-                SaveTask.UpdateElement(item, false);
+                SaveTask.UpdateElement(item, this.Character.Id);
                 ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                 if (template != null)
                     RemoveWeaponSkin(item, template);
@@ -456,7 +462,7 @@ namespace Symbioz.World.Models
             return Items.Find(x => x.Position == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         }
         public void MoveItem(uint uid, byte newposition, uint quantity)
-        {  
+        {
             if (Character.IsFighting)
             {
                 Character.Reply("Impossible en combat", true);
@@ -517,14 +523,14 @@ namespace Symbioz.World.Models
             if (quantity == item.Quantity)
             {
                 Items.Remove(item);
-                SaveTask.RemoveElement(item, false);
+                SaveTask.RemoveElement(item, this.Character.Id);
                 CharacterItemRecord.CharactersItems.Remove(item);
                 Character.Client.Send(new ObjectDeletedMessage(item.UID));
             }
             else if (quantity < item.Quantity)
             {
                 item.Quantity -= (uint)quantity;
-                SaveTask.UpdateElement(item, false);
+                SaveTask.UpdateElement(item, this.Character.Id);
             }
             if (refresh)
                 Refresh();
@@ -533,18 +539,7 @@ namespace Symbioz.World.Models
 
         public List<ObjectItem> ConvertAllObjectItems()
         {
-            List<ObjectItem> AllItems = Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
-            List<int> ObjGID = new List<int>();
-            List<ObjectItem> newList = new List<ObjectItem>();
-            foreach (ObjectItem item in AllItems)
-            {
-                if(!ObjGID.Contains(item.objectGID))
-                {
-                    newList.Add(item);
-                    ObjGID.Add(item.objectGID);
-                }
-            }
-            return (newList);
+            return Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
         }
 
         public List<ItemRecord> ConvertAllToTemplates()
@@ -587,7 +582,7 @@ namespace Symbioz.World.Models
 
         public void SaveItems()
         {
-            Items.ForEach(x => SaveTask.UpdateElement(x, false));
+            Items.ForEach(x => SaveTask.UpdateElement(x, this.Character.Id));
         }
 
         public void Refresh()

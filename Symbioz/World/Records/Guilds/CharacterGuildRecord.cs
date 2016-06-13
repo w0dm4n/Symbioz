@@ -111,7 +111,7 @@ namespace Symbioz.World.Records.Guilds
         }
         public static void RemoveAll(int characterId)
         {
-            CharactersGuilds.FindAll(x => x.CharacterId == characterId).ForEach(x => x.RemoveElement());
+            CharactersGuilds.FindAll(x => x.CharacterId == characterId).ForEach(x => x.RemoveElementWithoutDelay());
         }
        
     }
