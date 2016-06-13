@@ -15,12 +15,13 @@ namespace Symbioz.Core
     {
         private static MySqlConnection AuthConnection { get; set; }
 
-        [StartupInvoke("AuthConnection",StartupInvokeType.SQL)]
+        [StartupInvoke("AuthConnection", StartupInvokeType.SQL)]
         public static void Initialize() 
         {
             AuthConnection = DatabaseManager.GetNewProvider();
             AuthConnection.Open();
         }
+
         private static void CheckConnectionState()
         {
             if (!AuthConnection.Ping())

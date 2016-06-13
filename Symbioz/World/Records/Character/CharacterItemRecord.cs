@@ -86,19 +86,19 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.RemoveAll(x => x.actionId == (ushort)effect);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public void RemoveAllEffects()
         {
             m_realEffect.Clear();
             this.Effects = string.Empty;
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public void SetEffects(List<ObjectEffect> effects)
         {
             this.m_realEffect = effects;
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public T GetFirstEffect<T>(EffectsEnum effect) where T : ObjectEffect
         {
@@ -115,7 +115,7 @@ namespace Symbioz.World.Models
         {
             this.m_realEffect.AddRange(effects);
             this.Effects = EffectsToString(m_realEffect);
-            SaveTask.UpdateElement(this, false);
+            SaveTask.UpdateElement(this, this.CharacterId);
         }
         public List<ObjectEffect> GetEffects()
         {
@@ -139,9 +139,9 @@ namespace Symbioz.World.Models
         {
             return CharactersItems.FindAll(x => x.CharacterId == characterid);
         }
-        public static void RemoveAll(int characterid)
+        public static void RemoveAll(int characterId)
         {
-            GetCharacterItems(characterid).ForEach(x => SaveTask.RemoveElement(x, false));
+            GetCharacterItems(characterId).ForEach(x => SaveTask.RemoveElement(x));
         }
         public static CharacterItemRecord GetItemByUID(uint uid)
         {
@@ -206,16 +206,15 @@ namespace Symbioz.World.Models
             }
             return results;
         }
-       
 
         public CharacterItemRecord CloneAndGetNewUID()
         {
             return new CharacterItemRecord(PopNextUID(), 63, GID, CharacterId, Quantity, Effects);
         }
+
         public CharacterItemRecord CloneWithUID()
         {
             return new CharacterItemRecord(UID, 63, GID, CharacterId, Quantity, Effects);
         }
-        
     }
 }

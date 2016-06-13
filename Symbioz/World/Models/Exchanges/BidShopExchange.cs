@@ -55,12 +55,12 @@ namespace Symbioz.World.Models.Exchanges
             if (existing == null)
             {
                 var BidShopRecord = new BidShopItemRecord(BidShopId, price, quantity, item);
-                SaveTask.AddElement(BidShopRecord, false);
+                SaveTask.AddElement(BidShopRecord, this.Client.CharacterId);
             }
             else
             {
                 var BidShopRecord = new BidShopItemRecord(BidShopId, price, quantity, item.CloneAndGetNewUID());
-                SaveTask.AddElement(BidShopRecord, false);
+                SaveTask.AddElement(BidShopRecord, this.Client.CharacterId);
             }
             OpenSellPanel();
         }
@@ -68,7 +68,7 @@ namespace Symbioz.World.Models.Exchanges
         {
             var item = CharacterBidItems.Find(x => x.objectUID == uid);
             var realItem = BidShopItemRecord.GetBidShopItem(uid);
-            SaveTask.RemoveElement(realItem, false);
+            SaveTask.RemoveElement(realItem, this.Client.CharacterId);
             Client.Character.Inventory.Add(new CharacterItemRecord(realItem.UID, 63, realItem.GID, Client.Character.Id, realItem.Quantity, realItem.GetEffects()));
             OpenSellPanel();
         }

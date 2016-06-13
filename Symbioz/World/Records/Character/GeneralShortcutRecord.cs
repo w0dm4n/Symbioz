@@ -33,30 +33,30 @@ namespace Symbioz.World.Records
             this.Value2 = value2;
             this.SlotId = slotid;
         }
-        public static void RemoveAll(int characterid)
+        public static void RemoveAll(int characterId)
         {
-           GeneralShortcuts.FindAll(x=>x.CharacterId == characterid).ForEach(x => SaveTask.RemoveElement(x, false));
+           GeneralShortcuts.FindAll(x=>x.CharacterId == characterId).ForEach(x => SaveTask.RemoveElement(x));
         }
-        public static void RemoveShortcut(int characterid,sbyte slot)
+        public static void RemoveShortcut(int characterId, sbyte slot)
         {
-            SaveTask.RemoveElement(GetShorcut(characterid, slot), false);
+            SaveTask.RemoveElement(GetShorcut(characterId, slot), characterId);
         }
-        public static void AddShortcut(int characterid,sbyte slotid,int shortcuttype,int value1,int value2)
+        public static void AddShortcut(int characterId, sbyte slotid,int shortcuttype,int value1,int value2)
         {
-            var existing = GetShorcut(characterid, slotid);
+            var existing = GetShorcut(characterId, slotid);
             if (existing != null)
                 RemoveShortcut(existing.CharacterId,existing.SlotId);
-            var shortcut = new GeneralShortcutRecord(GeneralShortcuts.PopNextId<GeneralShortcutRecord>(x => x.Id), characterid, shortcuttype, value1, value2, slotid);
-            SaveTask.AddElement(shortcut, false);
+            var shortcut = new GeneralShortcutRecord(GeneralShortcuts.PopNextId<GeneralShortcutRecord>(x => x.Id), characterId, shortcuttype, value1, value2, slotid);
+            SaveTask.AddElement(shortcut, characterId);
         }
         static GeneralShortcutRecord GetShorcut(int characterid, sbyte slotid)
         {
             return GeneralShortcuts.Find(x => x.CharacterId == characterid && x.SlotId == slotid);
         }
-        public static void SwapSortcut(int characterid, sbyte firstslot, sbyte secondslot)
+        public static void SwapSortcut(int characterId, sbyte firstslot, sbyte secondslot)
         {
-            var shortcut1 = GetShorcut(characterid, firstslot);
-            var shortcut2 = GetShorcut(characterid, secondslot);
+            var shortcut1 = GetShorcut(characterId, firstslot);
+            var shortcut2 = GetShorcut(characterId, secondslot);
             if (!shortcut1.IsNull() && !shortcut2.IsNull())
             {
                 if (shortcut1.SlotId == firstslot)
@@ -68,7 +68,7 @@ namespace Symbioz.World.Records
                     shortcut2.SlotId = secondslot;
                 else
                     shortcut2.SlotId = firstslot;
-                SaveTask.UpdateElement(shortcut2, false);
+                SaveTask.UpdateElement(shortcut2, characterId);
             }
             else if (shortcut1 != null)
                 shortcut1.SlotId = secondslot;

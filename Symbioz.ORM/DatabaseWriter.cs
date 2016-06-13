@@ -94,11 +94,8 @@ namespace Symbioz.ORM
 
                 try
                 {
-                    Console.WriteLine("Query : " + command);
-                    var commandProvider = DatabaseManager.GetNewProvider(true);
-                    this.m_command = new MySqlCommand(command, commandProvider);
+                    this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
                     this.m_command.ExecuteNonQuery();
-                    commandProvider.Close();
                 }
                 catch (Exception ex)
                 {
@@ -120,10 +117,8 @@ namespace Symbioz.ORM
 
                         try
                         {
-                            var commandProvider = DatabaseManager.GetNewProvider(true);
-                            this.m_command = new MySqlCommand(command, commandProvider);
+                            this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
                             this.m_command.ExecuteNonQuery();
-                            commandProvider.Close();
                         }
                         catch (Exception ex)
                         {
@@ -149,10 +144,8 @@ namespace Symbioz.ORM
 
                     try
                     {
-                        var commandProvider = DatabaseManager.GetNewProvider(true);
-                        this.m_command = new MySqlCommand(command, commandProvider);
+                        this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
                         this.m_command.ExecuteNonQuery();
-                        commandProvider.Close();
                     }
                     catch (Exception ex)
                     {

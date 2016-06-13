@@ -16,7 +16,13 @@ namespace Symbioz.ORM
         public delegate void OnSaveEndedDel(int elapsed);
         public static event OnSaveEndedDel OnSaveEnded;
         private static Timer SaveTaskTimer;
-       
+
+        private static bool CanSaveLinkedElements = true;
+
+        private static Dictionary<int, Dictionary<Type, List<ITable>>> _linkedCharactersNewElements = new Dictionary<int, Dictionary<Type, List<ITable>>>();
+        private static Dictionary<int, Dictionary<Type, List<ITable>>> _linkedCharactersUpdateElements = new Dictionary<int, Dictionary<Type, List<ITable>>>();
+        private static Dictionary<int, Dictionary<Type, List<ITable>>> _linkedCharactersRemoveElements = new Dictionary<int, Dictionary<Type, List<ITable>>>();
+
         private static Dictionary<Type, List<ITable>> _newElements = new Dictionary<Type, List<ITable>>();
         private static Dictionary<Type, List<ITable>> _updateElements = new Dictionary<Type, List<ITable>>();
         private static Dictionary<Type, List<ITable>> _removeElements = new Dictionary<Type, List<ITable>>();
@@ -29,29 +35,62 @@ namespace Symbioz.ORM
             SaveTaskTimer.Start();
         }
 
-        public static void AddElement(ITable element, bool waitingNextWorldSave = true)
+        #region AddElement
+
+        public static void AddElement(ITable element)
         {
-            if (waitingNextWorldSave)
+            lock (_newElements)
             {
-                lock (_newElements)
+                if (_newElements.ContainsKey(element.GetType()))
                 {
-                    if (_newElements.ContainsKey(element.GetType()))
+                    if (!_newElements[element.GetType()].Contains(element))
+                        _newElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _newElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+
+            AddToCache(element);
+        }
+
+        public static void AddElement(ITable element, int characterId)
+        {
+            if (characterId > 0)
+            {
+                lock (_linkedCharactersNewElements)
+                {
+                    if (_linkedCharactersNewElements.ContainsKey(characterId))
                     {
-                        if (!_newElements[element.GetType()].Contains(element))
-                            _newElements[element.GetType()].Add(element);
+                        if (_linkedCharactersNewElements[characterId].ContainsKey(element.GetType()))
+                        {
+                            if (!_linkedCharactersNewElements[characterId][element.GetType()].Contains(element))
+                                _linkedCharactersNewElements[characterId][element.GetType()].Add(element);
+                        }
+                        else
+                        {
+                            _linkedCharactersNewElements[characterId].Add(element.GetType(), new List<ITable>() { element });
+                        }
                     }
                     else
                     {
-                        _newElements.Add(element.GetType(), new List<ITable> { element });
+                        Dictionary<Type, List<ITable>> newDictionary = new Dictionary<Type, List<ITable>>();
+                        newDictionary.Add(element.GetType(), new List<ITable>() { element });
+                        _linkedCharactersNewElements.Add(characterId, newDictionary);
                     }
                 }
+
+                AddToCache(element);
             }
             else
             {
-                Insert(element.GetType(), element);
+                Logger.Error("Unable to AddElement for characterId '" + characterId + "' !");
             }
+        }
 
-            #region Add value into array
+        private static void AddToCache(ITable element)
+        {
             var field = GetCache(element);
             if (field == null)
             {
@@ -67,74 +106,160 @@ namespace Symbioz.ORM
             }
 
             method.Invoke(field.GetValue(null), new object[] { element });
-            #endregion
         }
 
-        public static void UpdateElement(ITable element, bool waitingNextWorldSave = true)
+        #endregion
+
+        #region UpdateElement
+
+        public static void UpdateElement(ITable element)
         {
-            if (waitingNextWorldSave)
+            lock (_updateElements)
             {
-                lock (_updateElements)
+                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                    return;
+
+                if (_updateElements.ContainsKey(element.GetType()))
                 {
-                    if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                    if (!_updateElements[element.GetType()].Contains(element))
+                        _updateElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _updateElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+        }
+
+        public static void UpdateElement(ITable element, int characterId)
+        {
+            if (characterId > 0)
+            {
+                lock (_linkedCharactersUpdateElements)
+                {
+                    if (_linkedCharactersNewElements.ContainsKey(characterId) &&
+                        _linkedCharactersNewElements[characterId].ContainsKey(element.GetType()) &&
+                        _linkedCharactersNewElements[characterId][element.GetType()].Contains(element))
                         return;
 
-                    if (_updateElements.ContainsKey(element.GetType()))
+                    if (_linkedCharactersUpdateElements.ContainsKey(characterId))
                     {
-                        if (!_updateElements[element.GetType()].Contains(element))
-                            _updateElements[element.GetType()].Add(element);
+                        if (_linkedCharactersUpdateElements[characterId].ContainsKey(element.GetType()))
+                        {
+                            if (!_linkedCharactersUpdateElements[characterId][element.GetType()].Contains(element))
+                                _linkedCharactersUpdateElements[characterId][element.GetType()].Add(element);
+                        }
+                        else
+                        {
+                            _linkedCharactersUpdateElements[characterId].Add(element.GetType(), new List<ITable>() { element });
+                        }
+
                     }
                     else
                     {
-                        _updateElements.Add(element.GetType(), new List<ITable> { element });
+                        Dictionary<Type, List<ITable>> newDictionary = new Dictionary<Type, List<ITable>>();
+                        newDictionary.Add(element.GetType(), new List<ITable>() { element });
+                        _linkedCharactersUpdateElements.Add(characterId, newDictionary);
                     }
                 }
             }
             else
             {
-                Update(element.GetType(), element);
+                Logger.Error("Unable to UpdateElement for characterId '" + characterId + "' !");
             }
         }
 
-        public static void RemoveElement(ITable element, bool waitingNextWorldSave = true)
+        #endregion
+
+        #region RemoveElement
+
+        public static void RemoveElement(ITable element)
         {
             if (element == null)
                 return;
 
-            if (waitingNextWorldSave)
+            lock (_removeElements)
             {
-                lock (_removeElements)
+                if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
                 {
-                    if (_newElements.ContainsKey(element.GetType()) && _newElements[element.GetType()].Contains(element))
+                    RemoveFromCache(element);
+                    _newElements[element.GetType()].Remove(element);
+                    return;
+                } 
+
+                if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
+                    _updateElements[element.GetType()].Remove(element);
+
+                if (_removeElements.ContainsKey(element.GetType()))
+                {
+                    if (!_removeElements[element.GetType()].Contains(element))
+                        _removeElements[element.GetType()].Add(element);
+                }
+                else
+                {
+                    _removeElements.Add(element.GetType(), new List<ITable> { element });
+                }
+            }
+
+            if (element.GetType().Name == "CharacterSpellRecord")
+            {
+                Console.WriteLine("RemoveFromCache!");
+            }
+            RemoveFromCache(element);
+        }
+
+        public static void RemoveElement(ITable element, int characterId)
+        {
+            if (characterId > 0)
+            {
+                if (element == null)
+                    return;
+
+                lock (_linkedCharactersRemoveElements)
+                {
+                    if (_linkedCharactersNewElements.ContainsKey(characterId) &&
+                        _linkedCharactersNewElements[characterId].ContainsKey(element.GetType()) &&
+                        _linkedCharactersNewElements[characterId][element.GetType()].Contains(element))
                     {
-                        RemoveFromList(element);
-                        _newElements[element.GetType()].Remove(element);
+                        RemoveFromCache(element);
+                        _linkedCharactersNewElements[characterId][element.GetType()].Remove(element);
                         return;
                     }
 
-                    if (_updateElements.ContainsKey(element.GetType()) && _updateElements[element.GetType()].Contains(element))
-                        _updateElements[element.GetType()].Remove(element);
+                    if (_linkedCharactersUpdateElements.ContainsKey(characterId) &&
+                        _linkedCharactersUpdateElements[characterId].ContainsKey(element.GetType()) &&
+                        _linkedCharactersUpdateElements[characterId][element.GetType()].Contains(element))
+                        _linkedCharactersUpdateElements[characterId][element.GetType()].Remove(element);
 
-                    if (_removeElements.ContainsKey(element.GetType()))
+                    if (_linkedCharactersRemoveElements.ContainsKey(characterId))
                     {
-                        if (!_removeElements[element.GetType()].Contains(element))
-                            _removeElements[element.GetType()].Add(element);
+                        if (_linkedCharactersRemoveElements[characterId].ContainsKey(element.GetType()))
+                        {
+                            if (!_linkedCharactersRemoveElements[characterId][element.GetType()].Contains(element))
+                                _linkedCharactersRemoveElements[characterId][element.GetType()].Add(element);
+                        }
+                        else
+                        {
+                            _linkedCharactersRemoveElements[characterId].Add(element.GetType(), new List<ITable>() { element });
+                        }
                     }
                     else
                     {
-                        _removeElements.Add(element.GetType(), new List<ITable> { element });
+                        Dictionary<Type, List<ITable>> newDictionary = new Dictionary<Type, List<ITable>>();
+                        newDictionary.Add(element.GetType(), new List<ITable>() { element });
+                        _linkedCharactersRemoveElements.Add(characterId, newDictionary);
                     }
                 }
+
+                RemoveFromCache(element);
             }
             else
             {
-                Remove(element.GetType(), element);
+                Logger.Error("Unable to RemoveElement for characterId '" + characterId + "' !");
             }
-
-            RemoveFromList(element);
         }
 
-        static void RemoveFromList(ITable element)
+        static void RemoveFromCache(ITable element)
         {
             var field = GetCache(element);
             if (field == null)
@@ -153,6 +278,8 @@ namespace Symbioz.ORM
             method.Invoke(field.GetValue(null), new object[] { element });
         }
 
+        #endregion
+
         private static void SaveTaskTimer_Elapsed(object sender, ElapsedEventArgs e)
         { 
             Save(); 
@@ -160,6 +287,7 @@ namespace Symbioz.ORM
 
         public static void Save()
         {
+            CanSaveLinkedElements = false;
             Stopwatch stopWatch = Stopwatch.StartNew();
             if (OnSaveStarted != null)
                 OnSaveStarted();
@@ -222,52 +350,129 @@ namespace Symbioz.ORM
                             _updateElements[type] = _updateElements[type].Skip(elements.Count).ToList();
                     }
                 }
+
+                List<int> charactersIds = new List<int>();
+                charactersIds.AddRange(_linkedCharactersNewElements.Keys);
+                _linkedCharactersUpdateElements.Keys.ToList().ForEach((x) =>
+                {
+                    if(!charactersIds.Contains(x))
+                    {
+                        charactersIds.Add(x);
+                    }
+                });
+                _linkedCharactersRemoveElements.Keys.ToList().ForEach((x) =>
+                {
+                    if (!charactersIds.Contains(x))
+                    {
+                        charactersIds.Add(x);
+                    }
+                });
+
+                foreach(int characterId in charactersIds)
+                {
+                    SaveCharacter(characterId, true);
+                }
+
                 SaveTaskTimer.Start();
                 if (OnSaveEnded != null)
                     OnSaveEnded(stopWatch.Elapsed.Seconds);
-            }
-            catch (Exception e) { Logger.Error("[SAVING WORLD] " + e.Message); }
-        }
-
-        #region SingleQueryActions
-
-        public static void Insert(Type type, ITable element)
-        {
-            try
-            {
-                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, new ITable[1] { element });
-            }
-            catch(Exception e)
-            {
-                Logger.Error("Unable to insert (" + element.GetType() + ") : " + e.Message);
-            }
-        }
-
-        public static void Update(Type type, ITable element)
-        {
-            try
-            {
-                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, new ITable[1] { element });
+                CanSaveLinkedElements = true;
             }
             catch (Exception e)
             {
-                Logger.Error("Unable to update (" + element.GetType() + ") : " + e.Message);
+                CanSaveLinkedElements = true;
+                Logger.Error("[SAVING WORLD] " + e.Message);
             }
         }
 
-        public static void Remove(Type type, ITable element)
+        public static bool SaveCharacter(int characterId, bool forceSave = false)
         {
-            try
+            bool saved = false;
+            if (CanSaveLinkedElements || forceSave)
             {
-                Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Remove, new ITable[1] { element });
-            }
-            catch (Exception e)
-            {
-                Logger.Error("Unable to remove (" + element.GetType() + ") : " + e.Message);
-            }
-        }
+                Stopwatch stopWatch = Stopwatch.StartNew();
+                try
+                {
+                    if (_linkedCharactersRemoveElements.ContainsKey(characterId))
+                    {
+                        var types = _linkedCharactersRemoveElements[characterId].Keys.ToList();
+                        foreach (var type in types)
+                        {
+                            if (_linkedCharactersRemoveElements[characterId].ContainsKey(type))
+                            {
+                                List<ITable> elements;
 
-        #endregion
+                                lock (_linkedCharactersRemoveElements[characterId])
+                                    elements = _linkedCharactersRemoveElements[characterId][type];
+
+                                try
+                                {
+                                    var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Remove, elements.ToArray());
+                                }
+                                catch (Exception e) { Logger.Error(e.Message); }
+
+                                lock (_linkedCharactersRemoveElements[characterId])
+                                    _linkedCharactersRemoveElements[characterId][type] = _linkedCharactersRemoveElements[characterId][type].Skip(elements.Count).ToList();
+                            }
+                        }
+                    }
+
+                    if (_linkedCharactersNewElements.ContainsKey(characterId))
+                    {
+                        var types = _linkedCharactersNewElements[characterId].Keys.ToList();
+                        foreach (var type in types)
+                        {
+                            List<ITable> elements;
+
+                            lock (_linkedCharactersNewElements[characterId])
+                                elements = _linkedCharactersNewElements[characterId][type];
+
+                            try
+                            {
+                                var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Add, elements.ToArray());
+                            }
+                            catch (Exception e) { Logger.Error(e.ToString()); }
+
+                            lock (_linkedCharactersNewElements[characterId])
+                                _linkedCharactersNewElements[characterId][type] = _linkedCharactersNewElements[characterId][type].Skip(elements.Count).ToList();
+
+                        }
+                    }
+
+                    if (_linkedCharactersUpdateElements.ContainsKey(characterId))
+                    {
+                        var types = _linkedCharactersUpdateElements[characterId].Keys.ToList();
+                        foreach (var type in types)
+                        {
+                            List<ITable> elements;
+                            lock (_linkedCharactersUpdateElements[characterId])
+                                elements = _linkedCharactersUpdateElements[characterId][type];
+                            try
+                            {
+                                var writer = Activator.CreateInstance(typeof(DatabaseWriter<>).MakeGenericType(type), DatabaseAction.Update, elements.ToArray());
+                            }
+                            catch (Exception e) { Logger.Error(e.ToString()); }
+
+                            lock (_linkedCharactersUpdateElements[characterId])
+                            {
+                                var attribute = (TableAttribute)type.GetCustomAttribute(typeof(TableAttribute));
+
+                                if (attribute != null && !attribute.letInUpdateField)
+                                    _linkedCharactersUpdateElements[characterId][type] = _linkedCharactersUpdateElements[characterId][type].Skip(elements.Count).ToList();
+                            }
+                        }
+                    }
+
+                    saved = true;
+                    Logger.Log(string.Format("Character '{0}' saved in {1}ms !", characterId, stopWatch.ElapsedMilliseconds));
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("[SAVING CHARACTER] " + e.Message);
+                }
+            }
+            return saved;
+        }
 
         private static FieldInfo GetCache(ITable table)
         {
