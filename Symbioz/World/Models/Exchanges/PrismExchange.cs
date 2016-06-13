@@ -80,7 +80,7 @@ namespace Symbioz.World.Models.Exchanges
                 {
                     var newPrismModule = obj.GetPrismModule(this.Prism.Id);
                     Client.Send(new StorageObjectUpdateMessage(newPrismModule.GetObjectItem()));
-                    SaveTask.AddElement(newPrismModule, this.Client.CharacterId);
+                    SaveTask.AddElement(newPrismModule, false);
                     Client.Character.Inventory.RemoveItem(obj.UID, obj.Quantity);
                 }
                 else
@@ -100,12 +100,12 @@ namespace Symbioz.World.Models.Exchanges
             if (obj.IsNull())
                 return;
 
-            SaveTask.RemoveElement(obj, this.Client.CharacterId);
+            SaveTask.RemoveElement(obj, false);
             var existing = Client.Character.Inventory.Items.ExistingItem(obj);
             if (existing != null)
             {
                 existing.Quantity += (uint)-quantity;
-                SaveTask.UpdateElement(existing, this.Client.CharacterId);
+                SaveTask.UpdateElement(existing, false);
                 Client.Character.Inventory.Refresh();
             }
             else

@@ -64,7 +64,7 @@ namespace Symbioz.World.Models.Alliances
         public static void CreateAlliance(GuildRecord creator, string tag, string name, GuildEmblem emblem)
         {
             AllianceRecord newAlliance = new AllianceRecord(AllianceRecord.PopNextId(), name, tag, emblem.symbolColor, emblem.symbolShape, emblem.backgroundColor, emblem.backgroundShape, creator.Id, DateTime.Now, string.Empty);
-            SaveTask.AddElement(newAlliance, creator.Id);
+            SaveTask.AddElement(newAlliance, false);
             JoinAlliance(creator, newAlliance, null);
         }
 
@@ -75,15 +75,15 @@ namespace Symbioz.World.Models.Alliances
             foreach(GuildAllianceRecord member in allianceMembers)
             {
                 LeaveAlliance(member.GuildId);
-                member.RemoveElement();
+                member.RemoveElement(false);
             }
-            currentAlliance.RemoveElement();
+            currentAlliance.RemoveElement(false);
         }
 
         public static void JoinAlliance(GuildRecord Guild, AllianceRecord Alliance, WorldClient Inviter = null)
         {
             GuildAllianceRecord guildAllianceMember = new GuildAllianceRecord(Guild.Id, Alliance.Id);
-            guildAllianceMember.AddElement();
+            guildAllianceMember.AddElement(false);
             if(Inviter != null)
                 Inviter.Send(new AllianceInvitationAnswerMessage(true));
             foreach(CharacterGuildRecord member in CharacterGuildRecord.CharactersGuilds.FindAll(x => x.GuildId == Guild.Id))
@@ -101,7 +101,7 @@ namespace Symbioz.World.Models.Alliances
                 Character record = WorldServer.Instance.GetOnlineClient(guildMember.CharacterId).Character;
                 AllianceRecord.OnCharacterLeftAlliance(record);
             }
-            AllianceMember.RemoveElement();
+            AllianceMember.RemoveElement(false);
         }
 
         public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int allianceId)

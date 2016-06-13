@@ -805,7 +805,6 @@ namespace Symbioz.World.Handlers
             else
                 client.Character.Reply("Le joueur n'est pas mute.");
         }
-
         [InGameCommand("save", ServerRoleEnum.PLAYER)]
         public static void SavePlayer(string value, WorldClient client)
         {
@@ -814,14 +813,6 @@ namespace Symbioz.World.Handlers
             else if (client.Character.CanSave())
             {
                 client.Character.LastCharacterSave = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                if (client.Character.Save())
-                {
-                    client.Character.Reply("Votre personnage a bien été sauvegardé.");
-                }
-                else
-                {
-                    client.Character.Reply("Impossible de sauvegarder votre personnage pour le moment. Merci de réessayer ultérieurement !", Color.Red);
-                }
             }
         }
 

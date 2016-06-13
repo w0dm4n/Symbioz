@@ -36,7 +36,7 @@ namespace Symbioz.World.Records
         {
             var spellRecord = CharactersSpells.FindAll(x => x.CharacterId == spell.characterId).Find(x => x.SpellId == spell.spellId);
             spellRecord.SpellLevel = spell.spellLevel;
-            spellRecord.UpdateElement(spellRecord.CharacterId);
+            spellRecord.UpdateElement(false);
         }
         public static List<SpellItem> GetCharacterSpells(int characterid)
         {
@@ -46,11 +46,11 @@ namespace Symbioz.World.Records
         {
             CharacterSpellRecord spell = CharactersSpells.Find(x => x.CharacterId == characterid && x.SpellId == spellid);
             spell.SpellLevel = spelllevel;
-            spell.UpdateElement(spell.CharacterId);
+            spell.UpdateElement(false);
         }
         public static void RemoveAll(int characterid)
         {
-            CharactersSpells.FindAll(x => x.CharacterId == characterid).ForEach(x => x.RemoveElement());
+            CharactersSpells.FindAll(x => x.CharacterId == characterid).ForEach(x => x.RemoveElement(false));
         }
     }
 }

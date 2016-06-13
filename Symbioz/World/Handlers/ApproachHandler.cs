@@ -124,7 +124,7 @@ namespace Symbioz.World.Handlers
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
             Logger.Log("Character " + newCharacter.Name + " created!");
-            SaveTask.AddElement(client.Character.Record, client.CharacterId);
+            SaveTask.AddElement(client.Character.Record, false);
             ProcessSelection(client);
         }
         [MessageHandler]
@@ -166,7 +166,6 @@ namespace Symbioz.World.Handlers
             deletedCharacter.RemoveElement();
             CharacterItemRecord.RemoveAll(message.characterId);
             GeneralShortcutRecord.RemoveAll(message.characterId);
-            SpellShortcutRecord.RemoveAll(message.characterId);
             CharacterSpellRecord.RemoveAll(message.characterId);
             CharacterJobRecord.RemoveAll(message.characterId);
             BidShopGainRecord.RemoveAll(message.characterId);

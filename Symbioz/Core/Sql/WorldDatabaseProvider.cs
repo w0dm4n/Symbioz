@@ -16,6 +16,7 @@ namespace Symbioz.Core
         public static void Connect()
         {
             DatabaseManager.Initialize(ConfigurationManager.Instance.DatabaseHost,
+                string.Empty,
                 ConfigurationManager.Instance.DatabaseName,
                 ConfigurationManager.Instance.DatabaseUser,
                 ConfigurationManager.Instance.DatabasePassword);

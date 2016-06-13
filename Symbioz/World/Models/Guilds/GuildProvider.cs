@@ -27,14 +27,14 @@ namespace Symbioz.World.Models.Guilds
         {
             GuildRecord guild = new GuildRecord(GuildRecord.PopNextId(), message.guildName, message.guildEmblem.symbolShape,
                    message.guildEmblem.symbolColor, message.guildEmblem.backgroundShape, message.guildEmblem.backgroundColor, 1, 0, 1, DateTime.Now, string.Empty);
-            SaveTask.AddElement(guild, owner.Id);
+            SaveTask.AddElement(guild, false);
             JoinGuild(guild, owner, GuildRightsBitEnum.GUILD_RIGHT_BOSS, (ushort)GuildRightsBitEnum.GUILD_RIGHT_BOSS);
         }
 
         public void JoinGuild(GuildRecord guild, Character character, GuildRightsBitEnum rights, ushort rank)
         {
             CharacterGuildRecord characterGuild = new CharacterGuildRecord(character.Id, guild.Id, rank, 0, 0, (uint)rights);
-            characterGuild.AddElement(character.Id);
+            characterGuild.AddElement(false);
             character.HumanOptions.Add(new HumanOptionGuild(guild.GetGuildInformations()));
             character.Client.Send(new GuildJoinedMessage(guild.GetGuildInformations(), (uint)rights, true));
             character.SetGuildLook();
@@ -52,7 +52,7 @@ namespace Symbioz.World.Models.Guilds
 
         public void LeaveGuild(Character character)
         {
-            CharacterGuildRecord.GetCharacterGuild(character.Id).RemoveElement(character.Id);
+            CharacterGuildRecord.GetCharacterGuild(character.Id).RemoveElement(false);
             character.HumanOptions.RemoveAll(x => x is HumanOptionGuild);
             character.Client.Send(new GuildLeftMessage());
             AllianceRecord.OnCharacterLeftAlliance(character);

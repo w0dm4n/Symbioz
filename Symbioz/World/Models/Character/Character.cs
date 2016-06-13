@@ -382,8 +382,8 @@ namespace Symbioz.World.Models
             {
                 var spellRecord = new CharacterSpellRecord(CharacterSpellRecord.CharactersSpells.PopNextId<CharacterSpellRecord>(x => x.Id), Id, spell.spellId, 1);
                 var shortcutRecord = new SpellShortcutRecord(SpellShortcutRecord.SpellsShortcuts.PopNextId<SpellShortcutRecord>(x => x.Id), Id, (ushort)spell.spellId, SpellShortcutRecord.GetFreeSlotId(Id));
-                SaveTask.AddElement(spellRecord, this.Id);
-                SaveTask.AddElement(shortcutRecord, this.Id);
+                SaveTask.AddElement(spellRecord, false);
+                SaveTask.AddElement(shortcutRecord, false);
             }
             if (sendpackets)
             {
@@ -829,15 +829,9 @@ namespace Symbioz.World.Models
                 DungeonPartyProvider.Instance.RemoveCharacter(this);
             Client.Character.Look.UnsetAura();
             Record.Look = Look.ConvertToString();
-            SaveTask.UpdateElement(Record, this.Id);
-            SaveTask.UpdateElement(CharacterStatsRecord, this.Id);
+            SaveTask.UpdateElement(Record, false);
+            SaveTask.UpdateElement(CharacterStatsRecord, false);
             Inventory.SaveItems();
-            this.Save();
-        }
-
-        public bool Save()
-        {
-            return SaveTask.SaveCharacter(this.Id);
         }
 
         public void RefreshGroupInformations()
@@ -1072,7 +1066,7 @@ namespace Symbioz.World.Models
         {
             foreach (var friend in this.Friends)
             {
-                SaveTask.AddElement(friend, this.Id);
+                SaveTask.AddElement(friend, false);
             }
         }
 
@@ -1111,7 +1105,7 @@ namespace Symbioz.World.Models
             {
                 if (friend.FriendAccountId == friendAccountId)
                 {
-                    SaveTask.RemoveElement(friend, this.Id);
+                    SaveTask.RemoveElement(friend, false);
                     this.Friends.Remove(friend);
                     break;
                 }
@@ -1158,7 +1152,7 @@ namespace Symbioz.World.Models
             }
             if (seconds < ConfigurationManager.Instance.TimeBetweenCharacterSave)
             {
-                this.Reply("Vous devez attendre encore " + (ConfigurationManager.Instance.TimeBetweenCharacterSave - seconds) + " seconde(s) pour pouvoir à nouveau sauvegarder votre personnage.");
+                this.Reply("Vous devez attendre encore " + (ConfigurationManager.Instance.TimeBetweenCharacterSave - seconds) + " secondes pour pouvoir à nouveau sauvegarder votre personnage.");
                 return false;
             }
             else
@@ -1215,7 +1209,7 @@ namespace Symbioz.World.Models
         {
             foreach (var Ignored in this.IgnoredList)
             {
-                SaveTask.AddElement(Ignored, this.Id);
+                SaveTask.AddElement(Ignored, false);
             }
         }
 
@@ -1225,7 +1219,7 @@ namespace Symbioz.World.Models
             {
                 if (ignored.IgnoredAccountId == ignoredAccountId)
                 {
-                    SaveTask.RemoveElement(ignored, this.Id);
+                    SaveTask.RemoveElement(ignored, false);
                     this.IgnoredList.Remove(ignored);
                     break;
                 }

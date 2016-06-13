@@ -327,7 +327,7 @@ namespace Symbioz.World.Records
             var stats = new CharacterStatsRecord(character.Id, breed.StartLifePoints, (short)(ConfigurationManager.Instance.StartLevel * 10), breed.StartLifePoints, breed.StartProspecting, 6, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0);
             character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
             character.Record.CurrentLifePoint = character.CurrentStats.LifePoints;
-            SaveTask.AddElement(stats, character.Id);
+            SaveTask.AddElement(stats, false);
         }
         public static void InitializeCharacter(Character character)
         {

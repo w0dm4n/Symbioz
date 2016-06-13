@@ -11,53 +11,44 @@ namespace Symbioz.ORM
 {
     public static class DatabaseManager
     {
-        private static MySqlConnection Provider;
-
         private static string Host;
+        private static string Port = null;
         private static string Database;
         private static string User;
         private static string Password;
 
-        private static bool IsInitialized = false;
-
-        public static void Initialize(string host, string database, string user, string password)
+        public static void Initialize(string host, string port, string database, string user, string password)
         {
             Host = host;
+            if (!string.IsNullOrEmpty(port))
+            {
+                Port = port;
+            }
             Database = database;
             User = user;
             Password = password;
-
-            IsInitialized = true;
         }
 
-        public static MySqlConnection GetProvider()
+        public static MySqlConnection GetNewProvider(bool openProvider = false)
         {
-            if(Provider == null)
+            MySqlConnection newProvider = null;
+            if(Port != null)
             {
-                Provider = new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
-                    Password, Database));
-            }
-            if(!Provider.Ping())
-            {
-                Provider.Close();
-                Provider.Open();
-            }
-            return Provider;
-        }
-
-        public static MySqlConnection GetNewProvider()
-        {
-            if (IsInitialized)
-            {
-                return new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
-                    Password, Database));
+                newProvider = new MySqlConnection(string.Format("Server={0};Port={1};UserId={2};Password={3};Database={4}", Host,
+                    Port, User, Password, Database));
             }
             else
             {
-                throw new Exception("Database not initialized !");
+                newProvider = new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
+                    Password, Database));
             }
+            if(openProvider)
+            {
+                newProvider.Open();
+            }
+            return newProvider;
         }
-
+        
         public static void LoadTables(Type[] tables)
         {
             var orderedTables = new Type[tables.Length];
@@ -105,7 +96,7 @@ namespace Symbioz.ORM
                 var tableName = (string)reader.GetType().GetProperty("TableName").GetValue(reader);
                 Logger.Log("[SQL] Chargement de " + tableName + " ...");
                 var method = reader.GetType().GetMethods().FirstOrDefault(x => x.Name == "Read" && x.GetParameters().Length == 1);
-                method.Invoke(reader, new object[] { DatabaseManager.GetProvider() });
+                method.Invoke(reader, new object[] { GetNewProvider(true) });
 
                 var elements = reader.GetType().GetProperty("Elements").GetValue(reader);
 
