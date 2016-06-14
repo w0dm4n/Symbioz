@@ -1,4 +1,6 @@
 ﻿using Symbioz.Enums;
+using Symbioz.World.Records;
+using Symbioz.World.Records.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,6 +119,259 @@ namespace Symbioz.World.PathProvider
             }
 
             return Cells;
+        }
+
+        public static short[] getCiblesByZoneByWeapon(MapRecord CurrentMap, WeaponRecord template, int cell, int castCellID)
+        {
+            short[] allCell = new short[4];
+
+            bool gauche = false;
+            //0 a 14  -> gauche
+            //15 a 27  -> droite
+            //28 a 41 -> gauche
+            for (int i = 546; i > -1; i -= 14)
+            {
+                if (i <= castCellID)
+                    break;
+                if (gauche)
+                    gauche = false;
+                else
+                    gauche = true;
+            }
+
+            char c = getDirBetweenTwoCase(castCellID, cell, 15, gauche);
+
+            if (c == 0)
+            {
+                c = getDirBetweenTwoCase(castCellID, cell, 14, gauche);
+            }
+            if (c == 0)
+            {
+                //On cible quand meme le fighter sur la case
+                allCell[0] = (short)cell;
+                return allCell;
+            }
+            switch (template.TypeId)
+            {
+                //Cases devant celle ou l'on vise
+                case 7://marteau
+                    allCell[0] = (short)cell;//de base premier cell
+                    switch (c)
+                    {
+                        case 'f'://hautgauche
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell - 14);
+                                allCell[2] = (short)(cell - 13);
+                                allCell[3] = (short)(castCellID - 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell - 15);
+                                allCell[2] = (short)(cell - 14);
+                                allCell[3] = (short)(castCellID - 1);
+                            }
+                            break;
+                        case 'd'://basgauche
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell + 14);
+                                allCell[2] = (short)(cell + 15);
+                                allCell[3] = (short)(castCellID - 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell + 13);
+                                allCell[2] = (short)(cell + 14);
+                                allCell[3] = (short)(castCellID - 1);
+                            }
+                            break;
+                        case 'h'://hautdroite
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell - 14);
+                                allCell[2] = (short)(cell - 13);
+                                allCell[3] = (short)(castCellID + 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell - 15);
+                                allCell[2] = (short)(cell - 14);
+                                allCell[3] = (short)(castCellID + 1);
+                            }
+                            break;
+                        case 'b'://basdroite
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell + 14);
+                                allCell[2] = (short)(cell + 15);
+                                allCell[3] = (short)(castCellID + 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell + 14);
+                                allCell[2] = (short)(cell + 13);
+                                allCell[3] = (short)(castCellID + 1);
+                            }
+                            break;
+                    }
+                    break;
+                case 4://baton
+                    allCell[0] = (short)cell;//de base premier cell
+                    switch (c)
+                    {
+                        case 'f'://hautgauche
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell - 13);
+                                allCell[2] = (short)(castCellID - 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell - 14);
+                                allCell[2] = (short)(castCellID - 1);
+                            }
+                            break;
+                        case 'd'://basgauche
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell + 15);
+                                allCell[2] = (short)(castCellID - 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell + 14);
+                                allCell[2] = (short)(castCellID - 1);
+                            }
+                            break;
+                        case 'h'://hautdroite
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell - 14);
+                                allCell[2] = (short)(castCellID + 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell - 15);
+                                allCell[2] = (short)(castCellID + 1);
+                            }
+                            break;
+                        case 'b'://basdroite
+                            if (gauche)
+                            {
+                                allCell[1] = (short)(cell + 14);
+                                allCell[2] = (short)(castCellID + 1);
+                            }
+                            else
+                            {
+                                allCell[1] = (short)(cell + 13);
+                                allCell[2] = (short)(castCellID + 1);
+                            }
+                            break;
+                    }
+                    break;
+                case 8://pelle
+                    allCell[0] = (short)cell;//de base premier cell
+                    switch (c)
+                    {
+                        case 'f'://hautgauche
+                            if (gauche)
+                                allCell[1] = (short)(cell - 14);
+                            else
+                                allCell[1] = (short)(cell - 15);
+                            break;
+                        case 'd'://basgauche
+                            if (gauche)
+                                allCell[1] = (short)(cell + 14);
+                            else
+                                allCell[1] = (short)(cell + 13);
+                            break;
+                        case 'h'://hautdroite
+                            if (gauche)
+                                allCell[1] = (short)(cell - 13);
+                            else
+                                allCell[1] = (short)(cell - 14);
+                            break;
+                        case 'b'://basdroite
+                            if (gauche)
+                                allCell[1] = (short)(cell + 15);
+                            else
+                                allCell[1] = (short)(cell + 14);
+                            break;
+                    }
+                    break;
+                case 21://pioche
+                case 6://epee
+                case 22://faux
+                case 5://dagues
+                case 3://baguette
+                case 2://arc
+                case 19://hache
+                case 20://outils
+                    allCell[0] = (short)cell;
+                    break;
+            }
+            return allCell;
+        }
+
+        public static char getDirBetweenTwoCase(int cell1ID, int cell2ID, int line, bool gauche)
+        {
+            List<char> dirs = new List<char>();
+            dirs.Add('b');
+            dirs.Add('d');
+            dirs.Add('f');
+            dirs.Add('h');
+
+            foreach (char c in dirs)
+            {
+                int cell = cell1ID;
+                for (int i = 0; i <= 64; i++)
+                {
+                    if (GetCaseIDFromDirrection(cell, c, line) == cell2ID)
+                    {
+                        switch (c)
+                        {
+                            case 'h':
+                                switch (line)
+                                {
+                                    case 15:
+                                        if (!gauche)
+                                            return ('f');
+                                        break;
+                                }
+                                break;
+                            case 'd':
+                                switch (line)
+                                {
+                                    case 15:
+                                        if (gauche)
+                                            return ('b');
+                                        break;
+                                }
+                                break;
+                        }
+                        return c;
+                    }
+                    cell = GetCaseIDFromDirrection(cell, c, line);
+                }
+            }
+            return '\0';
+        }
+
+        public static int GetCaseIDFromDirrection(int CaseID, char Direction, int line)
+        {
+            switch (Direction)
+            {
+                case 'b':
+                    return CaseID + line;
+                case 'd':
+                    return CaseID + (line - 1);
+                case 'f':
+                    return CaseID - line;
+                case 'h':
+                    return CaseID - line + 1;
+            }
+            return -1;
         }
 
         public static Dictionary<short, DirectionsEnum> FightMove(Dictionary<short, DirectionsEnum> cells)
@@ -415,4 +670,5 @@ namespace Symbioz.World.PathProvider
             this.z = z;
         }
     }
+    
 }

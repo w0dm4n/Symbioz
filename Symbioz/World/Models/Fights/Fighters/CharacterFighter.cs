@@ -385,7 +385,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             foreach (var effect in handledEffects)
             {
                 Fight.TryStartSequence(ContextualId, 1);
-                short[] cells = template.GetDamagedCell(cellid, template, CurrentMap, CasterCellId);
+                short[] cells = Pathfinding.getCiblesByZoneByWeapon(CurrentMap, template, cellid, CasterCellId);
                 var actors = GetAffectedActors(cells, effect.Targets);
                 SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
                 Fight.TryEndSequence(1, 0);

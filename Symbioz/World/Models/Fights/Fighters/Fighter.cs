@@ -178,6 +178,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             RefreshStats();
             Fight.Synchronizer.Start(Fight.NewTurn);
         }
+
         public void Teleport(short cellid,bool save = true)
         {
             if (Fight.Ended)
@@ -189,6 +190,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             RefreshStats();
             this.Fight.TryEndSequence(5, 5);
         }
+
         public List<short> CheckMarks(List<short> path)
         {
             List<short> finalPath = new List<short>();
@@ -207,6 +209,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return finalPath;
         }
+
         public void Slide(int sourceid, List<short> cells)
         {
             ApplyFighterEvent(FighterEventType.BEFORE_MOVE, cells);
@@ -218,6 +221,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(5, 0);
             ApplyFighterEvent(FighterEventType.AFTER_MOVE, 0, cells); // 0 => mp cost
         }
+
         public virtual void Move(List<short> keys, short cellid, sbyte direction)
         {
             if (Fight.Ended)
@@ -240,12 +244,14 @@ namespace Symbioz.World.Models.Fights.Fighters
             ApplyFighterEvent(FighterEventType.AFTER_MOVE, mpcost, path);
 
         }
+
         public void GameActionFightPointsVariation(ActionsEnum action, short delta)
         {
             this.Fight.TryStartSequence(ContextualId, 1);
             this.Fight.Send(new GameActionFightPointsVariationMessage((ushort)action, ContextualId, ContextualId, delta));
             this.Fight.TryEndSequence(1, 100);
         }
+
         public FightTeam GetOposedTeam()
         {
             if (Team == Fight.BlueTeam)
@@ -253,6 +259,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             else
                 return Fight.BlueTeam;
         }
+
         public virtual void Die()
         {
             ApplyFighterEvent(FighterEventType.BEFORE_DIED, null);
@@ -266,6 +273,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             Dead = true;
             ApplyFighterEvent(FighterEventType.AFTER_DIED, null);
         }
+
         /// <summary>
         /// Début de l'animation
         /// </summary>
@@ -273,11 +281,13 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             Fight.RemoveAllBuffs<Buff>(x => x.SourceId == this.ContextualId);
         }
+
         public double CalculateCriticRate(double baseRate)
         {
             double num = System.Math.Floor((baseRate - (double)this.FighterStats.Stats.CriticalHit * 2.99011001130495 / System.Math.Log((double)(this.FighterStats.Stats.Agility + 12), 2.7182818284590451)));
             return (num > 2.0) ? num : 2.0;
         }
+
         public FightSpellCastCriticalEnum RollCriticalDice(SpellLevelRecord spell)
         {
             AsyncRandom asyncRandom = new AsyncRandom();
