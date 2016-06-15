@@ -37,6 +37,7 @@ using Symbioz.Network.Servers;
 using Symbioz.Auth.Records;
 using Symbioz.World.Records.Ignored;
 using Symbioz.World.Records.Items;
+using Symbioz.World.Records.Tracks;
 
 namespace Symbioz.World.Models
 {
@@ -53,6 +54,8 @@ namespace Symbioz.World.Models
         public int LastCharacterSave = 0;
         public DateTime RegenStartTime;
         public bool IsRegeneratingLife;
+        public bool CurrentlyInTrackRequest = false;
+        public bool isTracking = false;
         public short RegenRate;
         public MapRecord Map { get; set; }
         public short MovedCell { get; set; }
@@ -1301,6 +1304,26 @@ namespace Symbioz.World.Models
             this.DeleteKeyIfExist(KeyTemplateId);
             this.Keyring.Add(new KeyringRecord(KeyTemplateId, DateTimeUtils.GetEpochFromDateTime(DateTime.Now)));
             Client.Character.Reply("Vous avez utilisé votre trousseaux de clefs pour rentrer dans ce donjon car vous ne possédiez pas la clef.");
+        }
+        
+        public void SendStartDelayedMessageToMap(int targetCharacterId, DelayedActionTypeEnum type, double delayEndTime, int ItemId)
+        {
+            var onMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
+            foreach (var client in onMap)
+            {
+                if (client.Character.IsFighting == false && client.Character.Busy == false)
+                    client.Send(new GameRolePlayDelayedObjectUseMessage(targetCharacterId, (sbyte)type, delayEndTime, (ushort)ItemId));
+            }
+        }
+
+        public void SendEndDelayedMessageToMap(int characterId, DelayedActionTypeEnum type)
+        {
+            var onMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
+            foreach (var client in onMap)
+            {
+                if (client.Character.IsFighting == false && client.Character.Busy == false)
+                    client.Send(new GameRolePlayDelayedActionFinishedMessage(characterId, (sbyte)type));
+            }
         }
     }
 }

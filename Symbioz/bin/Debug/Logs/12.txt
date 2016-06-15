@@ -1,4 +1,10 @@
-Client: 127.0.0.1:60853
-At: 11/06/2016 00:06:01
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Handlers.MapsHandler.HandleMapMovement(GameMapMovementRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\MapsHandler.cs:ligne 63
+Client: 127.0.0.1:50999
+At: 12/06/2016 18:08:48
+System.ArgumentException: L'offset et la longueur étaient hors limites pour ce tableau ou bien le nombre est supérieur au nombre d'éléments de l'index à la fin de la collection source.
+   à System.ThrowHelper.ThrowArgumentException(ExceptionResource resource)
+   à System.Collections.Generic.List`1.GetRange(Int32 index, Int32 count)
+   à Symbioz.World.Models.Character.GetCharacterBaseIndexedColors() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 406
+   à Symbioz.World.Models.Character.SetGuildLook() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 382
+   à Symbioz.World.Models.Character.OnConnectedGuildInformations() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 364
+   à Symbioz.World.Handlers.ApproachHandler.ProcessSelection(WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ApproachHandler.cs:ligne 210
+   à Symbioz.World.Handlers.ApproachHandler.HandleCharacterSelection(CharacterSelectionMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ApproachHandler.cs:ligne 88

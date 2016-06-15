@@ -34,7 +34,16 @@ namespace Symbioz.World.Handlers
             WorldClient target = WorldServer.Instance.GetOnlineClient((fight.InitiatorId));
             if (message.accept)
             {
-
+                if (client.Character.CurrentlyInTrackRequest)
+                {
+                    client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    client.Character.CurrentlyInTrackRequest = false;
+                }
+                if (target.Character.CurrentlyInTrackRequest)
+                {
+                    target.Character.SendEndDelayedMessageToMap(target.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    target.Character.CurrentlyInTrackRequest = false;
+                }
                 sMessage.accept = true;
                 target.Send(sMessage);
                 fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
@@ -65,6 +74,16 @@ namespace Symbioz.World.Handlers
             if (client.Character.isIgnoring(target.Character.Record.AccountId))
             {
                 client.Character.Reply("Impossible car ce joueur vous ignore.");
+                return;
+            }
+            if (client.Character.Restrictions.isDead == true)
+            {
+                client.Character.Reply("Impossible car vous êtes mort.");
+                return;
+            }
+            if (target.Character.Restrictions.isDead == true)
+            {
+                client.Character.Reply("Impossible car ce joueur est mort.");
                 return;
             }
             if (message.friendly)
@@ -137,6 +156,11 @@ namespace Symbioz.World.Handlers
             {
                 client.Character.Reply("Impossible de rejoindre un combat en étant mort !");
                 return;
+            }
+            if (client.Character.CurrentlyInTrackRequest)
+            {
+                client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                client.Character.CurrentlyInTrackRequest = false;
             }
             var fight = FightProvider.Instance.GetFight(message.fightId);
             if (!fight.ContainCharacterFighter(client.Character.Id))

@@ -2,6 +2,7 @@
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Network.Clients;
+using Symbioz.World.Records.Tracks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,15 +145,35 @@ namespace Symbioz.World.Models.Exchanges
                 foreach (var item in ExchangedItems)
                 {
                     item.CharacterId = SecondTrader.Character.Id;
-                    SecondTrader.Character.Inventory.Add(item.CloneAndGetNewUID());
-                    Client.Character.Inventory.RemoveItem(item.UID, item.Quantity);
+                    if (item.GID == 7400)
+                    {
+                        var newItem = item.CloneAndGetNewUID();
+                        TracksRecord.AddTracked(TracksRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
+                        Client.Character.Inventory.Add(newItem);
+                    }
+                    else
+                        SecondTrader.Character.Inventory.Add(item.CloneAndGetNewUID());
+                    if (item.GID != 7400)
+                        SecondTrader.Character.Inventory.RemoveItem(item.UID, item.Quantity);
+                    else
+                        SecondTrader.Character.Inventory.RemoveItemNoTrack(item.UID, item.Quantity);
                 }
 
                 foreach (var item in SecondTrader.Character.PlayerTradeInstance.ExchangedItems)
                 {
                     item.CharacterId = Client.Character.Id;
-                    Client.Character.Inventory.Add(item.CloneAndGetNewUID());
-                    SecondTrader.Character.Inventory.RemoveItem(item.UID, item.Quantity);
+                    if (item.GID == 7400)
+                    {
+                        var newItem = item.CloneAndGetNewUID();
+                        TracksRecord.AddTracked(TracksRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
+                        Client.Character.Inventory.Add(newItem);
+                    }
+                    else
+                        Client.Character.Inventory.Add(item.CloneAndGetNewUID());
+                    if (item.GID != 7400)
+                        SecondTrader.Character.Inventory.RemoveItem(item.UID, item.Quantity);
+                    else
+                        SecondTrader.Character.Inventory.RemoveItemNoTrack(item.UID, item.Quantity);
                 }
 
                 SecondTrader.Character.AddKamas(ExchangedKamas);

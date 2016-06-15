@@ -145,7 +145,8 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void PartyFollowMemberRequest(PartyFollowMemberRequestMessage message, WorldClient client)
         {
-            client.Character.Reply("Cette fonctionnalité n'est pas encore implémentée");
+            var TargetPosition = MapRecord.GetMap(client.Character.Record.MapId);
+            //client.Character.Reply("Cette fonctionnalité n'est pas encore implémentée");
         }
         [MessageHandler]
         public static void PartyFollowThisMemberRequest(PartyFollowThisMemberRequestMessage message, WorldClient client)

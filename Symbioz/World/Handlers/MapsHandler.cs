@@ -62,6 +62,11 @@ namespace Symbioz.World.Handlers
             {
                 if (client.Character.Busy || client.Character.Restrictions.cantMove == true)
                     return;
+                if (client.Character.CurrentlyInTrackRequest)
+                {
+                    client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    client.Character.CurrentlyInTrackRequest = false;
+                }
 
                 if (client.Character.Map.Id == message.mapId)
                 {
@@ -289,6 +294,8 @@ namespace Symbioz.World.Handlers
                 switch (template.Id)
                 {
                     case 1: //Émote s'asseoir
+                        if (client.Character.Restrictions.isDead)
+                            return;
                         if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 10)
                             client.Character.StopRegenLife();
                         if (client.Character.IsRegeneratingLife && client.Character.RegenRate == 3)

@@ -378,6 +378,7 @@
     <Compile Include="World\Records\Spells\SpellRecord.cs" />
     <Compile Include="World\Records\SubAreas\SubAreaRecord.cs" />
     <Compile Include="World\Records\Succes\Succes.cs" />
+    <Compile Include="World\Records\Tracks\TracksRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

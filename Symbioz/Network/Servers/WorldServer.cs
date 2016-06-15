@@ -117,6 +117,18 @@ namespace Symbioz.Network.Servers
         {
             return GetAllClientsOnline().Find(x => x.Account.Id == accountId);
         }
+        public List<WorldClient> GetOnlineClientOnMap(int mapId)
+        {
+           var onlineClients =  WorldClients.FindAll(x => x.Character != null);
+            List <WorldClient> onTheMap = new List<WorldClient>();
+            foreach (var client in onlineClients)
+            {
+                if (client.Character.Record.MapId == mapId)
+                    onTheMap.Add(client);
+            }
+            return onTheMap;
+        }
+
         public Party GetPartyById(int partyId)
         {
             return this.Parties.Find(x => x.Id == partyId);

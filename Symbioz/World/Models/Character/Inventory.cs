@@ -16,6 +16,7 @@ using Symbioz.Providers.Conditions;
 using Symbioz.World.Records.Items;
 using Symbioz.World.Models.Items;
 using Symbioz.World.Records.Alliances.Prisms.Modules;
+using Symbioz.World.Records.Tracks;
 
 namespace Symbioz.World.Models
 {
@@ -111,11 +112,6 @@ namespace Symbioz.World.Models
             Add(newItem, refresh);
             if (notif)
                 Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + "!");
-
-            foreach (var i in CharacterItemRecord.CharactersItems)
-            {
-                Console.WriteLine("Item : " + i.UID);
-            }
             return newItem;
         }
 
@@ -520,6 +516,33 @@ namespace Symbioz.World.Models
                 return;
             }
 
+           if (item.GID == 7400) // Parchemin lié
+                TracksRecord.DeleteTrackedByItemUID((int)item.UID);
+            if (quantity == item.Quantity)
+            {
+                Items.Remove(item);
+                SaveTask.RemoveElement(item, this.Character.Id);
+                CharacterItemRecord.CharactersItems.Remove(item);
+                Character.Client.Send(new ObjectDeletedMessage(item.UID));
+            }
+            else if (quantity < item.Quantity)
+            {
+                item.Quantity -= (uint)quantity;
+                SaveTask.UpdateElement(item, this.Character.Id);
+            }
+            if (refresh)
+                Refresh();
+            Character.RefreshShortcuts();
+        }
+
+        public void RemoveItemNoTrack(uint id, uint quantity, bool refresh = true)
+        {
+            var item = GetItem(id);
+            if (item == null)
+            {
+                Character.NotificationError("Impossible de retirer l'item, il n'existe pas...");
+                return;
+            }
             if (quantity == item.Quantity)
             {
                 Items.Remove(item);

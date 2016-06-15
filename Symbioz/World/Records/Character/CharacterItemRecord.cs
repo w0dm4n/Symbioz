@@ -180,7 +180,11 @@ namespace Symbioz.World.Models
                     var eff = (ObjectEffectDice)effect;
                     str += ObjectEffectDice.Id + "#" + eff.actionId + "#" + +eff.diceNum + "#" + eff.diceSide + "#" + eff.diceConst + "|";
                 }
-
+                if (effect is ObjectEffectString)
+                {
+                    var eff = (ObjectEffectString)effect;
+                    str += ObjectEffectString.Id + "#" + eff.actionId + "#" + eff.value + "|";
+                }
             }
             return str;
         }
@@ -202,6 +206,10 @@ namespace Symbioz.World.Models
                 if (typeId == ObjectEffectDice.Id)
                 {
                     results.Add(new ObjectEffectDice(ushort.Parse(splited[1]), ushort.Parse(splited[2]), ushort.Parse(splited[3]), ushort.Parse(splited[4])));
+                }
+                if (typeId == ObjectEffectString.Id)
+                {
+                    results.Add(new ObjectEffectString(ushort.Parse(splited[1]), splited[2].ToString()));
                 }
             }
             return results;

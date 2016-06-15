@@ -1,12 +1,16 @@
 ﻿using Symbioz.Core.Startup;
 using Symbioz.DofusProtocol.Messages;
+using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Network.Clients;
+using Symbioz.Network.Servers;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Alliances.Prisms;
+using Symbioz.World.Records;
 using Symbioz.World.Records.Alliances.Prisms;
 using Symbioz.World.Records.Guilds;
 using Symbioz.World.Records.SubAreas;
+using Symbioz.World.Records.Tracks;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -25,7 +29,9 @@ namespace Symbioz.Providers
         {
             CustomHandlers.Add(14485, HandleMimicry);
             CustomHandlers.Add(14293, HandleAlliancePrism);
+            CustomHandlers.Add(7400, HandleLinkedParchment);
         }
+
         public static bool CustomHandlerExist(ushort itemgid)
         {
             if (CustomHandlers.ContainsKey(itemgid))
@@ -36,8 +42,8 @@ namespace Symbioz.Providers
 
         public static void Handle(WorldClient client, CharacterItemRecord item)
         {
-            var handler = CustomHandlers.FirstOrDefault(x=>x.Key == item.GID);
-            handler.Value(client,item);
+            var handler = CustomHandlers.FirstOrDefault(x => x.Key == item.GID);
+            handler.Value(client, item);
         }
 
         #region Mimicry
@@ -96,5 +102,26 @@ namespace Symbioz.Providers
 
         #endregion
 
+        #region LinkedParchment
+
+        public static void HandleLinkedParchment(WorldClient client, CharacterItemRecord item)
+        {
+            var target = WorldServer.Instance.GetOnlineClient(TracksRecord.GetCharacterIdTrackedFromItemUID((int)item.UID));
+            if (target != null)
+            {
+                var TargetPosition = MapRecord.GetMap(target.Character.Record.MapId);
+                client.Character.Reply("<b>" + target.Character.Record.Name + "</b> se trouve actuellement en : (<b>" + TargetPosition.WorldX + "," + TargetPosition.WorldY + "</b>)");
+                var Coordinates = new MapCoordinates((short)TargetPosition.WorldX, (short)TargetPosition.WorldY);
+                client.Send(new CompassUpdatePvpSeekMessage(0, Coordinates, (uint)target.Character.Id, target.Character.Record.Name));
+            }
+            else
+            {
+                client.Character.Reply("Impossible de traquer ce joueur car il n'est pas connecté !");
+            }
+
+        }
+
+        #endregion
     }
 }
+
