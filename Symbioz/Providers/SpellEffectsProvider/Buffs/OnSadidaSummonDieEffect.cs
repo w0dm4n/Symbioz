@@ -43,7 +43,8 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
         {
             var summoned = Fighter as MonsterFighter;
             Fighter master = Fighter.Fight.GetFighter(summoned.FighterStats.SummonerId);
-            master.Fight.AddSummon(master, 282, 1, Fighter.CellId, Fighter.Team);
+            MonsterFighter tree = master.Fight.AddSummon(master, 282, 1, Fighter.CellId, Fighter.Team);
+            tree.tree.wait = true;
         }
     }
 }

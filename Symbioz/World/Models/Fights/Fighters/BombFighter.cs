@@ -112,19 +112,18 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
         public void Increment()
         {
-            //if (RealFighterLook.scales.Count == 0)
-            //    RealFighterLook.scales.Add(100);
-            //if (RealFighterLook.scales[0] >= 200)
-            //    return;
-            //RealFighterLook.SetScale((short)(RealFighterLook.scales[0]+30));
-            //FighterLook = RealFighterLook;
-            //this.Fight.TryStartSequence(this.ContextualId, 1);
-            //this.Fight.Send(new GameActionFightChangeLookMessage(0, this.ContextualId, this.ContextualId, FighterLook.ToEntityLook()));
-            //this.Fight.TryEndSequence(1, 0);
+            if (RealFighterLook.scales.Count == 0)
+                RealFighterLook.scales.Add(100);
+            if (RealFighterLook.scales[0] >= 200)
+                return;
+            RealFighterLook.SetScale((short)(RealFighterLook.scales[0]+30));
+            FighterLook = RealFighterLook;
+            this.Fight.TryStartSequence(this.ContextualId, 1);
+            this.Fight.Send(new GameActionFightChangeLookMessage(0, this.ContextualId, this.ContextualId, FighterLook.ToEntityLook()));
+            this.Fight.TryEndSequence(1, 0);
         }
         public void Detonate()
         {
-            
             MarksHelper.Instance.CastDetonation(Master,this, BombWallRecord.DetonationSpellId, BombWallRecord.BombMonsterId,5);
             Die();
            

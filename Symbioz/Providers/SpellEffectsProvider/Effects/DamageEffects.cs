@@ -27,6 +27,11 @@ namespace Symbioz.Providers.SpellEffectsProvider
                 fighter.Heal(healJet, fighter.ContextualId);
 
         }
+
+        public static MonsterFighter ConvertMonster(MonsterFighter f)
+        {
+            return (f);
+        }
         [EffectHandler(EffectsEnum.Eff_StealHPFix)]
         public static void StealHPFix(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castercellid)
         {
@@ -101,6 +106,20 @@ namespace Symbioz.Providers.SpellEffectsProvider
         [EffectHandler(EffectsEnum.Eff_DamageWater)]
         public static void DamageWater(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
+            if (level.SpellId == 195)//larme sadida
+            {
+                bool arbre = false;
+                foreach (var target in affecteds)
+                {
+                    if (target is MonsterFighter && target.FighterStats.Summoned && fighter.GetAliveFighterSummons().Contains(target))
+                    {
+                        arbre = (target as MonsterFighter).tree != null;
+                        (target as MonsterFighter).tree.floor();
+                    }
+                }
+                if (arbre)
+                    return;
+            }
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Chance);
             affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Water), fighter.ContextualId));
 

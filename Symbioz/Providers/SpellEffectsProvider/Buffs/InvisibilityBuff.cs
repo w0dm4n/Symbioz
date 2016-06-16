@@ -1,6 +1,7 @@
 ﻿using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
+using Symbioz.World.Models.Fights;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +22,13 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
             Fighter.Fight.Send(new GameActionFightDispellableEffectMessage((ushort)EffectsEnum.Eff_Invisibility,
                 SourceId, new FightTemporaryBoostEffect((uint)Fighter.BuffIdProvider.Pop(),
                     Fighter.ContextualId, Duration, 1, (ushort)SourceSpellId, (uint)EffectsEnum.Eff_Invisibility, 0, Delta)));
-         
-            Fighter.FighterStats.InvisiblityState = GameActionFightInvisibilityStateEnum.INVISIBLE;
-
-               //Fighter.Team.Send(new  GameActionFightInvisibilityMessage((ushort)ActionsEnum.ACTION_CHARACTER_MAKE_INVISIBLE,
-               // SourceId,Fighter.ContextualId,(sbyte)Fighter.FighterStats.InvisiblityState));
-           
+            Fighter.FighterStats.InvisiblityState = GameActionFightInvisibilityStateEnum.VISIBLE;
+            Fighter.setvisible(false, SourceId);
         }
 
         public override void RemoveBuff()
         {
-            Fighter.FighterStats.InvisiblityState = GameActionFightInvisibilityStateEnum.VISIBLE;
+            Fighter.setvisible(true, SourceId);
         }
     }
 }

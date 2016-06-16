@@ -81,7 +81,11 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         [EffectHandler(EffectsEnum.Eff_RevealsInvisible)]
         public static void RevealsInvisible(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
-
+            foreach (var target in affecteds)
+            {
+                if (target.visible == false)
+                    target.setvisible(true, fighter.ContextualId);
+            }
         }
         [EffectHandler(EffectsEnum.Eff_Invisibility)]
         public static void Invisibility(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)

@@ -36,7 +36,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         public static void SpawnTrap(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
             Trap trap = new Trap(fighter, castcellid, effect.ZoneShape, effect.ZoneSize, effect.BaseEffect.DiceNum, level.Grade, effect.BaseEffect.Value);
-            fighter.Fight.AddMarkTrigger(fighter, trap,fighter.Team);
+            fighter.Fight.AddMarkTrigger(fighter, trap, fighter.Team);
         }
         [EffectHandler(EffectsEnum.Eff_Portal)]
         public static void SpawnPortal(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)

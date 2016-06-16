@@ -423,9 +423,9 @@ namespace Symbioz.World.Models.Fights
         {
             var message = new GameActionFightMarkCellsMessage(0, fighter.ContextualId, mark.GetMark());
             if (team == null)
-                Send(message);
+               Send(message);
             else
-                team.Send(message);
+               team.Send(message);
             mark.Intitialize(this, mark.GetType());
             Marks.Add(mark);
         }

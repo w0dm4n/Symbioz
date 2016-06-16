@@ -4,6 +4,7 @@ using Symbioz.Helper;
 using Symbioz.Providers.SpellEffectsProvider.Buffs;
 using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Records;
+using Symbioz.World.Records.Monsters;
 using Symbioz.World.Records.Spells;
 using System;
 using System.Collections.Generic;
@@ -137,15 +138,28 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         [EffectHandler(EffectsEnum.Eff_ChangeAppearance)]
         public static void ChangeAppearence(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
-            ExtendedChangeAppearence(fighter, level, record, affecteds, castcellid);
+            foreach (var target in affecteds)
+            {
+                LookBuff buff = new LookBuff((uint)target.BuffIdProvider.Pop(), (short)record.BaseEffect.Value, record.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, record.BaseEffect.Delay);
+                target.AddBuff(buff);
+               // DofusProtocol.Types.EntityLook newlook = null;
+                World.Models.ContextActorLook lo = World.Models.ContextActorLook.Parse("{" + record.BaseEffect.Value + "}");
+                //newlook = new DofusProtocol.Types.EntityLook(lo.bonesId, lo.skins, lo.indexedColors, lo.scales, lo.subentities);
+                fighter.Fight.Send(new GameActionFightChangeLookMessage(149, fighter.ContextualId, target.ContextualId, lo.ToEntityLook()));
+            }
         }
+
         [EffectHandler(EffectsEnum.Eff_ChangeAppearance_335)]
         public static void ExtendedChangeAppearence(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
             foreach (var target in affecteds)
             {
-                LookBuff buff = new LookBuff((uint)target.BuffIdProvider.Pop(), 0, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.Delay);
+                LookBuff buff = new LookBuff((uint)target.BuffIdProvider.Pop(), (short)effect.BaseEffect.Value, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.Delay);
                 target.AddBuff(buff);
+               // DofusProtocol.Types.EntityLook newlook = null;
+                World.Models.ContextActorLook lo = World.Models.ContextActorLook.Parse("{" + effect.BaseEffect.Value + "}");
+                //newlook = new DofusProtocol.Types.EntityLook(lo.bonesId, lo.skins, lo.indexedColors, lo.scales, lo.subentities);
+                fighter.Fight.Send(new GameActionFightChangeLookMessage(335, fighter.ContextualId, target.ContextualId, lo.ToEntityLook()));
             }
         }
         [EffectHandler(EffectsEnum.Eff_Punishment)]

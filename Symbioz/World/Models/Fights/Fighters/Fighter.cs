@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Symbioz.Network.Servers;
+using Symbioz.World.Models.Fights.CastSpellCheck;
 
 namespace Symbioz.World.Models.Fights.Fighters
 {
@@ -70,6 +71,8 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public short LastTurnPosition = 0;
 
+        public bool visible = true;
+
         public Fighter(FightTeam team)
         {
             this.Team = team;
@@ -109,6 +112,37 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             RefreshStats();
             Fight.Send(new GameFightRefreshFighterMessage(FighterInformations));
+        }
+
+        public void setvisible(bool v, int SourceId)
+        {
+            if (v == true && FighterStats.InvisiblityState == GameActionFightInvisibilityStateEnum.INVISIBLE)
+            {
+                FighterStats.InvisiblityState = GameActionFightInvisibilityStateEnum.VISIBLE;
+                Fight.Send(new GameActionFightInvisibilityMessage((ushort)ActionsEnum.ACTION_CHARACTER_MAKE_INVISIBLE,
+                    SourceId, ContextualId, (sbyte)GameActionFightInvisibilityStateEnum.VISIBLE));
+                this.visible = true;
+                foreach (Buff buff in Buffs)
+                {
+                    if (buff is InvisibilityBuff)
+                    {
+                        short LastDuration = buff.Duration;
+                        buff.setDuration(-1, this);
+                        short ral = (short)((LastDuration - buff.Duration) * -1);
+                        Fight.Send(new GameActionFightModifyEffectsDurationMessage((ushort)buff.UID, buff.SourceId, ContextualId, ral));
+                    }
+                }
+            }
+            else if (FighterStats.InvisiblityState == GameActionFightInvisibilityStateEnum.VISIBLE)
+            {
+                FighterStats.InvisiblityState = GameActionFightInvisibilityStateEnum.INVISIBLE;
+                FightTeam adv = Team.TeamColor == World.Models.Fights.TeamColorEnum.RED_TEAM ? Fight.BlueTeam : Fight.RedTeam;
+                adv.Send(new GameActionFightInvisibilityMessage((ushort)ActionsEnum.ACTION_CHARACTER_MAKE_INVISIBLE,
+                 SourceId, ContextualId, (sbyte)FighterStats.InvisiblityState));
+                Team.Send(new GameActionFightInvisibilityMessage((ushort)ActionsEnum.ACTION_CHARACTER_MAKE_INVISIBLE,
+                    SourceId, ContextualId, (sbyte)GameActionFightInvisibilityStateEnum.DETECTED));
+                this.visible = false;
+            }
         }
         public virtual void Initialize()
         {
@@ -232,7 +266,10 @@ namespace Symbioz.World.Models.Fights.Fighters
             path = CheckMarks(path);
             ApplyFighterEvent(FighterEventType.BEFORE_MOVE, path);
             this.Fight.TryStartSequence(ContextualId, 5);
-            this.Fight.Send(new GameMapMovementMessage(path, ContextualId));
+            if (this.visible == false)//Invisible
+                this.Team.Send(new GameMapMovementMessage(path, ContextualId));
+            else
+                this.Fight.Send(new GameMapMovementMessage(path, ContextualId));
             this.AddToLastPosition(path);
             short mpcost = (short)PathHelper.GetDistanceBetween(CellId, path.Last());
             FighterStats.Stats.MovementPoints -= mpcost;
@@ -332,8 +369,9 @@ namespace Symbioz.World.Models.Fights.Fighters
 
                 short[] cells = ShapesProvider.Handle(effect.ZoneShape, cellid, CellId, effect.ZoneSize).ToArray();
                 var actors = GetAffectedActors(cells, effect.Targets);
+                CharacterStates.CharacterSpellStatesChecker(this, actors, spell, effect);
+                MonsterStates.MonsterSpellStatesChecker(this, actors, spell, effect);
                 validatedEffectsDatas.Add(effect, actors);
-
             }
             foreach (var data in validatedEffectsDatas)
             {
@@ -386,6 +424,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
                 return false;
             }
+
             if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
             {
                 short[] portal = new short[0];
@@ -400,18 +439,35 @@ namespace Symbioz.World.Models.Fights.Fighters
                 if (target != null)
                     targetId = target.ContextualId;
             }
-            if (!SpellHistory.CanCast(spellLevl,targetId))
+            if (!SpellHistory.CanCast(spellLevl, targetId))
             {
                 OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
-            
+
             this.Fight.TryStartSequence(this.ContextualId, 1);
             FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
 
             short[] portals = new short[0];
 
-            this.Fight.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+            switch (spellid)
+            {
+                case 65://affichage des piege car c'est un plugin client
+                case 71:
+                case 73:
+                case 77:
+                case 79:
+                case 80:
+                    this.Team.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                    if (this.Team.TeamColor == TeamColorEnum.RED_TEAM)
+                        this.Fight.BlueTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                    else
+                        this.Fight.RedTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                    break;
+                default:
+                this.Fight.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                    break;
+            }
             this.SpellHistory.Add(spellLevl, targetId);
 
             #region EffectHandler

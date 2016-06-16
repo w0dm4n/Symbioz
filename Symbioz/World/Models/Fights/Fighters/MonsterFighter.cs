@@ -18,6 +18,8 @@ namespace Symbioz.World.Models.Fights.Fighters
         public MonsterRecord Template { get; set; }
         public MonsterSpawnMapRecord SpawnRecord { get; set; }
         public List<GameFightSpellCooldown> Cooldowns = new List<GameFightSpellCooldown>();
+        public TreeFighter tree = null;
+        public SacrifierFighter sacrifier = null;
         public MonsterFighter(MonsterSpawnMapRecord spawn, FightTeam team)
             : base(team)
         {
@@ -41,6 +43,15 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.SpawnRecord.ActualGrade = grade;
             this.Team = team;
             this.Team.AddSummon(this);
+            switch (SpawnRecord.MonsterId)
+            {
+                case 282://Arbre
+                this.tree = new TreeFighter(null, team, this, cellid, grade);
+                    break;
+                case 116://Sacrifier
+                    this.sacrifier = new SacrifierFighter(null, team, this, cellid, grade);
+                    break;
+            }
             InitializeSummon(summonerid, cellid);
         }
         public void InitializeSummon(int summonerid, short cellid)

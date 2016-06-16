@@ -5,7 +5,9 @@ using Symbioz.Enums;
 using Symbioz.Network.Clients;
 using Symbioz.Providers;
 using Symbioz.World.Handlers;
+using Symbioz.World.Models.Fights.CastSpellCheck;
 using Symbioz.World.Models.Fights.Damages;
+using Symbioz.World.Models.Fights.StartTurn;
 using Symbioz.World.PathProvider;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Items;
@@ -108,6 +110,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 return base.CastSpellOnTarget(spellid, targetid);
             }
         }
+
         public override bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
         {
             CompanionFighter companion = GetCompanion();
@@ -278,6 +281,8 @@ namespace Symbioz.World.Models.Fights.Fighters
             if (this.Disconnected)
                 OnDisconnect();
             base.StartTurn();
+            if (this.Client.Character.Record.Breed == 10)
+                StartTurnSadida.EffectAllTreeSadida(this);
             RefreshStats();
             Client.Send(new GameFightTurnStartPlayingMessage());
             if (this.Disconnected)
@@ -387,6 +392,8 @@ namespace Symbioz.World.Models.Fights.Fighters
                 Fight.TryStartSequence(ContextualId, 1);
                 short[] cells = Pathfinding.getCiblesByZoneByWeapon(CurrentMap, template, cellid, CasterCellId);
                 var actors = GetAffectedActors(cells, effect.Targets);
+                CharacterStates.CharacterSpellStatesChecker(this, actors, null, effect);
+                MonsterStates.MonsterSpellStatesChecker(this, actors, null, effect);
                 SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
                 Fight.TryEndSequence(1, 0);
             }

@@ -18,11 +18,11 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         [EffectHandler(EffectsEnum.Eff_405)] // Invocation Sadida
         public static void SadidaSummon(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castCellId)
         {
-            if (affecteds.Count > 0)
+            if (affecteds.Count > 0 && affecteds.First() is MonsterFighter)
             {
                 MonsterFighter affected = affecteds.First() as MonsterFighter;
-
-                if (affected != null && affected.FighterStats.SummonerId == fighter.ContextualId)
+                
+                if (affected != null && affected.tree != null && affected.tree.isFlored)
                 {
                     MonsterFighter summoned = fighter.Fight.AddSummon(fighter, effect.BaseEffect.DiceNum, fighter.GetSpellLevel(level.SpellId).Grade, castCellId, fighter.Team);
                     summoned.AddBuff(new OnSadidaSummonDieEffect((uint)fighter.BuffIdProvider.Pop(), 0, -1, 0, 0, level.Grade, 0));
@@ -35,6 +35,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             fighter.Fight.AddSummon(fighter, record.BaseEffect.DiceNum, fighter.GetSpellLevel(level.SpellId).Grade, castCellid, fighter.Team);
         }
+
         [EffectHandler(EffectsEnum.Eff_SpawnBomb)]
         public static void Bomb(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castCellid)
         {

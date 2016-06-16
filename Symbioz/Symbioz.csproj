@@ -147,8 +147,13 @@
     <Compile Include="Network\CharactersDisconnected.cs" />
     <Compile Include="World\Models\Alliances\Prisms\PrismsManager.cs" />
     <Compile Include="World\Models\Exchanges\PrismExchange.cs" />
+    <Compile Include="World\Models\Fights\CastSpellCheck\CharacterStates.cs" />
+    <Compile Include="World\Models\Fights\CastSpellCheck\MonsterStates.cs" />
+    <Compile Include="World\Models\Fights\Fighters\SacrifierFighter.cs" />
+    <Compile Include="World\Models\Fights\Fighters\TreeFighter.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAgression.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAvA.cs" />
+    <Compile Include="World\Models\Fights\StartTurn\StartTurnSadida.cs" />
     <Compile Include="World\Models\Parties\Dungeon\DungeonPartyProvider.cs" />
     <Compile Include="Providers\FightResults\Exp\ExperienceFormulas.cs" />
     <Compile Include="Providers\FightResults\Exp\GroupMemberData.cs" />
