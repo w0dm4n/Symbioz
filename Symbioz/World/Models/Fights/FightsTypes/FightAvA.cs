@@ -22,7 +22,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
         {
             get
             {
-                return base.FightType;//TODO type
+                return base.FightType;
             }
         }
 

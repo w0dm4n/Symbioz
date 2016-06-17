@@ -48,9 +48,9 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible car vous êtes mort.");
                 return;
             }
-            else if (client.Character.isIgnoring(target.Character.Record.AccountId))
+            else if (target.Character.IsIgnoring(client.Character.Record.AccountId))
             {
-                client.Character.Reply("Impossible car ce joueur vous ignore.");
+                client.Send(new TextInformationMessage(1, 370, new string[1] { target.Character.Record.Name }));
                 return;
             }
             target.Character.PlayerTradeInstance = new PlayerTradeExchange(target, client);

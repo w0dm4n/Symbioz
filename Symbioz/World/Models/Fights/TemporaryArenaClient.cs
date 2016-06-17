@@ -23,6 +23,7 @@ namespace Symbioz.World.Models.Fights
         public bool Master { get; set; }
 
         public bool Requested { get; set; }
+
         public TemporaryArenaClient(WorldClient client, TeamColorEnum teamColor, bool master)
         {
             this.WorldClient = client;

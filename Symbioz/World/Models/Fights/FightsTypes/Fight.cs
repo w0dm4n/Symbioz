@@ -68,6 +68,8 @@ namespace Symbioz.World.Models.Fights
 
         public int Id { get; set; }
 
+        public DateTime StartTime { get; set; }
+
         public MapRecord Map { get; set; }
 
         public short FightCellId { get; set; }
@@ -149,6 +151,7 @@ namespace Symbioz.World.Models.Fights
         public virtual void StartFight()
         {
             Map.Instance.RemoveFightSword(Id);
+            this.StartTime = DateTime.Now;
             Started = true;
             Send(new GameFightStartMessage(new Idol[0]));
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
@@ -573,39 +576,50 @@ namespace Symbioz.World.Models.Fights
             return results;
         }
 
-        public List<FightResultListEntry> GetFightResultsForLeaver(TeamColorEnum winner, int FighterContextualId)
+        public List<FightResultListEntry> GetFightResultsForLeaver(TeamColorEnum winner)
         {
             List<FightResultListEntry> results = new List<FightResultListEntry>();
             var fighters = GetAllFighters(true);
             foreach (Fighter fighter in fighters)
             {
-                if (fighter is CharacterFighter && fighter.FighterInformations.contextualId == FighterContextualId)
+                if (fighter is CharacterFighter)
                 {
-                    results.Add(new FightResultPlayer(fighter as CharacterFighter, winner).GetEntry());
-                    break ;
+                    results.Add(new FightResultPlayer(fighter as CharacterFighter, winner, true).GetEntryForLeaver());
+                }
+                if (fighter is MonsterFighter)
+                {
+                    if (!fighter.FighterStats.Summoned)
+                        results.Add(new FightResultMonster(fighter as MonsterFighter, winner).GetEntry());
                 }
             }
             return results;
         }
 
-        public List<CharacterItemRecord> GetAllItems(int CharacterId)
+        public int GetFightDuration()
         {
-            List<CharacterItemRecord> AllItems = new List<CharacterItemRecord>();
-            foreach (var Record in CharacterItemRecord.CharactersItems)
-            {
-                if (Record.CharacterId == CharacterId)
-                    AllItems.Add(Record);
-            }
-            return (AllItems);
+            return (!this.Started) ? 0 : ((int)(DateTime.Now - this.StartTime).TotalMilliseconds);
         }
 
-        public void LoadDeadItems(List<CharacterFighter> Losers)
+        #region FightDeadCharacterItemsLoot
+
+        public List<CharacterItemRecord> GetAllItems(int characterId)
         {
-            foreach (var Loser in Losers)
+            List<CharacterItemRecord> allItems = new List<CharacterItemRecord>();
+            foreach (var record in CharacterItemRecord.CharactersItems)
             {
-                var character = CharacterRecord.GetCharacterRecordById(Loser.FighterStats.Stats.CharacterId);
-                var Items = this.GetAllItems(character.Id);
-                foreach (var item in Items)
+                if (record.CharacterId == characterId)
+                    allItems.Add(record);
+            }
+            return allItems;
+        }
+
+        public void LoadDeadItems(List<CharacterFighter> losers)
+        {
+            foreach (var loser in losers)
+            {
+                var character = CharacterRecord.GetCharacterRecordById(loser.FighterStats.Stats.CharacterId);
+                var items = this.GetAllItems(character.Id);
+                foreach (var item in items)
                 {
                     ItemRecord template = ItemRecord.GetItem(item.GID);
                     this.ListDeadItems.Add(template);
@@ -615,24 +629,24 @@ namespace Symbioz.World.Models.Fights
             this.ListDeadsItemsStartSize = this.ListDeadItems.Count;
         }
 
-        public List<ItemRecord> GetItemRecordDropped(int[] Droppeds)
+        public List<ItemRecord> GetItemRecordDropped(int[] droppeds)
         {
-            List<ItemRecord> ListDropped = new List<ItemRecord>();
+            List<ItemRecord> listDropped = new List<ItemRecord>();
             var index = 0;
-            foreach (var Dropped in Droppeds)
+            foreach (var dropped in droppeds)
             {
                 index = 0;
                 foreach (var item in this.ListDeadItems)
                 {
-                    if (index == Dropped)
+                    if (index == dropped)
                     {
-                        ListDropped.Add(item);
+                        listDropped.Add(item);
                         break;
                     }
                     index++;
                 }
             }
-            return ListDropped;
+            return listDropped;
         }
 
         public void DeleteFromDeadItems(int itemId)
@@ -647,7 +661,9 @@ namespace Symbioz.World.Models.Fights
                         break;
                     }
                 }
-           }
+            }
         }
+
+        #endregion
     }
 }

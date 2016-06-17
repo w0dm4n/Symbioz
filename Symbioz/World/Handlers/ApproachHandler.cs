@@ -254,7 +254,7 @@ namespace Symbioz.World.Handlers
             client.Send(new GameContextDestroyMessage());
             client.Send(new GameContextCreateMessage((sbyte)GameContextEnum.ROLE_PLAY));
             client.Character.RefreshStats();
-            client.Character.AtConnection();
+            client.Character.OnConnectedBasicActions();
             client.Character.Teleport(client.Character.Record.MapId);
 
             #region Dofus Cinematic
@@ -262,9 +262,6 @@ namespace Symbioz.World.Handlers
             {
                 client.Send(new CinematicMessage(10));
                 client.Character.IsNew = false;
-                //client.Character.Record.OldLook = client.Character.Record.Look;
-                //client.Character.Record.AddElement();
-                //client.Character.Record.UpdateElement();
             }
             #endregion
         }

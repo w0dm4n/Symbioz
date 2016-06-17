@@ -17,6 +17,7 @@ using Symbioz.World.Models;
 using Symbioz.World.Models.Parties;
 using Shader.Helper;
 using Symbioz.ORM;
+using Symbioz.Auth.Records;
 
 namespace Symbioz.Network.Servers
 {
@@ -50,7 +51,7 @@ namespace Symbioz.Network.Servers
         
         void Server_OnServerStarted()
         {
-            Logger.World("Server Started (" + Server.EndPoint.AsIpString() + ")");
+            Logger.World("Server started (" + Server.EndPoint.AsIpString() + ")");
         }
         public void Start()
         {
@@ -93,13 +94,14 @@ namespace Symbioz.Network.Servers
                 client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                 if (client.Character.IsRegeneratingLife)
                     client.Character.StopRegenLife();
-                client.Character.Record.LastConnection = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                AccountsProvider.UpdateAccountsOnlineState(client.Account.Id, false);
+                client.Character.Record.LastConnection = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                 if (client.Character != null)
                     client.Character.Dispose();
             }
             if (remove == true)
                 WorldClients.Remove(client);
-            Logger.World("Client Disconnected!");
+            Logger.World("Client disconnected!");
         }
         public List<WorldClient> GetAllClientsOnline()
         {

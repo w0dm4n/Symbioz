@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace Symbioz.World.Records.Tracks
 {
-    [Table("CharactersTracked", true)]
-    class TracksRecord : ITable
+    [Table("CharactersTracked")]
+    public class TrackRecord : ITable
     {
-        public static List<TracksRecord> CharactersTracked = new List<TracksRecord>();
+        public static List<TrackRecord> CharactersTracked = new List<TrackRecord>();
         public static int IdToAdd = 0;
 
         [Primary]
@@ -24,7 +24,7 @@ namespace Symbioz.World.Records.Tracks
         public int TrackedCharacterId;
         public int ItemUID;
 
-        public TracksRecord(int id, int trackedCharacterId, int itemUID)
+        public TrackRecord(int id, int trackedCharacterId, int itemUID)
         {
             this.Id = id;
             this.TrackedCharacterId = trackedCharacterId;
@@ -43,32 +43,30 @@ namespace Symbioz.World.Records.Tracks
 
         public static int PopNextTrackedId()
         {
-            var Id = 0;
-            foreach (var Ignored in TracksRecord.CharactersTracked)
+            var nextId = 0;
+            foreach (var ignored in TrackRecord.CharactersTracked)
             {
-                if (Ignored.Id > Id)
-                    Id = Ignored.Id;
+                if (ignored.Id > nextId)
+                    nextId = ignored.Id;
             }
-            Id++;
-            Id += TracksRecord.IdToAdd;
-            TracksRecord.IdToAdd++;
-            return (Id);
+            nextId++;
+            nextId += TrackRecord.IdToAdd;
+            TrackRecord.IdToAdd++;
+            return (nextId);
         }
 
         public static void AddTracked(int trackedCharacterId, int itemUID)
         {
-            var newElement = new TracksRecord(TracksRecord.PopNextTrackedId(), trackedCharacterId, itemUID);
-            TracksRecord.CharactersTracked.Add(newElement);
+            var newElement = new TrackRecord(TrackRecord.PopNextTrackedId(), trackedCharacterId, itemUID);
             SaveTask.AddElement(newElement);
         }
 
         public static void DeleteTrackedByItemUID(int itemUID)
         {
-            foreach (var tracked in TracksRecord.CharactersTracked)
+            foreach (var tracked in TrackRecord.CharactersTracked)
             {
                 if (tracked.ItemUID == itemUID)
                 {
-                    TracksRecord.CharactersTracked.Remove(tracked);
                     SaveTask.RemoveElement(tracked);
                     break;
                 }

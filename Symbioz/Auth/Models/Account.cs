@@ -11,8 +11,6 @@ namespace Symbioz.Auth.Models
 {
     public class Account
     {
-
-
         public AccountInformationsRecord Informations { get { return AccountInformationsRecord.GetInformations(Id); } }
 
         public int Id { get; set; }
@@ -29,8 +27,8 @@ namespace Symbioz.Auth.Models
 
         public int MaxCharactersCount { get; set; }
 
-        public int PointsCount { get; set; }
+        public bool WarnOnFriendConnection { get; set; }
 
-  
+        public int PointsCount { get; set; }
     }
 }

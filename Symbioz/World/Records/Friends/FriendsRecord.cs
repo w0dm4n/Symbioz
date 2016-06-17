@@ -16,8 +16,9 @@ namespace Symbioz.World.Records.Friends
     [Table("CharactersFriends")]
     public class FriendRecord : ITable
     {
+        private static ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
         public static List<FriendRecord> CharactersFriends = new List<FriendRecord>();
-        public static int IdToAdd = 0;
 
         [Primary]
         public int Id;
@@ -29,6 +30,21 @@ namespace Symbioz.World.Records.Friends
             this.Id = id;
             this.AccountId = accountId;
             this.FriendAccountId = friendAccountId;
+        }
+
+        public static int PopNextId()
+        {
+            Locker.EnterReadLock();
+            try
+            {
+                var ids = CharactersFriends.ConvertAll<int>(x => x.Id);
+                ids.Sort();
+                return ids.Count == 0 ? 1 : ids.Last() + 1;
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
         }
     }
 }

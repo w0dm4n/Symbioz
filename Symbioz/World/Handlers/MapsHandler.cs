@@ -62,9 +62,10 @@ namespace Symbioz.World.Handlers
             {
                 if (client.Character.Busy || client.Character.Restrictions.cantMove == true)
                     return;
+
                 if (client.Character.CurrentlyInTrackRequest)
                 {
-                    client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    client.Character.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
                     client.Character.CurrentlyInTrackRequest = false;
                 }
 

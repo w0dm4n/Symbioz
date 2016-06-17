@@ -39,9 +39,9 @@ namespace Symbioz.Core
             }
         }
 
-        public static void Update(string table, string colum, string value, string where, string wherevalue)
+        public static void Update(string table, string column, string value, string where, string wherevalue)
         {
-            string query = "UPDATE " + table + " SET " + colum + "='" + value + "' WHERE " + where + "='" + wherevalue + "'";
+            string query = "UPDATE " + table + " SET " + column + "='" + value + "' WHERE " + where + "='" + wherevalue + "'";
             Execute(query);
         }
 

@@ -72,6 +72,5 @@ namespace Symbioz.Core.Startup
             Singleton<AuthServer>.Instance.Start();
             Singleton<WorldServer>.Instance.Start();
         }
-        
     }
 }

@@ -17,6 +17,7 @@ namespace Symbioz.Auth.Records
     class AccountsProvider     
     {
         static ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
         public static void CreateAccountInformation(int accountid,int startbankkamas)
         {
            
@@ -31,6 +32,7 @@ namespace Symbioz.Auth.Records
                 Locker.ExitReadLock();
             }
         } 
+
         public static void Ban(string accountName)
         {
             Locker.EnterReadLock();
@@ -44,6 +46,7 @@ namespace Symbioz.Auth.Records
             }
            
         }
+
         public static void BanIp(string ip)
         {
             Locker.EnterReadLock();
@@ -56,6 +59,7 @@ namespace Symbioz.Auth.Records
                 Locker.ExitReadLock();
             }
         }
+
         public static Account GetAccountFromDb(string username)
         {
             Locker.EnterReadLock();
@@ -103,6 +107,7 @@ namespace Symbioz.Auth.Records
                     account.Id = dataReader.GetInt32("Id");
                     account.Banned = dataReader.GetBoolean("Banned");
                     account.MaxCharactersCount = dataReader.GetInt32("MaxCharactersCount");
+                    account.WarnOnFriendConnection = dataReader.GetInt32("WarnOnFriendConnection") == 1 ? true : false;
                     account.PointsCount = dataReader.GetInt32("PointCount");
                 }
                 dataReader.Close();
@@ -113,6 +118,48 @@ namespace Symbioz.Auth.Records
                 Locker.ExitReadLock();
             }
         }
+
+        public static bool UpdateAccountsWarningEvent(Account account)
+        {
+            bool updated = false;
+            Locker.EnterReadLock();
+            try
+            {
+                AuthDatabaseProvider.Update("accounts", "WarnOnFriendConnection", account.WarnOnFriendConnection ? "1" : "0", "Id", account.Id.ToString());
+                //TODO: Warns ...
+                updated = true;
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
+            return updated;
+        }
+
+        public static bool UpdateAccountsOnlineState(int accountId, bool isOnline)
+        {
+            bool updated = false;
+            Locker.EnterReadLock();
+            try
+            {
+                AuthDatabaseProvider.Update("accounts", "IsOnline", isOnline ? "1" : "0", "Id", accountId.ToString());
+                updated = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
+            finally
+            {
+                Locker.ExitReadLock();
+            }
+            return updated;
+        }
+
         public static bool RemovePoints(Account account)
         {
             Locker.EnterReadLock();
@@ -130,6 +177,7 @@ namespace Symbioz.Auth.Records
                 Locker.ExitReadLock();
             }
         }
+
         public static Account DecryptCredentialsFromClient(AuthClient client, string salt, IEnumerable<byte> credentials)
         {
             try
@@ -155,6 +203,7 @@ namespace Symbioz.Auth.Records
                 return null;
             }
         }
+
         static byte[] AESEncrypt(byte[] data, byte[] key)
         {
             var iv = key.Take(16).ToArray();
@@ -172,6 +221,7 @@ namespace Symbioz.Auth.Records
                 return null;
             }
         }
+
         public static byte[] EncryptTicket(string ticket, byte[] key)
         {
             var writer = new BigEndianWriter();
@@ -179,6 +229,7 @@ namespace Symbioz.Auth.Records
             writer.WriteUTFBytes(ticket);
             return AESEncrypt(writer.Data, key);
         }
+
         public static bool CheckAndApplyNickname(AuthClient client, string nickname)
         {
             Locker.EnterReadLock();

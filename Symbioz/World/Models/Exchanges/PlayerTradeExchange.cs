@@ -148,7 +148,7 @@ namespace Symbioz.World.Models.Exchanges
                     if (item.GID == 7400)
                     {
                         var newItem = item.CloneAndGetNewUID();
-                        TracksRecord.AddTracked(TracksRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
+                        TrackRecord.AddTracked(TrackRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
                         Client.Character.Inventory.Add(newItem);
                     }
                     else
@@ -165,7 +165,7 @@ namespace Symbioz.World.Models.Exchanges
                     if (item.GID == 7400)
                     {
                         var newItem = item.CloneAndGetNewUID();
-                        TracksRecord.AddTracked(TracksRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
+                        TrackRecord.AddTracked(TrackRecord.GetCharacterIdTrackedFromItemUID((int)item.UID), (int)newItem.UID);
                         Client.Character.Inventory.Add(newItem);
                     }
                     else

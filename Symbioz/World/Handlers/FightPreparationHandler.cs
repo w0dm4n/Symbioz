@@ -22,6 +22,7 @@ namespace Symbioz.World.Handlers
         {
             if (client.Character.IsFighting)
                 return;
+
             FightDual fight = FightProvider.Instance.GetFight(message.fightId) as FightDual;
             var sMessage = new GameRolePlayPlayerFightFriendlyAnsweredMessage(message.fightId, (uint)client.Character.Id, (uint)fight.InitiatorId, false);
 
@@ -36,12 +37,12 @@ namespace Symbioz.World.Handlers
             {
                 if (client.Character.CurrentlyInTrackRequest)
                 {
-                    client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    client.Character.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
                     client.Character.CurrentlyInTrackRequest = false;
                 }
                 if (target.Character.CurrentlyInTrackRequest)
                 {
-                    target.Character.SendEndDelayedMessageToMap(target.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                    target.Character.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
                     target.Character.CurrentlyInTrackRequest = false;
                 }
                 sMessage.accept = true;
@@ -56,10 +57,10 @@ namespace Symbioz.World.Handlers
                 FightProvider.Instance.RemoveFight(message.fightId);
             }
         }
+
         [MessageHandler]
         public static void HandleChallengeRequest(GameRolePlayPlayerFightRequestMessage message, WorldClient client)
         {
-
             if (client.Character.Map != null && client.Character.Map.HaveZaap)
             {
                 client.Character.Reply("Action impossible sur cette carte.");
@@ -71,17 +72,17 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible car le joueur est occupé.");
                 return;
             }
-            if (client.Character.isIgnoring(target.Character.Record.AccountId))
+            if (target.Character.IsIgnoring(client.Character.Record.AccountId))
             {
-                client.Character.Reply("Impossible car ce joueur vous ignore.");
+                client.Send(new TextInformationMessage(1, 370, new string[1] { target.Character.Record.Name }));
                 return;
             }
-            if (client.Character.Restrictions.isDead == true)
+            if (client.Character.Restrictions.isDead)
             {
                 client.Character.Reply("Impossible car vous êtes mort.");
                 return;
             }
-            if (target.Character.Restrictions.isDead == true)
+            if (target.Character.Restrictions.isDead)
             {
                 client.Character.Reply("Impossible car ce joueur est mort.");
                 return;
@@ -97,6 +98,7 @@ namespace Symbioz.World.Handlers
                 target.Send(sMessage);
             }
         }
+
         [MessageHandler]
         public static void HandleAttackRequest(GameRolePlayAttackMonsterRequestMessage message, WorldClient client)
         {
@@ -130,6 +132,7 @@ namespace Symbioz.World.Handlers
                     client.Character.NotificationError("Unable to fight, MonsterGroup dosent exist...");
             }
         }
+
         [MessageHandler]
         public static void HandleSwapPositions(GameFightPlacementSwapPositionsRequestMessage message, WorldClient client)
         {
@@ -139,6 +142,7 @@ namespace Symbioz.World.Handlers
                 requested.SwapPosition(client.Character.FighterInstance);
             }
         }
+
         [MessageHandler]
         public static void HandlePositionChange(GameFightPlacementPositionRequestMessage message, WorldClient client)
         {
@@ -149,6 +153,7 @@ namespace Symbioz.World.Handlers
                 client.Character.FighterInstance.Fight.Send(new GameEntityDispositionMessage(new IdentifiedEntityDispositionInformations((short)message.cellId, (sbyte)3, client.Character.FighterInstance.ContextualId)));
             }
         }
+
         [MessageHandler]
         public static void HandleFightJoin(GameFightJoinRequestMessage message, WorldClient client)
         {
@@ -159,7 +164,7 @@ namespace Symbioz.World.Handlers
             }
             if (client.Character.CurrentlyInTrackRequest)
             {
-                client.Character.SendEndDelayedMessageToMap(client.Character.Record.Id, DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                client.Character.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
                 client.Character.CurrentlyInTrackRequest = false;
             }
             var fight = FightProvider.Instance.GetFight(message.fightId);
@@ -168,11 +173,13 @@ namespace Symbioz.World.Handlers
             else
                 client.Character.NotificationError("Vous avez déja rejoint ce combat");
         }
+
         [MessageHandler]
         public static void HandleFightReady(GameFightReadyMessage message, WorldClient client)
         {
             client.Character.FighterInstance.ToogleReady(message.isReady);
         }
+
         [MessageHandler]
         public static void HandleGameContextQuit(GameContextQuitMessage message, WorldClient client)
         {
@@ -190,6 +197,7 @@ namespace Symbioz.World.Handlers
                 client.Character.NotificationError("Une erreur est survenue en essayant de quitter le combat !");
             }
         }
+
         [MessageHandler]
         public static void HandleFightOptions(GameFightOptionToggleMessage message, WorldClient client)
         {

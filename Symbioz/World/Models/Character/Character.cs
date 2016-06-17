@@ -38,11 +38,15 @@ using Symbioz.Auth.Records;
 using Symbioz.World.Records.Ignored;
 using Symbioz.World.Records.Items;
 using Symbioz.World.Records.Tracks;
+using Symbioz.World.Models.Items;
+using System.Timers;
+using Symbioz.Auth.Models;
 
 namespace Symbioz.World.Models
 {
     public class Character : IDisposable
     {
+        public Account Account { get; set; }
         public int Id { get { return Record.Id; } }
         public bool IsNew = false;
         public bool isGod = false;
@@ -55,7 +59,7 @@ namespace Symbioz.World.Models
         public DateTime RegenStartTime;
         public bool IsRegeneratingLife;
         public bool CurrentlyInTrackRequest = false;
-        public bool isTracking = false;
+        public bool IsTracking = false;
         public short RegenRate;
         public MapRecord Map { get; set; }
         public short MovedCell { get; set; }
@@ -75,8 +79,9 @@ namespace Symbioz.World.Models
         public List<SuccesRewards> SuccesShortcuts = new List<SuccesRewards>();
         public PartyMember PartyMember;
         public List<FriendRecord> Friends = new List<FriendRecord>();
-        public List<IgnoredRecord> IgnoredList = new List<IgnoredRecord>();
-        public List<KeyringRecord> Keyring = new List<KeyringRecord>();
+        public List<IgnoredRecord> Enemies = new List<IgnoredRecord>();
+        public List<IgnoredRecord> Ignored = new List<IgnoredRecord>();
+        public List<CharacterKeyring> Keyrings = new List<CharacterKeyring>();
 
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
@@ -117,16 +122,30 @@ namespace Symbioz.World.Models
         {
             this.Client = client;
             this.Record = record;
+
+            this.Account = AccountsProvider.GetAccountFromDb(this.Record.AccountId);
+            AccountsProvider.UpdateAccountsOnlineState(this.Account.Id, true);
+
             this.Look = ContextActorLook.Parse(Record.Look);
             this.HumanOptions = new List<HumanOption>();
 
             this.Inventory = new Inventory(this);
 
+            this.LoadFriends();
+            this.LoadEnemies();
+
             this.PlayerStatus = new PlayerStatus((sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE);
+        }
+        public void OnConnectedBasicActions()
+        {
+            this.SendOnlineFriendsCountMessage();
+
+            this.GetLifeBackAtConnection();
+            this.RegenLife(10);
         }
         public void OnConnectedGuildInformations()
         {
-            if (HasGuild)
+            if (this.HasGuild)
             {
                 Client.Send(new GuildMembershipMessage(this.GetGuild().GetGuildInformations(), CharacterGuildRecord.GetCharacterGuild(this.Id).Rights, true));
                 this.HumanOptions.Add(new HumanOptionGuild(this.GetGuild().GetGuildInformations()));
@@ -136,7 +155,7 @@ namespace Symbioz.World.Models
         }
         public void OnConnectedAllianceInformations()
         {
-            if (HasAlliance)
+            if (this.HasAlliance)
             {
                 Client.Send(new AllianceMembershipMessage(GetAlliance().GetAllianceInformations(), true));
                 this.HumanOptions.Add(new HumanOptionAlliance(GetAlliance().GetAllianceInformations(), (sbyte)0));
@@ -202,6 +221,7 @@ namespace Symbioz.World.Models
         }
         public void OnConnectedNotifications()
         {
+            this.SendWarnOnStateMessages();
             Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new string[0]));
             Client.Character.Reply(ConfigurationManager.Instance.WelcomeMessage, System.Drawing.Color.GhostWhite);
             BidShopsHandler.AddEventualBidShopGains(Client);
@@ -635,7 +655,6 @@ namespace Symbioz.World.Models
                 Reply("Vous connaissez déja cette émote (" + template.Name + ").");
                 return false;
             }
-            Logger.Log(id);
         }
         public void ForgetEmote(byte id)
         {
@@ -1035,7 +1054,7 @@ namespace Symbioz.World.Models
 
         public void UpdateLastSalesMessage()
         {
-            this.LastSalesMessage = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+            this.LastSalesMessage = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
         }
 
         public bool CanSendSeekMessage()
@@ -1068,82 +1087,6 @@ namespace Symbioz.World.Models
             this.LastSeekMessage = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
         }
 
-        public void SaveAllFriends()
-        {
-            foreach (var friend in this.Friends)
-            {
-                SaveTask.AddElement(friend, this.Id);
-            }
-        }
-
-        public int PopNextFriendId()
-        {
-            var Id = 0;
-            foreach (var Friend in FriendRecord.CharactersFriends)
-            {
-                if (Friend.Id > Id)
-                    Id = Friend.Id;
-            }
-            Id++;
-            Id += FriendRecord.IdToAdd;
-            FriendRecord.IdToAdd++;
-            return (Id);
-        }
-
-        public void AddFriend(int FriendAccountId)
-        {
-            this.Friends.Add(new FriendRecord(PopNextFriendId(), this.Record.AccountId, FriendAccountId));
-        }
-
-        public bool AlreadyFriend(int accountId)
-        {
-            foreach (var Friend in this.Friends)
-            {
-                if (Friend.FriendAccountId == accountId)
-                    return true;
-            }
-            return false;
-        }
-
-        public void RemoveFriend(int friendAccountId)
-        {
-            foreach (var friend in Friends)
-            {
-                if (friend.FriendAccountId == friendAccountId)
-                {
-                    SaveTask.RemoveElement(friend, this.Id);
-                    this.Friends.Remove(friend);
-                    break;
-                }
-            }
-        }
-
-        public bool isFriendWith(int accountId)
-        {
-            foreach (var friend in this.Friends)
-                if (friend.FriendAccountId == accountId)
-                    return true;
-            return false;
-        }
-
-        public void LoadFriends()
-        {
-            foreach (var Friend in FriendRecord.CharactersFriends)
-            {
-                if (Friend.AccountId == this.Record.AccountId && !this.Friends.Contains(Friend))
-                {
-                    this.Friends.Add(Friend);
-                    var characters = CharacterRecord.GetAccountCharacters(Friend.FriendAccountId);
-                    foreach (var character in characters)
-                    {
-                        var target = WorldServer.Instance.GetOnlineClient(character.Name);
-                        if (target != null && target.Character.Record.WarnOnFriendConnection == true)
-                            target.Character.Reply("<b>" + this.Record.Name + "</b> est en ligne.");
-                    }
-                }
-            }
-        }
-
         public bool CanSave()
         {
             if (this.LastCharacterSave == 0)
@@ -1165,90 +1108,231 @@ namespace Symbioz.World.Models
                 return true;
         }
 
-        public void AtConnection()
+        #region Friends, Enemies, Ignored
+
+        #region Friends
+
+        #region SendInformations
+
+        private void SendWarnOnStateMessages()
         {
-            this.GetLifeBackAtConnection();
-            this.RegenLife(10);
-            this.LoadFriends();
-            this.LoadIgnored();
+            this.Client.Send(new FriendWarnOnConnectionStateMessage(this.Account.WarnOnFriendConnection));
         }
 
-        public int PopNextIgnoredId()
+        private void SendOnlineFriendsCountMessage()
         {
-            var Id = 0;
-            foreach (var Ignored in IgnoredRecord.CharactersIgnored)
+            int onlineFriendsCount = 0;
+            this.Friends.ForEach((x) =>
             {
-                if (Ignored.Id > Id)
-                    Id = Ignored.Id;
-            }
-            Id++;
-            Id += IgnoredRecord.IdToAdd;
-            IgnoredRecord.IdToAdd++;
-            return (Id);
-        }
-
-        public void AddIgnored(int IgnoredAccountId)
-        {
-            this.IgnoredList.Add(new IgnoredRecord(PopNextIgnoredId(), this.Record.AccountId, IgnoredAccountId));
-        }
-
-        public void LoadIgnored()
-        {
-            foreach (var Ignored in IgnoredRecord.CharactersIgnored)
+                var friendCharacters = CharacterRecord.GetAccountCharacters(x.FriendAccountId);
+                foreach (var character in friendCharacters)
+                {
+                    var worldClient = WorldServer.Instance.GetOnlineClient(character.Id);
+                    if (worldClient != null)
+                    {
+                        onlineFriendsCount = onlineFriendsCount + 1;
+                    }
+                }
+            });
+            if (onlineFriendsCount > 0)
             {
-                if (Ignored.AccountId == this.Record.AccountId && !this.IgnoredList.Contains(Ignored))
-                    this.IgnoredList.Add(Ignored);
+                this.Client.Send(new TextInformationMessage(0, 197, new string[1] { onlineFriendsCount.ToString() }));
             }
+        }
+
+        #endregion
+
+        public void LoadFriends()
+        {
+            var accountFriends = FriendRecord.CharactersFriends.FindAll(x => x.AccountId == this.Record.AccountId);
+            if(accountFriends != null && accountFriends.Count > 0)
+            {
+                this.Friends.AddRange(accountFriends);
+                this.Friends.ForEach((x) =>
+                {
+                    var friendCharacters = CharacterRecord.GetAccountCharacters(x.FriendAccountId); 
+                    if(friendCharacters.Count > 0)
+                    {
+                        friendCharacters.ForEach((friendCharacter) =>
+                        {
+                            var friendWorldClient = WorldServer.Instance.GetOnlineClient(friendCharacter.Name);
+                            if(friendWorldClient != null && this.Account.WarnOnFriendConnection)
+                            {
+                                friendWorldClient.Send(new TextInformationMessage(0, 143, new string[] { this.Account.Nickname, this.Record.Name, this.Record.Id.ToString() }));
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        public FriendRecord AddFriend(int FriendAccountId)
+        {
+            var newFriend = new FriendRecord(FriendRecord.PopNextId(), this.Record.AccountId, FriendAccountId);
+            this.Friends.Add(newFriend);
+            return newFriend;
+        }
+
+        public bool RemoveFriend(int friendAccountId)
+        {
+            bool removed = false;
+            var oldFriend = this.Friends.FirstOrDefault(x => x.FriendAccountId == friendAccountId);
+            if (oldFriend != null)
+            {
+                this.Friends.Remove(oldFriend);
+                SaveTask.RemoveElement(oldFriend, this.Id);
+                removed = true;
+            }
+            return removed;
+        }
+
+        public bool IsFriendWith(int accountId)
+        {
+            bool isFriend = false;
+            if(this.Friends.FirstOrDefault(x => x.FriendAccountId == accountId) != null)
+            {
+                isFriend = true;
+            }
+            return isFriend;
+        }
+
+        public string GetFriendName(int accountId)
+        {
+            string friendName = string.Empty;
+            var friend = this.Friends.FirstOrDefault(x => x.FriendAccountId == accountId);
+            if (friend != null)
+            {
+                var friendAccount = AccountsProvider.GetAccountFromDb(friend.AccountId);
+                if (friendAccount != null)
+                {
+                    friendName = friendAccount.Nickname;
+                }
+            }
+            return friendName;
+        }
+
+        #endregion
+
+        #region Enemies
+
+        public void LoadEnemies()
+        {
+            var accountEnemies = IgnoredRecord.CharactersIgnored.FindAll(x => x.AccountId == this.Record.AccountId);
+            if (accountEnemies != null && accountEnemies.Count > 0)
+            {
+                this.Enemies.AddRange(accountEnemies);
+            }
+        }
+
+        public IgnoredRecord AddEnemy(int enemyAccountId)
+        {
+            var newEnemy = new IgnoredRecord(IgnoredRecord.PopNextId(), this.Record.AccountId, enemyAccountId);
+            this.Enemies.Add(newEnemy);
+            return newEnemy;
+        }
+
+        public bool AlreadyEnemy(int accountId)
+        {
+            bool enemy = false;
+            if(this.Enemies.FirstOrDefault(x => x.IgnoredAccountId == accountId) != null)
+            {
+                enemy = true;
+            }
+            return enemy;
+        }
+
+        public string GetEnemyName(int accountId)
+        {
+            string enemyName = string.Empty;
+            var enemy = this.Enemies.FirstOrDefault(x => x.IgnoredAccountId == accountId);
+            if(enemy != null)
+            {
+                var enemyAccount = AccountsProvider.GetAccountFromDb(enemy.AccountId);
+                if(enemyAccount != null)
+                {
+                    enemyName = enemyAccount.Nickname;
+                }
+            }
+            return enemyName;
+        }
+
+        public bool RemoveEnemy(int ignoredAccountId)
+        {
+            bool removed = false;
+            var oldEnemy = this.Enemies.FirstOrDefault(x => x.IgnoredAccountId == ignoredAccountId);
+            if (oldEnemy != null)
+            {
+                this.Enemies.Remove(oldEnemy);
+                SaveTask.RemoveElement(oldEnemy, this.Id);
+                removed = true;
+            }
+            return removed;
+        }
+
+        #endregion
+
+        #region Ignored
+
+        public bool AddIgnored(int ignoredAccountId)
+        {
+            bool added = false;
+            this.Ignored.Add(new IgnoredRecord(1, this.Record.AccountId, ignoredAccountId));
+            added = true;
+            return added;
         }
 
         public bool AlreadyIgnored(int accountId)
         {
-            foreach (var Ignored in this.IgnoredList)
+            bool enemy = false;
+            if (this.Ignored.FirstOrDefault(x => x.IgnoredAccountId == accountId) != null)
             {
-                if (Ignored.IgnoredAccountId == accountId)
-                    return true;
+                enemy = true;
             }
-            return false;
+            return enemy;
         }
 
-        public void SaveAllIgnoreds()
+        public string GetIgnoredName(int accountId)
         {
-            foreach (var Ignored in this.IgnoredList)
+            string ignoredName = string.Empty;
+            var ignored = this.Ignored.FirstOrDefault(x => x.IgnoredAccountId == accountId);
+            if (ignored != null)
             {
-                SaveTask.AddElement(Ignored, this.Id);
-            }
-        }
-
-        public void RemoveIgnored(int ignoredAccountId)
-        {
-            foreach (var ignored in IgnoredList)
-            {
-                if (ignored.IgnoredAccountId == ignoredAccountId)
+                var ignoredAccount = AccountsProvider.GetAccountFromDb(ignored.AccountId);
+                if (ignoredAccount != null)
                 {
-                    SaveTask.RemoveElement(ignored, this.Id);
-                    this.IgnoredList.Remove(ignored);
-                    break;
+                    ignoredName = ignoredAccount.Nickname;
                 }
             }
+            return ignoredName;
         }
 
-        public bool isIgnoring(int AccountId)
+        public bool RemoveIgnored(int ignoredAccountId)
         {
-            var characters = CharacterRecord.GetAccountCharacters(AccountId);
-            foreach (var character in characters)
+            bool removed = false;
+            var oldIgnored = this.Ignored.FirstOrDefault(x => x.IgnoredAccountId == ignoredAccountId);
+            if (oldIgnored != null)
             {
-                var target = WorldServer.Instance.GetOnlineClient(character.Name);
-                if (target != null)
-                {
-                    foreach (var ignored in target.Character.IgnoredList)
-                    {
-                        if (ignored.IgnoredAccountId == this.Record.AccountId)
-                            return true;
-                    }
-                }
+                this.Ignored.Remove(oldIgnored);
+                removed = true;
             }
-            return false;
+            return removed;
         }
+
+        #endregion
+
+        public bool IsIgnoring(int accountId)
+        {
+            bool isIgnoring = false;
+            if(this.Enemies.FirstOrDefault(x => x.IgnoredAccountId == accountId) != null || this.Ignored.FirstOrDefault(x => x.IgnoredAccountId == accountId) != null)
+            {
+                isIgnoring = true;
+            }
+            return isIgnoring;
+        }
+
+        #endregion
+
+        #region Keyrings
 
         public bool HaveKeyring()
         {
@@ -1259,13 +1343,13 @@ namespace Symbioz.World.Models
             return false;
         }
 
-        public void DeleteKeyIfExist(int TemplateId)
+        public void DeleteKeyIfExist(int templateId)
         {
-            foreach (var Key in Keyring)
+            foreach (var key in this.Keyrings)
             {
-                if (Key.KeyId == TemplateId)
+                if (key.KeyId == templateId)
                 {
-                    Keyring.Remove(Key);
+                    this.Keyrings.Remove(key);
                     break;
                 }
             }
@@ -1273,25 +1357,25 @@ namespace Symbioz.World.Models
 
         public bool CanUseKeyring(int keyTemplateId)
         {
-            foreach (var Key in Keyring)
+            foreach (var key in this.Keyrings)
             {
-                if (Key.KeyId == keyTemplateId)
+                if (key.KeyId == keyTemplateId)
                 {
-                    var StartTime = Key.KeyTimeUse;
-                    var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                    var startTime = key.KeyTimeUse;
+                    var currentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                     var seconds = 0;
-                    while (StartTime <= CurrentTime)
+                    while (startTime <= currentTime)
                     {
                         seconds++;
-                        StartTime++;
+                        startTime++;
                     }
                     if (seconds >= ConfigurationManager.Instance.TimeForUseKeyring)
                         return true;
                     else
                     {
                         var timeLeft = ConfigurationManager.Instance.TimeForUseKeyring - seconds;
-                        var Time = timeLeft / 60 + " minutes restantes";
-                        this.Reply("Vous ne possédez pas la clef pour rentrer dans ce donjon et il est encore trop tôt pour utiliser votre trousseau de clefs (<b>" + Time + "</b>)");
+                        var time = timeLeft / 60 + " minute(s) restante(s)";
+                        this.Reply("Vous ne possédez pas la clef pour rentrer dans ce donjon et il est encore trop tôt pour utiliser votre trousseau de clés (<b>" + time + "</b>).");
                         return false;
                     }
                 }
@@ -1299,31 +1383,66 @@ namespace Symbioz.World.Models
             return true;
         }
 
-        public void UseKeyring(int KeyTemplateId)
+        public void UseKeyring(int keyTemplateId)
         {
-            this.DeleteKeyIfExist(KeyTemplateId);
-            this.Keyring.Add(new KeyringRecord(KeyTemplateId, DateTimeUtils.GetEpochFromDateTime(DateTime.Now)));
-            Client.Character.Reply("Vous avez utilisé votre trousseaux de clefs pour rentrer dans ce donjon car vous ne possédiez pas la clef.");
+            this.DeleteKeyIfExist(keyTemplateId);
+            this.Keyrings.Add(new CharacterKeyring(keyTemplateId, DateTimeUtils.GetEpochFromDateTime(DateTime.Now)));
+            this.Client.Character.Reply("Vous avez utilisé votre trousseau de clés pour entrer dans ce donjon car vous ne possédiez pas la clé.");
         }
-        
-        public void SendStartDelayedMessageToMap(int targetCharacterId, DelayedActionTypeEnum type, double delayEndTime, int ItemId)
+
+        #endregion
+
+        #region DelayedActions
+
+        public void OnStartingUseDelayedObject(DelayedActionTypeEnum type, double delayEndTime, int itemId)
         {
-            var onMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
-            foreach (var client in onMap)
+            var clientsOnMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
+            foreach (var client in clientsOnMap)
             {
                 if (client.Character.IsFighting == false && client.Character.Busy == false)
-                    client.Send(new GameRolePlayDelayedObjectUseMessage(targetCharacterId, (sbyte)type, delayEndTime, (ushort)ItemId));
+                    client.Send(new GameRolePlayDelayedObjectUseMessage(this.Id, (sbyte)type, delayEndTime, (ushort)itemId));
             }
         }
 
-        public void SendEndDelayedMessageToMap(int characterId, DelayedActionTypeEnum type)
+        public void OnEndingUseDelayedObject(DelayedActionTypeEnum type)
         {
-            var onMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
-            foreach (var client in onMap)
+            var clientsOnMap = WorldServer.Instance.GetOnlineClientOnMap(this.Record.MapId);
+            foreach (var client in clientsOnMap)
             {
                 if (client.Character.IsFighting == false && client.Character.Busy == false)
-                    client.Send(new GameRolePlayDelayedActionFinishedMessage(characterId, (sbyte)type));
+                    client.Send(new GameRolePlayDelayedActionFinishedMessage(this.Id, (sbyte)type));
             }
         }
+
+        #endregion
+
+        #region Tracking
+
+        public void OnTrackingTimeElapsed(WorldClient target, Timer actionTimer, CharacterItemRecord itemRecord)
+        {
+            if (target.Character.CurrentlyInTrackRequest)
+            {
+                this.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
+                target.Character.Reply("Le joueur <b>" + this.Record.Name + "</b>" + " détient désormais un parchemin de recherche lié à votre nom !", Color.Orange);
+
+                this.Inventory.RemoveItem(itemRecord.UID, 1);
+
+                List<ObjectEffect> objectEffects = new List<ObjectEffect>();
+                objectEffects.Add(new ObjectEffectString(989, target.Character.Record.Name));
+                CharacterItemRecord newItem = new CharacterItemRecord(CharacterItemRecord.PopNextUID(), 63, 7400, this.Id, 1, objectEffects);
+                this.Inventory.Add(newItem);
+                this.Reply("Vous avez obtenu 1 <b>Parchemin lié</b> !");
+
+                TrackRecord.AddTracked(target.Character.Record.Id, (int)newItem.UID);
+                target.Character.CurrentlyInTrackRequest = false;
+            }
+            else
+                this.Reply("Vous n'avez pas obtenu de parchemin lié à <b>" + target.Character.Record.Name + "</b> car il s'est enfuit !", Color.Orange);
+
+            this.IsTracking = false;
+            actionTimer.Stop();
+        }
+
+        #endregion
     }
 }

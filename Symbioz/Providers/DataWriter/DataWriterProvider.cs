@@ -45,11 +45,18 @@ namespace Symbioz.Providers.DataWriter
         public void Generate()
         {
             Logger.Write(string.Format("Génération des fichiers de données ..."), DefaultColor);
-            this.GenerateGuildListMessage(ConfigurationManager.Instance.ServerId);
-            this.GenerateGuildVersatileInfoListMessage(ConfigurationManager.Instance.ServerId);
-            this.GenerateAllianceListMessage(ConfigurationManager.Instance.ServerId);
-            this.GenerateAllianceVersatileInfoListMessage(ConfigurationManager.Instance.ServerId);
-            Logger.Write(string.Format("Génération des fichiers de données terminée !"), DefaultColor);
+            if (Directory.Exists(ConfigurationManager.Instance.CyclicFileGenerationPath))
+            {
+                this.GenerateGuildListMessage(ConfigurationManager.Instance.ServerId);
+                this.GenerateGuildVersatileInfoListMessage(ConfigurationManager.Instance.ServerId);
+                this.GenerateAllianceListMessage(ConfigurationManager.Instance.ServerId);
+                this.GenerateAllianceVersatileInfoListMessage(ConfigurationManager.Instance.ServerId);
+                Logger.Write(string.Format("Génération des fichiers de données terminée !"), DefaultColor);
+            }
+            else
+            {
+                Logger.Error("Impossible de générer les fichiers de données car le dossier spécifié dans la configuration n'existe pas !");
+            }
         }
 
         #region Files Generation

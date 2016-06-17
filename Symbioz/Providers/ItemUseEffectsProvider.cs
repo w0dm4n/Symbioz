@@ -66,12 +66,16 @@ namespace Symbioz.Providers
                 }
                 else
                 {
-                    if (item.GID == 7401) // Parchemin de recherche
-                        client.Character.Reply("Impossible d'utiliser un parchemin de recherche sur vous même, vous devez cibler quelqu'un !");
-                    else
+                    switch(item.GID)
                     {
-                        if (client.Character.isDebugging)
-                            client.Character.NotificationError((EffectsEnum)effect.actionId + " n'est pas encore disponible !");
+                        case 7401: //Parchemins de recherche (Vierge)
+                            client.Character.Reply("Impossible d'utiliser un parchemin de recherche sur vous même, vous devez cibler quelqu'un !");
+                            break;
+
+                        default:
+                            if (client.Character.isDebugging)
+                                client.Character.NotificationError("L'effet " + (EffectsEnum)effect.actionId + " n'est pas encore implanté !");
+                            break;
                     }
                 }
             }

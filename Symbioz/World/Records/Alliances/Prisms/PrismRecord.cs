@@ -94,7 +94,7 @@ namespace Symbioz.World.Records.Alliances.Prisms
                 {
                     baseNextVulnerabilityDate = baseNextVulnerabilityDate.AddDays(1);
                 }
-                return new DateTime(baseNextVulnerabilityDate.Year, baseNextVulnerabilityDate.Month, baseNextVulnerabilityDate.Day,
+                return (int)new DateTime(baseNextVulnerabilityDate.Year, baseNextVulnerabilityDate.Month, baseNextVulnerabilityDate.Day,
                     GetKeyValuePairBySbyte(this.StartDefenseTime).Key, GetKeyValuePairBySbyte(this.StartDefenseTime).Value, 0).ToEpochTime();
             }
         }
@@ -291,7 +291,7 @@ namespace Symbioz.World.Records.Alliances.Prisms
 
         public void ChangeSettings(Character character, sbyte startDefenseTime)
         {
-            this.LastTimeSettingsModificationDate = DateTime.Now.ToEpochTime();
+            this.LastTimeSettingsModificationDate = (int)DateTime.Now.ToEpochTime();
             this.StartDefenseTime = startDefenseTime;
             this.UpdateLastModificationInformations(character);
         }

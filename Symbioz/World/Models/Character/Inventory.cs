@@ -111,7 +111,7 @@ namespace Symbioz.World.Models
             ItemCustomEffects.Instance.Init(newItem);
             Add(newItem, refresh);
             if (notif)
-                Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + "!");
+                Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + " !");
             return newItem;
         }
 
@@ -517,7 +517,7 @@ namespace Symbioz.World.Models
             }
 
            if (item.GID == 7400) // Parchemin lié
-                TracksRecord.DeleteTrackedByItemUID((int)item.UID);
+                TrackRecord.DeleteTrackedByItemUID((int)item.UID);
             if (quantity == item.Quantity)
             {
                 Items.Remove(item);

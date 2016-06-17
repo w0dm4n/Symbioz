@@ -805,6 +805,7 @@ namespace Symbioz.World.Handlers
             else
                 client.Character.Reply("Le joueur n'est pas mute.");
         }
+
         [InGameCommand("save", ServerRoleEnum.PLAYER)]
         public static void SavePlayer(string value, WorldClient client)
         {
@@ -812,7 +813,9 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible de sauvegarder votre personnage en combat !");
             else if (client.Character.CanSave())
             {
-                client.Character.LastCharacterSave = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                client.Character.LastCharacterSave = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                client.Character.Save();
+                client.Character.Reply("Votre personnage a bien été sauvegardé.");
             }
         }
 
@@ -840,20 +843,33 @@ namespace Symbioz.World.Handlers
         [InGameCommand("life", ServerRoleEnum.MODERATOR)]
         public static void GetLife(string value, WorldClient client)
         {
-            if (!client.Character.IsFighting)
+            if (string.IsNullOrEmpty(value))
             {
-                if (!client.Character.Restrictions.isDead)
+                if (!client.Character.IsFighting)
                 {
-                    client.Character.CurrentStats.LifePoints = (uint)client.Character.CharacterStatsRecord.LifePoints;
-                    client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
-                    client.Character.RefreshStats();
-                    client.Character.Reply("Vous avez récupérer vos points de vie !");
+                    if (!client.Character.Restrictions.isDead)
+                    {
+                        client.Character.CurrentStats.LifePoints = (uint)client.Character.CharacterStatsRecord.LifePoints;
+                        client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
+                        client.Character.RefreshStats();
+                        client.Character.Reply("Vous avez récupéré vos points de vie !");
+                    }
+                    else
+                        client.Character.Reply("Impossible de récupérer vos points de vie lorsque vous êtes mort !");
                 }
                 else
-                    client.Character.Reply("Impossible de récupérer vos points de vie en étant mort !");
+                    client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
             }
             else
-                client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
+            {
+                int percent = -1;
+                if(int.TryParse(value, out percent))
+                {
+                    client.Character.CurrentStats.LifePoints = (uint)((int)client.Character.CharacterStatsRecord.LifePoints).Percentage(percent);
+                    client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
+                    client.Character.RefreshStats();
+                }
+            }
         }
 
         [InGameCommand("direction", ServerRoleEnum.MODERATOR)]

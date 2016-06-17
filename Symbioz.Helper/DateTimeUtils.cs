@@ -11,13 +11,23 @@ namespace Shader.Helper
         public static int GetEpochFromDateTime(DateTime input)
         {
             TimeSpan timeSpan = input - new DateTime(1970, 1, 1);
-            int secondsSinceEpoch = (int)timeSpan.TotalSeconds;
-            return secondsSinceEpoch;
+            return (int)timeSpan.TotalSeconds;
+        }
+
+        public static double GetEpochInMillisFromDateTime(DateTime input)
+        {
+            TimeSpan timeSpan = input - new DateTime(1970, 1, 1);
+            return timeSpan.TotalMilliseconds;
         }
 
         public static int ToEpochTime(this DateTime input)
         {
             return DateTimeUtils.GetEpochFromDateTime(input);
+        }
+
+        public static double ToEpochTimeInMillis(this DateTime input)
+        {
+            return DateTimeUtils.GetEpochInMillisFromDateTime(input);
         }
 
         public static DateTime GetDateTimeFromEpoch(this int input)

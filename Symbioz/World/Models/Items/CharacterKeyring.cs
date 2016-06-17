@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Symbioz.World.Records.Items
+namespace Symbioz.World.Models.Items
 {
-    public class KeyringRecord
+    public class CharacterKeyring
     {
         public int KeyId;
         public int KeyTimeUse;
 
-        public KeyringRecord(int keyId, int keyItemUse)
+        public CharacterKeyring(int keyId, int keyItemUse)
         {
             this.KeyId = keyId;
             this.KeyTimeUse = keyItemUse;

@@ -1,4 +1,5 @@
 ﻿using Symbioz.Core;
+using Symbioz.Core.Startup;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Network.Servers;
 using Symbioz.ORM;
@@ -105,8 +106,6 @@ namespace Symbioz.World.Records
         [Update]
         public int LastConnection;
         [Update]
-        public bool WarnOnFriendConnection;
-        [Update]
         public int MoodSmileyId;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
@@ -115,7 +114,7 @@ namespace Symbioz.World.Records
             ushort spellpoints, ushort honor, List<ushort> knowntiles, List<ushort> knownornaments, ushort activetitle,
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
-            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int lastConnection, bool warnOnFriendConnection,
+            short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int lastConnection,
             int moodSmileyId)
         {
             this.Id = id;
@@ -160,7 +159,6 @@ namespace Symbioz.World.Records
             this.Succes = succes;
             this.CurrentLifePoint = currentLifePoint;
             this.LastConnection = lastConnection;
-            this.WarnOnFriendConnection = warnOnFriendConnection;
             this.MoodSmileyId = moodSmileyId;
         }
         [BeforeSave]
@@ -194,7 +192,7 @@ namespace Symbioz.World.Records
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, true, 0);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, 0);
         }
         public static bool CheckCharacterNameExist(string name)
         {

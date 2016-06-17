@@ -10,35 +10,17 @@ using Symbioz.DofusProtocol.Messages;
 using Symbioz.Network.Clients;
 using System.Collections.Generic;
 using Symbioz.Auth.Records;
+using Symbioz.ORM;
+using Symbioz.Enums;
 
 namespace Symbioz.World.Handlers
 {
-    class IgnoredHandler
+    public class IgnoredHandler
     {
         [MessageHandler]
         public static void HandleIgnoredGetListMessage(IgnoredGetListMessage message, WorldClient client)
         {
-            List<IgnoredInformations> AllIgnoreds = new List<IgnoredInformations>();
-            bool isOnline = false;
-            foreach (var Ignored in client.Character.IgnoredList)
-            {
-                isOnline = false;
-                var characters = CharacterRecord.GetAccountCharacters(Ignored.IgnoredAccountId);
-                var account = AccountsProvider.GetAccountFromDb(Ignored.IgnoredAccountId);
-                foreach (var character in characters)
-                {
-                    var target = WorldServer.Instance.GetOnlineClient(character.Name);
-                    if (target != null)
-                    {
-                        AllIgnoreds.Add(new IgnoredOnlineInformations(account.Id, account.Username, (uint)target.Character.Record.Id, target.Character.Record.Name,
-                            target.Character.Record.Breed, target.Character.Record.Sex));
-                        isOnline = true;
-                    }
-                }
-                if (isOnline == false)
-                    AllIgnoreds.Add(new IgnoredInformations(account.Id, account.Username));
-            }
-            client.Send(new IgnoredListMessage(AllIgnoreds));
+            SendIgnoredList(client);
         }
 
         [MessageHandler]
@@ -47,35 +29,85 @@ namespace Symbioz.World.Handlers
             var toAdd = WorldServer.Instance.GetOnlineClient(message.name);
             if (toAdd != null)
             {
-                if (!client.Character.AlreadyIgnored(toAdd.Character.Record.AccountId))
+                int accountId = toAdd.Character.Record.AccountId;
+                if (!message.session)
                 {
-                    client.Character.AddIgnored(toAdd.Character.Record.AccountId);
-                    client.Character.SaveAllIgnoreds();
-                    IgnoredHandler.HandleIgnoredGetListMessage(new IgnoredGetListMessage(), client);
+                    if (!client.Character.AlreadyEnemy(accountId))
+                    {
+                        SaveTask.AddElement(client.Character.AddEnemy(accountId), client.Character.Id);
+                        SendIgnoredList(client);
+                        //TODO: Failure, Quota
+                    }
+                }
+                else
+                {
+                    if(!client.Character.AlreadyIgnored(accountId))
+                    {
+                        if(client.Character.AddIgnored(accountId))
+                        {
+                            client.Send(new IgnoredAddedMessage(new IgnoredInformations(accountId, client.Character.GetIgnoredName(accountId)), true));
+                        }
+                        else
+                        {
+                            client.Send(new IgnoredAddFailureMessage((sbyte)ListAddFailureEnum.LIST_ADD_FAILURE_UNKNOWN));
+                        }
+                    }
                 }
             }
             else
-                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté !");
+                client.Send(new TextInformationMessage(1, 211, new string[0]));
         }
 
         [MessageHandler]
         public static void HandleIgnoredDeleteRequestMessage(IgnoredDeleteRequestMessage message, WorldClient client)
         {
-            foreach (var Ignored in client.Character.IgnoredList)
+            if(!message.session)
             {
-                var characters = CharacterRecord.GetAccountCharacters(Ignored.IgnoredAccountId);
+                if(client.Character.AlreadyEnemy(message.accountId))
+                {
+                    string name = client.Character.GetEnemyName(message.accountId);
+                    bool success = client.Character.RemoveEnemy(message.accountId);
+                    client.Send(new IgnoredDeleteResultMessage(success, false, name));
+                    SendIgnoredList(client);
+                }
+            }
+            else
+            {
+                if(client.Character.AlreadyIgnored(message.accountId))
+                {
+                    string name = client.Character.GetIgnoredName(message.accountId);
+                    bool success = client.Character.RemoveIgnored(message.accountId);
+                    client.Send(new IgnoredDeleteResultMessage(success, true, name));
+                }
+            }
+        }
+
+        #region Send
+
+        public static void SendIgnoredList(WorldClient client)
+        {
+            List<IgnoredInformations> allIgnoreds = new List<IgnoredInformations>();
+            foreach (var ignored in client.Character.Enemies)
+            {
+                var characters = CharacterRecord.GetAccountCharacters(ignored.IgnoredAccountId);
+                var account = AccountsProvider.GetAccountFromDb(ignored.IgnoredAccountId);
                 foreach (var character in characters)
                 {
                     var target = WorldServer.Instance.GetOnlineClient(character.Name);
                     if (target != null)
                     {
-                        client.Character.RemoveIgnored(Ignored.IgnoredAccountId);
-                        client.Send(new IgnoredDeleteResultMessage(true, true, target.Character.Record.Name));
-                        IgnoredHandler.HandleIgnoredGetListMessage(new IgnoredGetListMessage(), client);
-                        return;
+                        allIgnoreds.Add(new IgnoredOnlineInformations(account.Id, account.Username, (uint)target.Character.Record.Id, target.Character.Record.Name,
+                            target.Character.Record.Breed, target.Character.Record.Sex));
+                    }
+                    else
+                    {
+                        allIgnoreds.Add(new IgnoredInformations(account.Id, account.Username));
                     }
                 }
             }
+            client.Send(new IgnoredListMessage(allIgnoreds));
         }
+
+        #endregion
     }
 }

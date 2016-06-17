@@ -65,7 +65,7 @@ namespace Symbioz.World.Models.Fights
         }
         public override void ShowFightResults(List<FightResultListEntry> results, WorldClient client)
         {
-            client.Send(new GameFightEndMessage((ushort)TimeLine.m_round, 0, 0, results, new NamedPartyTeamWithOutcome[0]));
+            client.Send(new GameFightEndMessage(this.GetFightDuration(), 0, 0, results, new NamedPartyTeamWithOutcome[0]));
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Symbioz.ORM
     public static class DatabaseManager
     {
         private static MySqlConnection Provider;
+        private static MySqlConnection NonQueryProvider;
 
         private static string Host;
         private static string Database;
@@ -45,12 +46,27 @@ namespace Symbioz.ORM
             return Provider;
         }
 
+        public static MySqlConnection GetNonQueryProvider()
+        {
+            if (NonQueryProvider == null)
+            {
+                NonQueryProvider = new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
+                    Password, Database));
+            }
+            if (!NonQueryProvider.Ping())
+            {
+                NonQueryProvider.Close();
+                NonQueryProvider.Open();
+            }
+            return NonQueryProvider;
+        }
+
         public static MySqlConnection GetNewProvider()
         {
             if (IsInitialized)
             {
                 return new MySqlConnection(string.Format("Server={0};UserId={1};Password={2};Database={3}", Host, User,
-                    Password, Database));
+                        Password, Database));
             }
             else
             {

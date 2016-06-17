@@ -48,7 +48,6 @@ namespace Symbioz.World.Records
             this.Name = name;
             this.RealEffects = new ItemEffectsParser(Effects);
             this.Criteria = criteria;
-            
         }
         public ObjectItem GenerateRandomObjectItem()
         {

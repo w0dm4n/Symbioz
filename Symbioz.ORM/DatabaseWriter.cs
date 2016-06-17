@@ -94,7 +94,7 @@ namespace Symbioz.ORM
 
                 try
                 {
-                    this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
+                    this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
                     this.m_command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
@@ -117,7 +117,7 @@ namespace Symbioz.ORM
 
                         try
                         {
-                            this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
+                            this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
                             this.m_command.ExecuteNonQuery();
                         }
                         catch (Exception ex)
@@ -144,7 +144,7 @@ namespace Symbioz.ORM
 
                     try
                     {
-                        this.m_command = new MySqlCommand(command, DatabaseManager.GetProvider());
+                        this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
                         this.m_command.ExecuteNonQuery();
                     }
                     catch (Exception ex)

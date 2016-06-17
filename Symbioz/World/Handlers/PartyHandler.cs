@@ -25,9 +25,9 @@ namespace Symbioz.World.Handlers
             WorldClient target = WorldServer.Instance.GetOnlineClient(message.name); 
             Party p;
 
-            if (client.Character.isIgnoring(target.Character.Record.AccountId))
+            if (target.Character.IsIgnoring(client.Character.Record.AccountId))
             {
-                client.Character.Reply("Impossible car ce joueur vous ignore.");
+                client.Send(new TextInformationMessage(1, 370, new string[1] { target.Character.Record.Name }));
                 return;
             }
 
