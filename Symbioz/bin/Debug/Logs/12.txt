@@ -1,5 +1,11 @@
-Client: 127.0.0.1:59756
-At: 16/06/2016 19:57:49
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Character.CreateFighter(FightTeam team) dans C:\Users\utilisateur\Desktop\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 181
-   à Symbioz.World.Handlers.FightPreparationHandler.HandleChallengeAnswer(GameRolePlayPlayerFightFriendlyAnswerMessage message, WorldClient client) dans C:\Users\utilisateur\Desktop\Symbioz\Symbioz\World\Handlers\FightPreparationHandler.cs:ligne 50
+Client: 127.0.0.1:56014
+At: 17/06/2016 05:52:04
+System.ArgumentOutOfRangeException: L'index était hors limites. Il ne doit pas être négatif et doit être inférieur à la taille de la collection.
+Nom du paramètre : index
+   à System.ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument argument, ExceptionResource resource)
+   à System.Collections.Generic.List`1.get_Item(Int32 index)
+   à Symbioz.World.Models.MonsterGroup.GetActorInformations(MapRecord map, MonsterGroup group) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Monsters\MonsterGroup.cs:ligne 62
+   à Symbioz.World.Models.MonsterGroup.GetActorsInformations(MapRecord map, List`1 groups) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Monsters\MonsterGroup.cs:ligne 83
+   à Symbioz.World.Models.MapInstance.GetMonsters() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Maps\MapInstance.cs:ligne 200
+   à Symbioz.World.Models.MapInstance.GetActors(WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Maps\MapInstance.cs:ligne 89
+   à Symbioz.World.Handlers.MapsHandler.HandleMapInformations(MapInformationsRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\MapsHandler.cs:ligne 41

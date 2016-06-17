@@ -145,11 +145,13 @@ namespace Symbioz.Providers.FightResults
             var willDrop = fighter.Fight.ListDeadsItemsStartSize / Winners.Count;
             int[] dropped = new int[willDrop];
             int index = 0;
+            int infinite = 0;
             Random rand = new Random();
             while (willDrop != 0)
             {
                 if (Winners.Count != 1)
                 {
+                    infinite = 0;
                     while (true)
                     {
                         var randomValue = rand.Next(0, fighter.Fight.ListDeadItems.Count);
@@ -158,6 +160,9 @@ namespace Symbioz.Providers.FightResults
                             dropped[index] = randomValue;
                             break;
                         }
+                        infinite++;
+                        if (infinite > 100000)
+                            break;
                     }
                 }
                 else

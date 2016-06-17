@@ -134,6 +134,10 @@ namespace Symbioz.Core
 
         public int TimeForUseKeyring { get; set; }
 
+        public int ArchMonsterBySubArea { get; set; }
+
+        public int TimeBetweenSpawnArchMonster { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -166,6 +170,8 @@ namespace Symbioz.Core
             config.TurnBeforeFightDisconnection = 20;
             config.TimeBetweenCharacterSave = 120;
             config.TimeForUseKeyring = 7200;
+            config.ArchMonsterBySubArea = 1;
+            config.TimeBetweenSpawnArchMonster = 1800;
             return config;
         }
     }

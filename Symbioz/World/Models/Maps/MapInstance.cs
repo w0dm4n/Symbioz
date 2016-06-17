@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 using Symbioz.Enums;
 using Symbioz.World.Records.Alliances.Prisms;
 using Symbioz.World.PathProvider;
+using Symbioz.World.Records.SubAreas;
+using Shader.Helper;
+using Symbioz.Core;
 
 namespace Symbioz.World.Models
 {
@@ -126,9 +129,25 @@ namespace Symbioz.World.Models
                             num2 += monster.Probability;
                             if (num <= num2)
                             {
-                                monster.ActualGrade = (sbyte)random.Next(1, 6);
-                                monsters.Add(monster);
-                                break;
+                                MonsterRecord currentMonsterRecord = MonsterRecord.GetMonster(monster.MonsterId);
+                                if (currentMonsterRecord != null && currentMonsterRecord.Race == 78)
+                                {
+                                    var subArea = SubAreaRecord.GetSubArea(this.Record.SubAreaId);
+                                    if (SubAreaRecord.RefreshArchMonsterTime(this.Record.SubAreaId) || subArea.ArchMonsterCount < ConfigurationManager.Instance.ArchMonsterBySubArea)
+                                    {
+                                        subArea.ArchMonsterCount++;
+                                        SubAreaRecord.UpdateLastArchMonsterOnSubArea(this.Record.SubAreaId);
+                                        monster.ActualGrade = (sbyte)random.Next(1, 6);
+                                        monsters.Add(monster);
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    monster.ActualGrade = (sbyte)random.Next(1, 6);
+                                    monsters.Add(monster);
+                                    break;
+                                }
                             }
                         }
 

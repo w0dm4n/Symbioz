@@ -17,7 +17,7 @@
   <WelcomeMessage>Bienvenue sur le serveur de test héroique</WelcomeMessage>
   <ShowProtocolMessages>True</ShowProtocolMessages>
   <KamasDropRatio>1</KamasDropRatio>
-  <ExperienceRatio>10</ExperienceRatio>
+  <ExperienceRatio>8</ExperienceRatio>
   <ItemsDropRatio>1</ItemsDropRatio>
   <StartBankKamas>0</StartBankKamas>
   <Host>127.0.0.1</Host>
@@ -31,4 +31,6 @@
   <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>
   <TimeBetweenCharacterSave>60</TimeBetweenCharacterSave>
   <TimeForUseKeyring>7200</TimeForUseKeyring>
+  <ArchMonsterBySubArea>1</ArchMonsterBySubArea>
+  <TimeBetweenSpawnArchMonster>1800</TimeBetweenSpawnArchMonster>
 </Configuration>
