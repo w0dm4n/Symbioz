@@ -125,6 +125,7 @@ namespace Symbioz.Providers
             {
                 var targetPosition = MapRecord.GetMap(target.Character.Record.MapId);
                 var targetCoordinates = new MapCoordinates((short)targetPosition.WorldX, (short)targetPosition.WorldY);
+                client.Character.Reply("<b>" + target.Character.Record.Name + "</b> se trouve actuellement en : (<b>" + targetPosition.WorldX + "," + targetPosition.WorldY + "</b>)");
                 client.Send(new CompassUpdatePvpSeekMessage(0, targetCoordinates, (uint)target.Character.Id, target.Character.Record.Name));
             }
             else

@@ -45,6 +45,7 @@ namespace Symbioz.World.Handlers
                     {
                         if(client.Character.AddIgnored(accountId))
                         {
+                            client.Character.Reply("Ce joueur a été ignoré pour la session.");
                             client.Send(new IgnoredAddedMessage(new IgnoredInformations(accountId, client.Character.GetIgnoredName(accountId)), true));
                         }
                         else
