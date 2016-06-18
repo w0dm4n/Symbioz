@@ -42,18 +42,26 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
            
         }
+        //Poutch Event dommages en zones sans event pour Evité boucle infini
         public override bool OnEventCalled(object arg1, object arg2, object arg3)
         {
+            if (arg1 == null || arg2 == null)
+                return false;
+
             int sourceId = (int)arg1;
             TakenDamages damages = (TakenDamages)arg2;
-            damages.Delta = damages.GetDeltaPercentage(REWIND_PERCENTAGE);
+            Fighter source = Fighter.Fight.GetFighter(SourceId);
             List<short> cellIds = ShapesProvider.GetCrossCells(Fighter.CellId, Fighter.CellId, 1);
+            damages.Delta = damages.GetDeltaPercentage(REWIND_PERCENTAGE);
+
+            if (source == null)
+                return false;
             foreach (var cellId in cellIds)
             {
                 Fighter target = Fighter.Fight.GetFighter(cellId);
                 if (target != null)
                 {
-                    //target.Fight.Send(new DebugHighlightCellsMessage(0, new ushort[] { (ushort)cellId }));
+                    target.LoseLifeNoEvent(new TakenDamages(damages.Delta, ElementType.Neutral), source.ContextualId);
                 }
             }
             return false;

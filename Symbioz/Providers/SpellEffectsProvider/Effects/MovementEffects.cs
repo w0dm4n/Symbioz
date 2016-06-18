@@ -30,9 +30,9 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                 if (target != null)
                 {
                     line.Remove(target.CellId);
-                    List<short> cells = fighter.Fight.BreakAtFirstObstacles(line);
-                    if (cells.Count > 0)
-                        target.Slide(fighter.ContextualId, cells);
+                    List<short> cells = fighter.Fight.BreakAtFirstObstacles(target.CellId, line, dir);
+                    List<Fighter> next = fighter.Fight.GetFighterBreakAtFirstObstacles(fighter.CellId, line, dir);
+                    target.Slide(fighter.ContextualId, cells, 0, next);
                 }
             }
         }
@@ -187,18 +187,9 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
             {
                 List<short> line = ShapesProvider.GetLineFromOposedDirection(target.CellId, (byte)(effect.BaseEffect.DiceNum + 1), ShapesProvider.GetDirectionFromTwoCells(fighter.CellId, target.CellId));
 
-                List<short> cells = new List<short>();
-                foreach (var cell in line)
-                {
-                    if (!fighter.Fight.IsObstacle(cell) || cell == fighter.CellId)
-                        cells.Add(cell);
-                    else
-                        break;
-                }
-                if (cells.Count > 0)
-                {
-                    fighter.Slide(fighter.ContextualId, cells);
-                }
+                List<short> cells = fighter.Fight.BreakAtFirstObstacles(target.CellId, line, ShapesProvider.GetDirectionFromTwoCells(fighter.CellId, target.CellId));
+                List<Fighter> next = fighter.Fight.GetFighterBreakAtFirstObstacles(fighter.CellId, line, ShapesProvider.GetDirectionFromTwoCells(fighter.CellId, target.CellId));
+                fighter.Slide(fighter.ContextualId, cells, line.Count - cells.Count, next);
             }
 
         }
@@ -209,13 +200,10 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
             {
                 var direction = ShapesProvider.GetDirectionFromTwoCells(target.CellId, fighter.CellId);
                 List<short> line = ShapesProvider.GetLineFromDirection(target.CellId, (byte)effect.BaseEffect.DiceNum, direction);
-                List<short> cells = fighter.Fight.BreakAtFirstObstacles(line);
+                List<short> cells = fighter.Fight.BreakAtFirstObstacles(target.CellId, line, direction);
                 cells.Reverse();
-
-                if (cells.Count > 0)
-                {
-                    fighter.Slide(fighter.ContextualId, cells);
-                }
+                List<Fighter> next = fighter.Fight.GetFighterBreakAtFirstObstacles(fighter.CellId, line, direction);
+                fighter.Slide(fighter.ContextualId, cells, line.Count - cells.Count, next);
             }
         }
         [EffectHandler(EffectsEnum.Eff_PushBack_1103)]
@@ -239,11 +227,9 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                     direction = ShapesProvider.GetDirectionFromTwoCells(target.CellId, fighter.CellId);
                 }
                 List<short> line = ShapesProvider.GetLineFromDirection(target.CellId, effect.BaseEffect.DiceNum, direction);
-                List<short> cells = fighter.Fight.BreakAtFirstObstacles(line);
-                if (cells.Count > 0)
-                {
-                    target.Slide(fighter.ContextualId, cells);
-                }
+                List<short> cells = fighter.Fight.BreakAtFirstObstacles(target.CellId, line, direction);
+                List<Fighter> next = fighter.Fight.GetFighterBreakAtFirstObstacles(fighter.CellId, line, direction);
+                target.Slide(fighter.ContextualId, cells, line.Count - cells.Count, next);
             }
         }
         [EffectHandler(EffectsEnum.Eff_PushBack)]
@@ -262,11 +248,9 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                     direction = ShapesProvider.GetDirectionFromTwoCells(castcellid, target.CellId);
                 }
                 List<short> line = ShapesProvider.GetLineFromDirection(target.CellId, (byte)effect.BaseEffect.DiceNum, direction);
-                List<short> cells = fighter.Fight.BreakAtFirstObstacles(line);
-                if (cells.Count > 0)
-                {
-                    target.Slide(fighter.ContextualId, cells);
-                }
+                List<short> cells = fighter.Fight.BreakAtFirstObstacles(target.CellId, line, direction);
+                List<Fighter> next = fighter.Fight.GetFighterBreakAtFirstObstacles(fighter.CellId, line, direction);
+                target.Slide(fighter.ContextualId, cells, line.Count - cells.Count, next);
             }
 
         }

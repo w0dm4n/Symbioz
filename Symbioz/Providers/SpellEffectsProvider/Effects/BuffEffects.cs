@@ -190,8 +190,5 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                 target.AddBuff(buff);
             }
         }
-      
-
-
     }
 }

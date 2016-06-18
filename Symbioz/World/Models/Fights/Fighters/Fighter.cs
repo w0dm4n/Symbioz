@@ -244,16 +244,43 @@ namespace Symbioz.World.Models.Fights.Fighters
             return finalPath;
         }
 
-        public void Slide(int sourceid, List<short> cells)
+        public void Slide(int sourceid, List<short> cells, int push, List<Fighter> next)
         {
-            ApplyFighterEvent(FighterEventType.BEFORE_MOVE, cells);
-            LastPosition.Add(CellId);
-            cells = CheckMarks(cells);
-            Fight.TryStartSequence(ContextualId, 5);
-            Fight.Send(new GameActionFightSlideMessage(0, sourceid, ContextualId, CellId, cells.Last()));
-            CellId = cells.Last();
-            Fight.TryEndSequence(5, 0);
-            ApplyFighterEvent(FighterEventType.AFTER_MOVE, 0, cells); // 0 => mp cost
+            if (cells.Count > 0)
+            {
+                ApplyFighterEvent(FighterEventType.BEFORE_MOVE, cells);
+                LastPosition.Add(CellId);
+                cells = CheckMarks(cells);
+                Fight.TryStartSequence(ContextualId, 5);
+                Fight.Send(new GameActionFightSlideMessage(0, sourceid, ContextualId, CellId, cells.Last()));
+                CellId = cells.Last();
+                Fight.TryEndSequence(5, 0);
+                ApplyFighterEvent(FighterEventType.AFTER_MOVE, 0, cells); // 0 => mp cost
+            }
+            if (push > 0)
+                PushLocked(sourceid, push, next);
+        }
+
+        public void PushLocked(int SourceId, int push, List<Fighter> next)
+        {
+            Fighter source = Fight.GetFighter(SourceId);
+            var jet = CalculateJetPush(push, source.FighterStats.Stats.PushDamageBonus);
+            TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
+
+            if (next != null)
+            {
+                short div = 2;
+                foreach (var n in next)
+                {
+                    if (jet < 0)
+                        break;
+                    jet /= div;
+                    if (jet < 0)
+                        break;
+                    n.TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
+                    div++;
+                }
+            }
         }
 
         public virtual void Move(List<short> keys, short cellid, sbyte direction)
@@ -399,6 +426,26 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             m_buffedSpells.RemoveAll(x => x.SpellId == spellId && x.Delta == delta);
         }
+
+        public bool HaveConditionToLunchSpell(SpellLevelRecord spell)
+        {
+            foreach(var effect in spell.Effects)
+            {
+                switch (effect.BaseEffect.EffectType)
+                {
+                    case EffectsEnum.Eff_405:
+                    case EffectsEnum.Eff_Summon:
+                        if (this.FighterStats.Stats.SummonableCreaturesBoost == this.SummonCount)
+                            return (false);
+                        break;
+                    case EffectsEnum.Eff_SpawnBomb:
+                        if (3 == this.GetBombs().Count)
+                            return (false);
+                        break;
+                }
+            }
+            return true;
+        }
         public virtual bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
         {
             SpellLevelRecord spellLevl = GetSpellLevel(spellid);
@@ -422,6 +469,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             if (spellLevl.ApCost > FighterStats.Stats.ActionPoints)
             {
                 OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
+                return false;
+            }
+
+            if (!HaveConditionToLunchSpell(spellLevl))
+            {
+                OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
 
@@ -453,6 +506,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             switch (spellid)
             {
                 case 65://affichage des piege car c'est un plugin client
+                case 69:
                 case 71:
                 case 73:
                 case 77:
@@ -672,7 +726,65 @@ namespace Symbioz.World.Models.Fights.Fighters
                 ApplyFighterEvent(FighterEventType.AFTER_ATTACKED, sourceid, damages);
             }
             Fight.TryEndSequence(1, 103);
+        }
 
+        public void LoseLifeNoEvent(TakenDamages damages, int sourceid)
+        {
+            damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
+
+            if (damages.Delta <= 0)
+                return;
+
+            Fight.TryStartSequence(sourceid, 1);
+            if (FighterStats.ShieldPoints > 0)
+            {
+                if (FighterStats.ShieldPoints - damages.Delta <= 0)
+                {
+                    ushort rest = (ushort)(damages.Delta - FighterStats.ShieldPoints);
+                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage((ushort)ActionsEnum.ACTION_CHARACTER_BOOST_SHIELD, sourceid, ContextualId, rest, 0, (ushort)FighterStats.ShieldPoints));
+                    FighterStats.ShieldPoints = 0;
+                    if (FighterStats.Stats.LifePoints - rest <= 0)
+                    {
+                        FighterStats.Stats.LifePoints = 0;
+                        RefreshStats();
+                        Die();
+
+
+                    }
+                    else
+                    {
+                        ShowFighter();
+                        FighterStats.Stats.LifePoints -= (short)rest;
+                    }
+                    return;
+                }
+                else
+                {
+                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage(0, sourceid, ContextualId, 0, 0, (ushort)damages.Delta));
+                    FighterStats.ShieldPoints -= (int)damages.Delta;
+                    ShowFighter();
+                    return;
+                }
+            }
+            if (FighterStats.Stats.LifePoints - damages.Delta <= 0)
+            {
+                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)FighterStats.Stats.LifePoints, 0));
+                FighterStats.Stats.LifePoints = 0;
+                Die();
+                return;
+            }
+            else
+            {
+                ushort erosionDelta = (ushort)CalculateErosionDamage(damages.Delta);
+                FighterStats.RealStats.LifePoints -= (short)erosionDelta;
+                FighterStats.ErodedLife += erosionDelta;
+                FighterStats.Stats.LifePoints -= damages.Delta;
+
+                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)damages.Delta, erosionDelta));
+
+                RefreshStats();
+            }
+            Fight.TryEndSequence(1, 103);
         }
         public void AddBuff(Buff buff)
         {
@@ -816,6 +928,7 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         }
         public bool IsPlaying { get; set; }
+        public object TackenDamages { get; private set; }
 
         public abstract SpellLevelRecord GetSpellLevel(ushort spellid);
         public abstract int GetInitiative();
@@ -835,6 +948,11 @@ namespace Symbioz.World.Models.Fights.Fighters
                 ushort spellId = SpellLevelRecord.GetLevel(record.BaseEffect.SpellLevelId).SpellId;
                 jet += GetSpellBoost(spellId);
             }
+            return (short)(Math.Floor((double)jet * (100 + statdata + FighterStats.Stats.AllDamagesBonusPercent) / 100) + FighterStats.Stats.AllDamagesBonus);
+        }
+        public short CalculateJetPush(int push, short statdata)
+        {
+            short jet = (short)(push * 25);//25 degat/cases
             return (short)(Math.Floor((double)jet * (100 + statdata + FighterStats.Stats.AllDamagesBonusPercent) / 100) + FighterStats.Stats.AllDamagesBonus);
         }
         public bool IsAligned(Fighter fighter)

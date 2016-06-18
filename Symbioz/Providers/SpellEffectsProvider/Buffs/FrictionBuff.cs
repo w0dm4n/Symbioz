@@ -43,10 +43,10 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
                 return false;
 
             DirectionsEnum dir = ShapesProvider.GetDirectionFromTwoCells(Fighter.CellId, source.CellId);
-            List<short> cells = Fighter.Fight.BreakAtFirstObstacles(ShapesProvider.GetLineFromDirection(Fighter.CellId, 1, dir));
-
-            if (cells.Count > 0) 
-                Fighter.Slide(SourceId, new List<short>() { Fighter.CellId, cells[0] });
+            List<short> line = ShapesProvider.GetLineFromDirection(Fighter.CellId, 1, dir);
+            List<short> cells = Fighter.Fight.BreakAtFirstObstacles(Fighter.CellId, line, dir);
+            List<Fighter> next = Fighter.Fight.GetFighterBreakAtFirstObstacles(Fighter.CellId, line, dir);
+            Fighter.Slide(SourceId, new List<short>() { Fighter.CellId, cells[0] }, line.Count - cells.Count, next);
 
             return false;
         }

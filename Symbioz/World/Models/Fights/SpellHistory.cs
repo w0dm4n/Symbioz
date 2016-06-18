@@ -28,13 +28,20 @@ namespace Symbioz.World.Models.Fights
             {
                 if (@default.CastInterval > 0)
                 {
+                    Logger.Log("LOCK BY CASTINTERVAL");
                     return false;
                 }
             }
-            if (count == level.MaxCastPerTurn && count != 0)
+            if (count > level.MaxCastPerTurn && count != 0 && level.MaxCastPerTurn != 0)//a verifier
+            {
+                Logger.Log("LOCK BY MAXPERTURN Count:" + count + " > maxperturn:" + level.MaxCastPerTurn);
                 return false;
-            if (count == level.MaxCastPerTarget && targetId != 0 && count != 0)
+            }
+            if (count > level.MaxCastPerTarget && targetId != 0 && count != 0 && level.MaxCastPerTarget != 0)//a verifier
+            {
+                Logger.Log("LOCK BY MAXCASTPERTARGET Count:" + count + " > maxpertarget" + level.MaxCastPerTarget);
                 return false;
+            }
             return true;
         }
         public void OnTurnEnded()

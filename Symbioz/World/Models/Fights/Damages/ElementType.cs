@@ -13,6 +13,7 @@ namespace Symbioz.World.Models.Fights.Damages
         Water,
         Fire,
         Neutral,
+        Push,
 
     }
 }

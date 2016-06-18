@@ -38,7 +38,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
         {
             var direction = ShapesProvider.GetDirectionFromTwoCells(Fighter.CellId,source.CellId);
             List<short> line = ShapesProvider.GetLineFromOposedDirection(Fighter.CellId,Delta, direction);
-            List<short> cells = Fighter.Fight.BreakAtFirstObstacles(line);
+            List<short> cells = Fighter.Fight.BreakAtFirstObstacles(Fighter.CellId, line, direction);
             if (cells.Count > 0)
             {
                 Fighter.Fight.TryStartSequence(Fighter.ContextualId, 5);

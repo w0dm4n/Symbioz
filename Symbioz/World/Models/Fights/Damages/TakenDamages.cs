@@ -63,6 +63,11 @@ namespace Symbioz.World.Models.Fights.Damages
                     elementReduction = (short)(target.FighterStats.Stats.NeutralReduction + (pvp? target.FighterStats.Stats.PvPNeutralReduction : 0));
                     elementResistPercent = target.FighterStats.Stats.NeutralResistPercent + (pvp ? target.FighterStats.Stats.PvPNeutralResistPercent : 0);
                     break;
+                case ElementType.Push:
+                    elementBonus = source.FighterStats.Stats.PushDamageBonus;
+                    elementReduction = (short)(target.FighterStats.Stats.PushDamageReduction);
+                    elementResistPercent = 0;
+                    break;
                 default:
                     break;
             }
@@ -80,6 +85,31 @@ namespace Symbioz.World.Models.Fights.Damages
             }
             if (Delta <= 0)
                 Delta = 0;
+        }
+
+        public int EvaluatePushResistances(Fighter source, Fighter target, bool pvp)
+        {
+            if (source == null)
+                return (0);
+            short elementBonus = 0;
+            short elementReduction = 0;
+            double elementResistPercent = 0;
+
+            elementBonus = source.FighterStats.Stats.PushDamageBonus;
+            elementReduction = (short)(target.FighterStats.Stats.PushDamageReduction);
+            elementResistPercent = 0;
+            Delta += elementBonus;
+            if (source.UsingWeapon)
+                Delta += (short)((source.FighterStats.Stats.WeaponDamagesBonusPercent / 100) * Delta);
+            if (elementResistPercent != 0)
+                Delta = (short)(Delta - elementReduction - (elementResistPercent / 100 * Delta));
+            else
+                Delta -= elementReduction;
+            if (target.FighterStats.Stats.GlobalDamageReduction > 0)
+            {
+                return (target.FighterStats.Stats.GlobalDamageReduction);
+            }
+            return (0);
         }
 
     }

@@ -286,7 +286,7 @@ namespace Symbioz.World.Models.Fights
         }
         #endregion
         #region ManageMethods
-        public List<short> BreakAtFirstObstacles(List<short> cells)
+        /*public List<short> BreakAtFirstObstacles(List<short> cells)
         {
 
             List<short> results = new List<short>();
@@ -305,6 +305,144 @@ namespace Symbioz.World.Models.Fights
                 }
             }
             return results;
+        }*/
+        public List<short> BreakAtFirstObstacles(short endcell, List<short> cells, DirectionsEnum direction)
+        {
+
+            List<short> results = new List<short>();
+            if (cells == null)
+                return results;
+            foreach (var cell in cells)
+            {
+                if (!IsObstacle(cell) && !IsOutMap(endcell, cell, direction))
+                {
+                    results.Add(cell);
+                }
+                else
+                {
+                    break;
+                }
+                endcell = cell;
+            }
+            return results;
+        }
+
+        public List<Fighter> GetFighterBreakAtFirstObstacles(short endcell, List<short> cells, DirectionsEnum direction)
+        {
+
+            List<Fighter> results = new List<Fighter>();
+            if (cells == null)
+                return null;
+            bool colled = false;
+            foreach (var cell in cells)
+            {
+                if (GetAllFighters().ConvertAll<short>(x => x.CellId).Contains(cell) && !IsOutMap(endcell, cell, direction))
+                {
+                    colled = true;
+                    foreach (var f in GetAllFighters())
+                    {
+                        if (f.CellId == cell)
+                            results.Add(f);
+                    }
+                }
+                else
+                {
+                    if (colled)
+                        break;
+                }
+                endcell = cell;
+            }
+            return results;
+        }
+
+        public bool IsOutMap(short endcellid, short cellid, DirectionsEnum dir)
+        {
+            switch (dir)
+            {
+                case DirectionsEnum.DIRECTION_NORTH_EAST:
+                    if (endcellid >= 0 && endcellid <= 13)//line top
+                        return (true);
+                    if (IsrightMap(endcellid))//line right
+                        return (true);
+                    break;
+                case DirectionsEnum.DIRECTION_NORTH_WEST:
+                    if (endcellid >= 0 && endcellid <= 13)//line top
+                        return (true);
+                    if (IsleftMap(endcellid))//line left
+                        return (true);
+                    break;
+                case DirectionsEnum.DIRECTION_SOUTH_EAST:
+                    if (endcellid >= 546 && endcellid <= 559)
+                        return (true);
+                    if (IsrightMap(endcellid))//line right
+                        return (true);
+                    break;
+                case DirectionsEnum.DIRECTION_SOUTH_WEST:
+                    if (endcellid >= 546 && endcellid <= 559)
+                        return (true);
+                    if (IsleftMap(endcellid))//line left
+                        return (true);
+                    break;
+            }
+            return (false);
+        }
+
+        public bool IsrightMap(short cell)
+        {
+            switch (cell)
+            {
+                case 27:
+                case 55:
+                case 83:
+                case 111:
+                case 139:
+                case 167:
+                case 195:
+                case 223:
+                case 251:
+                case 279:
+                case 307:
+                case 335:
+                case 363:
+                case 391:
+                case 419:
+                case 447:
+                case 475:
+                case 503:
+                case 531:
+                case 559:
+                    return (true);
+            }
+            return (false);
+        }
+
+        public bool IsleftMap(short cell)
+        {
+            switch (cell)
+            {
+                case 0:
+                case 28:
+                case 56:
+                case 84:
+                case 112:
+                case 140:
+                case 168:
+                case 196:
+                case 224:
+                case 252:
+                case 280:
+                case 308:
+                case 336:
+                case 364:
+                case 392:
+                case 420:
+                case 448:
+                case 476:
+                case 504:
+                case 532:
+                    return (true);
+            }
+            return (false);
         }
         public bool IsObstacle(short cellid)
         {
