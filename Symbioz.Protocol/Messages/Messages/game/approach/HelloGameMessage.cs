@@ -1,23 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Generated on 06/04/2015 18:44:11
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +15,6 @@ public override ushort MessageId
 {
     get { return Id; }
 }
-
 
 
 public HelloGameMessage()

@@ -1,5 +1,7 @@
-﻿using Symbioz.Enums;
+﻿using Symbioz.DofusProtocol.Messages;
+using Symbioz.Enums;
 using Symbioz.Providers.SpellEffectsProvider.Buffs;
+using Symbioz.World.Models;
 using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Records.Spells;
 using System;
@@ -7,6 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Symbioz.World.Records;
+using Symbioz.Providers.FightResults.Exp;
+using Symbioz.Network.Clients;
 
 namespace Symbioz.Providers.SpellEffectsProvider.Effects
 {
@@ -23,19 +28,19 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var affected in affecteds)
             {
+                int baseretrait = effect.BaseEffect.DiceNum;
+                int wisdom = fighter.FighterStats.Stats.Wisdom;
+                int calculretrait = baseretrait * wisdom / 100;
 
-
-                // TODO ALGO
-
-                //if (loss == 0)
-                //{
-                //    fighter.Fight.Send(new GameActionFightDodgePointLossMessage((ushort)ActionsEnum.ACTION_FIGHT_SPELL_DODGED_PA, fighter.ContextualId, affected.ContextualId,(ushort)maxLost));
-                //}
-                //else 
-                //{
-                //    var buff = new APBuff((uint)affected.BuffIdProvider.Pop(),loss, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType);
-                //    affected.AddBuff(buff);
-                //}
+                if (calculretrait == 0)
+                {
+                    fighter.Fight.Send(new GameActionFightDodgePointLossMessage((ushort)ActionsEnum.ACTION_FIGHT_SPELL_DODGED_PA, fighter.ContextualId, affected.ContextualId,(ushort)calculretrait));
+                }
+                else 
+                {
+                    var buff = new APBuff((uint)affected.BuffIdProvider.Pop(), (short)calculretrait, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType, effect.BaseEffect.Delay);
+                    affected.AddBuff(buff);
+                }
             }
         }
         [EffectHandler(EffectsEnum.Eff_SubAP)]
@@ -89,17 +94,23 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var affected in affecteds)
             {
-                // TODO, ALGO
+                int baseretrait = effect.BaseEffect.DiceNum;
+                int wisdom = fighter.FighterStats.Stats.Wisdom;
+                int calculretrait = baseretrait * wisdom / 100;
 
-                //if (loss == 0)
-                //{
-                //    fighter.Fight.Send(new GameActionFightDodgePointLossMessage((ushort)ActionsEnum.ACTION_FIGHT_SPELL_DODGED_PM, fighter.ContextualId, affected.ContextualId, (ushort)maxLost));
-                //}
-                //else
-                //{
-                //    var buff = new MPBuff((uint)affected.BuffIdProvider.Pop(), loss, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType);
-                //    affected.AddBuff(buff);
-                //}
+
+
+
+                if (calculretrait == 0)
+                {
+                    fighter.Fight.Send(new GameActionFightDodgePointLossMessage((ushort)ActionsEnum.ACTION_FIGHT_SPELL_DODGED_PM, fighter.ContextualId, affected.ContextualId, (ushort)calculretrait));
+                }
+                else
+                {
+                    var buff = new MPBuff((uint)affected.BuffIdProvider.Pop(), (short)calculretrait, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType, effect.BaseEffect.Delay);
+                    affected.AddBuff(buff);
+                }
+                
             }
         }
         #endregion
