@@ -35,5 +35,11 @@ namespace Shader.Helper
             DateTime dateTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return dateTimeOrigin.AddSeconds(input);
         }
+
+        public static bool IsNumeric(string s)
+        {
+            float output;
+            return float.TryParse(s, out output);
+        }
     }
 }

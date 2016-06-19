@@ -126,6 +126,10 @@ namespace Symbioz.World.Handlers
                 client.Send(new LeaveDialogMessage((sbyte)client.Character.CurrentDialogType));
                 client.Character.CurrentDialogType = null;
             }
+            if (client.Character.ShopStockInstance != null)
+            {
+                client.Character.ShopStockInstance.CancelExchange();
+            }
         }
         [MessageHandler]
         public static void HandleShortcutBarSwap(ShortcutBarSwapRequestMessage message, WorldClient client)

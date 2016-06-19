@@ -107,6 +107,9 @@ namespace Symbioz.World.Records
         public int LastConnection;
         [Update]
         public int MoodSmileyId;
+        [Update]
+        public int MerchantMode;
+        
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -115,7 +118,7 @@ namespace Symbioz.World.Records
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
             short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int lastConnection,
-            int moodSmileyId)
+            int moodSmileyId, int merchantMode)
         {
             this.Id = id;
             this.Name = name;
@@ -160,6 +163,7 @@ namespace Symbioz.World.Records
             this.CurrentLifePoint = currentLifePoint;
             this.LastConnection = lastConnection;
             this.MoodSmileyId = moodSmileyId;
+            this.MerchantMode = merchantMode;
         }
         [BeforeSave]
         public static void BeforeSave()
@@ -192,7 +196,7 @@ namespace Symbioz.World.Records
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, 0);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, 0, 0);
         }
         public static bool CheckCharacterNameExist(string name)
         {
@@ -222,5 +226,6 @@ namespace Symbioz.World.Records
                 Locker.ExitReadLock();
             }
         }
+
     }
 }

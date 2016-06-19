@@ -39,11 +39,6 @@ namespace Symbioz.World.Handlers
             client.Character.BidShopInstance.ShowBidHouseType(message.type);
         }
         [MessageHandler]
-        public static void HandleAddItemInBid(ExchangeObjectMovePricedMessage message, WorldClient client)
-        {
-            client.Character.BidShopInstance.AddItem(message.objectUID, message.quantity, message.price);
-        }
-        [MessageHandler]
         public static void HandleExchangeItemBidHouseBuy(ExchangeBidHouseBuyMessage message,WorldClient client)
         {
             client.Character.BidShopInstance.BuyItem(message.uid, message.qty, message.price);

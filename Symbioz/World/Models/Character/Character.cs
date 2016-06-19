@@ -82,6 +82,7 @@ namespace Symbioz.World.Models
         public List<IgnoredRecord> Enemies = new List<IgnoredRecord>();
         public List<IgnoredRecord> Ignored = new List<IgnoredRecord>();
         public List<CharacterKeyring> Keyrings = new List<CharacterKeyring>();
+        public List<CharactersMerchantsRecord> MerchantItems = new List<CharactersMerchantsRecord>();
 
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
@@ -89,6 +90,7 @@ namespace Symbioz.World.Models
         public SmithMagicExchange SmithMagicInstance { get; set; }
         public BankExchange BankInstance { get; set; }
         public BidShopExchange BidShopInstance { get; set; }
+        public ShopStockExchange ShopStockInstance { get; set; }
         public PlayerTradeExchange PlayerTradeInstance { get; set; }
         public CraftExchange CraftInstance { get; set; }
         public PrismExchange PrismStorageInstance { get; set; }
@@ -131,6 +133,7 @@ namespace Symbioz.World.Models
 
             this.Inventory = new Inventory(this);
 
+            this.LoadMerchantItems();
             this.LoadFriends();
             this.LoadEnemies();
 
@@ -138,8 +141,9 @@ namespace Symbioz.World.Models
         }
         public void OnConnectedBasicActions()
         {
+            if (this.Record.MerchantMode == 1)
+                this.Record.MerchantMode = 0;
             this.SendOnlineFriendsCountMessage();
-
             this.GetLifeBackAtConnection();
             this.RegenLife(10);
         }
@@ -719,6 +723,14 @@ namespace Symbioz.World.Models
                 Record.Name, new HumanInformations(Restrictions, Record.Sex, HumanOptions),
                 Client.Account.Id, GetActorAlignement());
         }
+
+
+        public GameRolePlayMerchantInformations GetRolePlayMerchantInformations()
+        {
+             return new GameRolePlayMerchantInformations(Id, this.Look.Clone(), new EntityDispositionInformations(this.Record.CellId, this.Record.Direction), this.Record.Name
+                , 3, this.HumanOptions);
+        }
+
         public void AddKamas(int amount, bool shownotif = false)
         {
             if (amount <= int.MaxValue)
@@ -812,11 +824,12 @@ namespace Symbioz.World.Models
                 case ExchangeTypeEnum.BIDHOUSE_BUY:
                     if (BidShopInstance != null)
                         BidShopInstance.CancelExchange();
-
                     break;
                 case ExchangeTypeEnum.STORAGE:
                     if (BankInstance != null)
                         BankInstance.CancelExchange();
+                    if (ShopStockInstance != null)
+                        ShopStockInstance.CancelExchange();
                     break;
                 case ExchangeTypeEnum.RUNES_TRADE:
                     if (SmithMagicInstance != null)
@@ -834,7 +847,7 @@ namespace Symbioz.World.Models
 
         public void Dispose()
         {
-            if (Map != null)
+            if (Map != null && this.Record.MerchantMode == 0)
                 Map.Instance.RemoveClient(Client);
             if (SearchingArena)
                 ArenaProvider.Instance.OnClientDisconnected(Client);
@@ -1107,6 +1120,34 @@ namespace Symbioz.World.Models
             else
                 return true;
         }
+
+        #region MerchantItems
+        public void LoadMerchantItems()
+        {
+            this.MerchantItems = CharactersMerchantsRecord.GetCharactersItems(this.Id);
+        }
+
+        public uint GetTaxCost()
+        {
+            uint cost = 0;
+            var quantityIndex = 0;
+            uint tmp = 0;
+            foreach (var item in this.MerchantItems)
+            {
+                quantityIndex = 0;
+                while (quantityIndex <= item.Quantity)
+                {
+                    tmp = item.Price / 15000;
+                    if (tmp != 0)
+                        cost += tmp;
+                    else
+                        cost += 1;
+                    quantityIndex++;
+                }
+            }
+            return cost;
+        }
+        #endregion
 
         #region Friends, Enemies, Ignored
 

@@ -562,7 +562,20 @@ namespace Symbioz.World.Models
 
         public List<ObjectItem> ConvertAllObjectItems()
         {
-            return Items.ConvertAll<ObjectItem>(x => x.GetObjectItem());
+            List<ObjectItem> ItemsList = new List<ObjectItem>();
+            foreach (var Item in Items)
+            {
+                if (!CharactersMerchantsRecord.InMerchantList((int)Item.UID))
+                    ItemsList.Add(Item.GetObjectItem());
+                else
+                {
+                    var itemObject = Item.GetObjectItem();
+                    itemObject.quantity -= (uint)CharactersMerchantsRecord.GetQuantityFromUID((int)itemObject.objectUID);
+                    if (itemObject.quantity > 0)
+                        ItemsList.Add(itemObject);
+                }
+            }
+            return ItemsList;
         }
 
         public List<ItemRecord> ConvertAllToTemplates()
@@ -587,18 +600,20 @@ namespace Symbioz.World.Models
             uint actual = 0;
             foreach (var item in Items)
             {
-                var template = ItemRecord.GetItem(item.GID);
-                WeaponRecord test = null;
-                if (template == null)
-                    test = WeaponRecord.GetWeapon(item.GID);
-                for (int i = 0; i < item.Quantity; i++)
+                if (!CharactersMerchantsRecord.InMerchantList((int)item.UID))
                 {
-                    if (template != null)
-                        actual += (uint)template.Weight;
-                    else if (test != null)
-                        actual += (uint)test.RealWeight;
+                    var template = ItemRecord.GetItem(item.GID);
+                    WeaponRecord weapon = null;
+                    if (template == null)
+                        weapon = WeaponRecord.GetWeapon(item.GID);
+                    for (int i = 0; i < item.Quantity; i++)
+                    {
+                        if (template != null)
+                            actual += (uint)template.Weight;
+                        else if (weapon != null)
+                            actual += (uint)weapon.RealWeight;
+                    }
                 }
-
             }
             return actual;
         }

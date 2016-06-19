@@ -25,7 +25,7 @@
   <RealHost />
   <SafeRun>False</SafeRun>
   <CyclicFileGenerationInterval>900000</CyclicFileGenerationInterval>
-  <CyclicFileGenerationPath>C:/wamp64/www/games/dofus2/game-export/</CyclicFileGenerationPath>
+  <CyclicFileGenerationPath>E:/uwamp/www/games/dofus2/game-export/</CyclicFileGenerationPath>
   <TimeBetweenSalesMessage>20</TimeBetweenSalesMessage>
   <TimeBetweenSeekMessage>20</TimeBetweenSeekMessage>
   <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>

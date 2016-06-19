@@ -123,6 +123,10 @@ namespace Symbioz.World.Handlers
             client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
             client.Character.UpdateBreedSpells();
             client.Character.LearnAllJobs();
+
+            /* GIVE KEYRING AT CHARACTER CREATION */
+            client.Character.Inventory.Add(10207, 1);
+
             Logger.Log("Character " + newCharacter.Name + " created!");
             SaveTask.AddElement(client.Character.Record, client.CharacterId);
             ProcessSelection(client);

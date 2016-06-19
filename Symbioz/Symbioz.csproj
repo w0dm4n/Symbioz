@@ -143,11 +143,13 @@
     <Compile Include="World\Handlers\IgnoredHandler.cs" />
     <Compile Include="World\Handlers\SuccesHandler.cs" />
     <Compile Include="World\Handlers\TargetableObjectHandler.cs" />
+    <Compile Include="World\Handlers\MerchantHandler.cs" />
     <Compile Include="World\Models\Alliances\AllianceInvitationDialog.cs" />
     <Compile Include="World\Models\Alliances\AllianceProvider.cs" />
     <Compile Include="Network\CharactersDisconnected.cs" />
     <Compile Include="World\Models\Alliances\Prisms\PrismsManager.cs" />
     <Compile Include="World\Models\Exchanges\PrismExchange.cs" />
+    <Compile Include="World\Models\Exchanges\ShopStockExchange.cs" />
     <Compile Include="World\Models\Fights\CastSpellCheck\CharacterStates.cs" />
     <Compile Include="World\Models\Fights\CastSpellCheck\MonsterStates.cs" />
     <Compile Include="World\Models\Fights\Fighters\SacrifierFighter.cs" />
@@ -319,6 +321,7 @@
     <Compile Include="World\Records\Alliances\Prisms\Modules\PrismModuleRecord.cs" />
     <Compile Include="World\Records\Alliances\Prisms\PrismRecord.cs" />
     <Compile Include="World\Records\Character\CharacteristicRecord.cs" />
+    <Compile Include="World\Records\Character\CharactersMerchantsRecord.cs" />
     <Compile Include="World\Records\Character\EmoteRecord.cs" />
     <Compile Include="World\Records\Character\GeneralShortcutRecord.cs" />
     <Compile Include="World\Records\Character\OrnamentRecord.cs" />

@@ -73,8 +73,28 @@ namespace Symbioz.World.Models
         }
         List<GameRolePlayCharacterInformations> GetPlayers()
         {
+            List<GameRolePlayCharacterInformations> ListPlayers = new List<GameRolePlayCharacterInformations>();
+            foreach (var client in Clients)
+            {
+                if (client.Character.Record.MerchantMode == 0)
+                    ListPlayers.Add(client.Character.GetRolePlayActorInformations());
+            }
             return Clients.ConvertAll<GameRolePlayCharacterInformations>(x => x.Character.GetRolePlayActorInformations());
         }
+
+        List<GameRolePlayMerchantInformations> GetPlayersMerchant()
+        {
+            List<GameRolePlayMerchantInformations> ListPlayersMerchant = new List<GameRolePlayMerchantInformations>();
+            foreach (var client in Clients)
+            {
+                if (client.Character.Record.MerchantMode == 1)
+                {
+                    ListPlayersMerchant.Add(client.Character.GetRolePlayMerchantInformations());
+                }
+            }
+            return ListPlayersMerchant;
+        }
+
         public List<InteractiveElement> GetInteractiveElements()
         {
             return Interactives.ConvertAll<InteractiveElement>(x => x.GetInteractiveElement());
@@ -93,6 +113,7 @@ namespace Symbioz.World.Models
                 actors.Add(this.Prism.GetGameRolePlayPrismInformations(client));
             }
             actors.AddRange(GetPlayers());
+            actors.AddRange(GetPlayersMerchant());
             return actors;
         }
 
@@ -141,6 +162,11 @@ namespace Symbioz.World.Models
                                         monsters.Add(monster);
                                         break;
                                     }
+                                    else
+                                    {
+                                        w--;
+                                        break;
+                                    }
                                 }
                                 else
                                 {
@@ -150,7 +176,6 @@ namespace Symbioz.World.Models
                                 }
                             }
                         }
-
                     }
                     MonstersGroups.Add(new MonsterGroup(groupId + MonsterGroup.START_ID, monsters, (ushort)Record.RandomWalkableCell()));
                 }

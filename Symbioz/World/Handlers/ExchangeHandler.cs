@@ -117,9 +117,17 @@ namespace Symbioz.World.Handlers
                     {
                         client.Character.PrismStorageInstance.MoveItem(message.objectUID, message.quantity);
                     }
+                    if (client.Character.ShopStockInstance != null)
+                    {
+                        client.Character.ShopStockInstance.RemoveItem(message.objectUID);
+                    }
                     break;
                 case ExchangeTypeEnum.RUNES_TRADE:
                     client.Character.SmithMagicInstance.MoveItem(message.objectUID, message.quantity);
+                    break;
+
+                case ExchangeTypeEnum.SHOP_STOCK:
+                    client.Character.Reply("Crève");
                     break;
             }
 

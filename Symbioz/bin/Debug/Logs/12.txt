@@ -1,11 +1,9 @@
-Client: 127.0.0.1:56014
-At: 17/06/2016 05:52:04
-System.ArgumentOutOfRangeException: L'index était hors limites. Il ne doit pas être négatif et doit être inférieur à la taille de la collection.
-Nom du paramètre : index
-   à System.ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument argument, ExceptionResource resource)
-   à System.Collections.Generic.List`1.get_Item(Int32 index)
-   à Symbioz.World.Models.MonsterGroup.GetActorInformations(MapRecord map, MonsterGroup group) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Monsters\MonsterGroup.cs:ligne 62
-   à Symbioz.World.Models.MonsterGroup.GetActorsInformations(MapRecord map, List`1 groups) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Monsters\MonsterGroup.cs:ligne 83
-   à Symbioz.World.Models.MapInstance.GetMonsters() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Maps\MapInstance.cs:ligne 200
-   à Symbioz.World.Models.MapInstance.GetActors(WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Maps\MapInstance.cs:ligne 89
-   à Symbioz.World.Handlers.MapsHandler.HandleMapInformations(MapInformationsRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\MapsHandler.cs:ligne 41
+Client: 127.0.0.1:57235
+At: 19/06/2016 06:25:00
+MySql.Data.MySqlClient.MySqlException (0x80004005): There is already an open DataReader associated with this Connection which must be closed first.
+   à MySql.Data.MySqlClient.ExceptionInterceptor.Throw(Exception exception)
+   à MySql.Data.MySqlClient.MySqlConnection.Ping()
+   à Symbioz.Core.AuthDatabaseProvider.CheckConnectionState() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\SQL\AuthDatabaseProvider.cs:ligne 26
+   à Symbioz.Core.AuthDatabaseProvider.get_Connection() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\SQL\AuthDatabaseProvider.cs:ligne 37
+   à Symbioz.Auth.Records.AccountsProvider.GetAccountFromDb(String username) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Records\AccountsProvider.cs:ligne 70
+   à Symbioz.Auth.Handlers.ConnectionHandler.HandleIdentificationMessage(IdentificationMessage message, AuthClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Handlers\ConnectionHandler.cs:ligne 30

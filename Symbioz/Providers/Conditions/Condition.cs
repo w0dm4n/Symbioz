@@ -1,4 +1,5 @@
-﻿using Symbioz.Network.Clients;
+﻿using Shader.Helper;
+using Symbioz.Network.Clients;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,18 @@ namespace Symbioz.Providers.Conditions
 
         public static bool BasicEval(string conditionvalue,char comparaisonsymbol,int delta)
         {
-            int conditionalDelta = int.Parse(conditionvalue);
+            var conditionalDelta = 0;
+            if (DateTimeUtils.IsNumeric(conditionvalue))
+                conditionalDelta = int.Parse(conditionvalue);
+            else
+            {
+                var Array = conditionvalue.Split('|');
+                if (Array.Count() > 1)
+                {
+                    if (DateTimeUtils.IsNumeric(Array[0]))
+                        conditionalDelta = int.Parse(Array[0]);
+                }
+            }
             switch (comparaisonsymbol)
             {
                 case '=':
