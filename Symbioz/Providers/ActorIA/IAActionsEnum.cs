@@ -14,6 +14,7 @@ namespace Symbioz.Providers.ActorIA.Actions
         MoveToLowerEnemy = 3,
         AgressivSpellCast = 4,
         Flee = 5,
-        ANIMATED_BAG = 7
+        ANIMATED_BAG = 7,
+        MoveToalignEnemy = 8
     }
 }

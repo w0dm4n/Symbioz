@@ -450,7 +450,6 @@ namespace Symbioz.World.Models.Fights
                 return true;
             if (GetAllFighters().ConvertAll<short>(x => x.CellId).Contains(cellid))
                 return true;
-
             return false;
         }
         public T GetFighter<T>(Predicate<T> predicate) where T : Fighter

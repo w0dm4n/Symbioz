@@ -53,7 +53,12 @@ namespace Symbioz.Providers.ActorIA
         }
         public void StartPlay()
         {
-            NextAction();
+            int boucle = 4;
+            while (boucle > 0)
+            {
+                NextAction();
+                boucle--;
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         public List<GameFightSpellCooldown> Cooldowns = new List<GameFightSpellCooldown>();
         public TreeFighter tree = null;
         public SacrifierFighter sacrifier = null;
+        public bool isSummon = false;
         public MonsterFighter(MonsterSpawnMapRecord spawn, FightTeam team)
             : base(team)
         {
@@ -43,6 +44,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.SpawnRecord.ActualGrade = grade;
             this.Team = team;
             this.Team.AddSummon(this);
+            this.isSummon = true;
             switch (SpawnRecord.MonsterId)
             {
                 case 282://Arbre

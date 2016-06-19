@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Symbioz.Providers.ActorIA.Actions
 {
-  //  [IAAction(IAActionsEnum.MOVE_TO_ALLY)]
+    [IAAction(IAActionsEnum.MoveToalignEnemy)]
     class MoveToLowerAllyAction : AbstractIAAction
     {
         public override void Execute(MonsterFighter fighter)
@@ -16,10 +16,10 @@ namespace Symbioz.Providers.ActorIA.Actions
             if (fighter.FighterStats.Stats.MovementPoints <= 0)
                 return;
 
-            Fighter lower = fighter.Team.LowerFighter();
+            Fighter lower = fighter.Team.LowerProchAlignFighter(fighter, fighter.FighterStats.Stats.MovementPoints);
             var path = new Pathfinder(fighter.Fight.Map, fighter.CellId);
             path.PutEntities(fighter.Fight.GetAllFighters());
-            var cells = path.FindPath(lower.CellId);
+            var cells = path.FindPathProche(lower.CellId, fighter.FighterStats.Stats.MovementPoints, fighter.CellId);
             if (cells == null || cells.Count() <= 1)
                 return;
             cells.Remove(cells.Last());

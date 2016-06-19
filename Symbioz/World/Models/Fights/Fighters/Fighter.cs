@@ -434,6 +434,9 @@ namespace Symbioz.World.Models.Fights.Fighters
                 switch (effect.BaseEffect.EffectType)
                 {
                     case EffectsEnum.Eff_405:
+                        //if (this.FighterStats.Stats.SummonableCreaturesBoost == this.FighterStats.s)
+                        //    return (false);
+                        break;
                     case EffectsEnum.Eff_Summon:
                         if (this.FighterStats.Stats.SummonableCreaturesBoost == this.SummonCount)
                             return (false);
@@ -450,34 +453,37 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             SpellLevelRecord spellLevl = GetSpellLevel(spellid);
 
+            Logger.Log("la1");
             if (!IsPlaying)
             {
                 OnSpellCastFailed(CastFailedReason.NOT_PLAYING, spellLevl);
                 return false;
             }
+            Logger.Log("la2");
             if (Fight.Ended)
             {
                 OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spellLevl);
                 return false;
             }
-
+            Logger.Log("la3");
             if (!ValidState(spellLevl))
             {
                 OnSpellCastFailed(CastFailedReason.FORBIDDEN_STATE, spellLevl);
                 return false;
             }
+            Logger.Log("la4" + spellLevl.ApCost + " PA :" + FighterStats.Stats.ActionPoints);
             if (spellLevl.ApCost > FighterStats.Stats.ActionPoints)
             {
                 OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
                 return false;
             }
-
+            Logger.Log("la5");
             if (!HaveConditionToLunchSpell(spellLevl))
             {
                 OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
-
+            Logger.Log("la6");
             if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
             {
                 short[] portal = new short[0];
@@ -486,17 +492,20 @@ namespace Symbioz.World.Models.Fights.Fighters
                 UsingWeapon = false;
                 return result;
             }
+            Logger.Log("la7");
             if (targetId == 0)
             {
                 var target = Fight.GetFighter(cellid);
                 if (target != null)
                     targetId = target.ContextualId;
             }
+            Logger.Log("la8");
             if (!SpellHistory.CanCast(spellLevl, targetId))
             {
                 OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
+            Logger.Log("la9");
 
             this.Fight.TryStartSequence(this.ContextualId, 1);
             FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
@@ -623,6 +632,11 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             int Distance = PathHelper.GetDistanceBetween(targetedcell, this.CellId);
             if (Distance > level.MaxRange + FighterStats.Stats._Range || Distance < level.MinRange)
+            {
+                OnSpellCastFailed(CastFailedReason.RANGE, level);
+                return false;
+            }
+            if (level.CastTestLos && )
             {
                 OnSpellCastFailed(CastFailedReason.RANGE, level);
                 return false;

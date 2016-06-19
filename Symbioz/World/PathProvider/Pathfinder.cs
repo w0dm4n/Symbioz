@@ -1,4 +1,6 @@
 ﻿
+using Symbioz.Enums;
+using Symbioz.PathProvider;
 using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Records;
 using System.Collections.Generic;
@@ -91,6 +93,34 @@ namespace Symbioz.World.PathProvider
                 this.AddToOpen(bestCell, this.GetNeighbors(bestCell));
             }
             this.m_end.Walkable = false;
+            return null;
+        }
+
+        public List<short> FindPathProche(short target, int pm, short start)
+        {
+            List <short> lst = FindPath(target);
+
+            if (lst == null)
+            {
+                List<DirectionsEnum> dirs = new List<DirectionsEnum>();
+                dirs.Add(DirectionsEnum.DIRECTION_NORTH_EAST);
+                dirs.Add(DirectionsEnum.DIRECTION_NORTH_WEST);
+                dirs.Add(DirectionsEnum.DIRECTION_SOUTH_EAST);
+                dirs.Add(DirectionsEnum.DIRECTION_SOUTH_WEST);
+                foreach (DirectionsEnum dir in dirs)
+                {
+                    short cell = PathHelper.GetNearCellByDirection(target, dir);
+                    int nbr = PathHelper.GetDistanceBetween(start, cell);
+
+                    if (nbr > pm)
+                        continue;
+                    lst = FindPath(cell);
+                    if (lst != null)
+                        return (lst);
+                }
+            }
+            else
+                return (lst);
             return null;
         }
 

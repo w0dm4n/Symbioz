@@ -27,7 +27,10 @@ namespace Symbioz.Providers.ActorIA
             foreach (SpellCategoryEnum category in Enum.GetValues(typeof(SpellCategoryEnum)))
             {
                 if (File.Exists(SpellCategory.GetFileName(category)))
+                {
                     Categories.Add(SpellCategory.FromCategory(category));
+                    SpellCategory.FromCategory(category).Serialize();
+                }
             }
             foreach (var spell in SpellRecord.Spells)
             {

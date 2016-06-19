@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.World.Records;
+using Symbioz.World.Records.Spells;
 
 namespace Symbioz.Providers.ActorIA.Actions
 {
@@ -28,10 +29,22 @@ namespace Symbioz.Providers.ActorIA.Actions
         }
         public override void Execute(MonsterFighter fighter)
         {
-            Fighter lower = fighter.GetOposedTeam().LowerFighter();
+            var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
+            int po = 2;
+            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))
+            {
+                foreach (int s in spell.SpellLevels)
+                {
+                    SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
+                    if (record == null)
+                        continue;
+                    if (po < record.MaxRange)
+                        po = record.MaxRange;
+                }
+            }
+            Fighter lower = fighter.GetOposedTeam().LowerProchFighter(fighter, po);
             if (lower == null)
                 return;
-            var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
 
             
             foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))

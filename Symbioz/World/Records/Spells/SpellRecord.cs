@@ -30,6 +30,7 @@ namespace Symbioz.World.Records
             this.TypeId = typeid;
             this.IconId = iconid;
             this.SpellLevels = spelllevels;
+
         }
         public static ushort GetSpellId(int levelid)
         {

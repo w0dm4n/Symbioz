@@ -11,15 +11,22 @@ namespace Symbioz.Providers.ActorIA.Actions
     [IAAction(IAActionsEnum.MoveToLowerEnemy)]
     public class MoveToLowerEnemy : AbstractIAAction
     {
+        //search fighter priority not summon and lower life, select cells proch
         public override void Execute(MonsterFighter fighter)
         {
             if (fighter.FighterStats.Stats.MovementPoints <= 0)
                 return;
+            Logger.Log("MOVETOLOWERENEMY");
+            // search fighter lower by pm
+            Fighter lower = fighter.GetOposedTeam().LowerProchFighter(fighter, fighter.FighterStats.Stats.MovementPoints);
 
-            Fighter lower = fighter.GetOposedTeam().LowerFighter();
+            //si c'est un summon que que c'est notre fin de tour ont regarde plus loin un fighter non summon
+            if (fighter.FighterStats.Stats.ActionPoints <= 2 && lower is MonsterFighter && (lower as MonsterFighter).isSummon)
+                lower = fighter.GetOposedTeam().LowerProchFighter(fighter, 6);
+
             var path = new Pathfinder(fighter.Fight.Map, fighter.CellId);
             path.PutEntities(fighter.Fight.GetAllFighters());
-            var cells = path.FindPath(lower.CellId);
+            var cells = path.FindPathProche(lower.CellId, fighter.FighterStats.Stats.MovementPoints, fighter.CellId);
             if (cells == null || cells.Count() <= 1)
                 return;
             cells.Remove(cells.Last());

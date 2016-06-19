@@ -40,6 +40,7 @@ namespace Symbioz.Providers.ActorIA
         }
         public static string GetFileName(SpellCategoryEnum category)
         {
+            Logger.Log(FILES_DIRECTORY + category + ".xml");
             return FILES_DIRECTORY + category + ".xml";
         }
     }

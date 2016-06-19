@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using Symbioz.Enums;
+using Symbioz.World.Models.Fights;
 
 namespace Symbioz.PathProvider
 {
@@ -199,6 +200,65 @@ namespace Symbioz.PathProvider
                 default:
                     return 0;
             }
+        }
+
+        public static List<short> Getalldirection(Fight fight, short cell)
+        {
+            List<short> result = new List<short>();
+
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH_EAST), DirectionsEnum.DIRECTION_NORTH_EAST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH_EAST));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH_WEST), DirectionsEnum.DIRECTION_NORTH_WEST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH_WEST));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH_EAST), DirectionsEnum.DIRECTION_SOUTH_EAST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH_EAST));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH_WEST), DirectionsEnum.DIRECTION_SOUTH_WEST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH_WEST));
+            return (result);
+        }
+
+        public static List<short> Getalldirectionlines(Fight fight, short Cell1)
+        {
+            List<short> result = new List<short>();
+            short tmp = Cell1;
+            short endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_NORTH_EAST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_NORTH_EAST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+            }
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_NORTH_WEST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_NORTH_WEST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+            }
+
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_SOUTH_EAST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_SOUTH_EAST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+            }
+
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_SOUTH_WEST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_SOUTH_WEST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+            }
+            return (result);
         }
 
         public static int GetDirectionNew(int BeginCell, int EndCell)

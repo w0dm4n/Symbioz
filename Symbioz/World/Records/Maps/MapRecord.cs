@@ -35,6 +35,7 @@ namespace Symbioz.World.Records
         public List<short> WalkableCells;
         public List<short> BlueCells;
         public List<short> RedCells;
+        //public List<short> LosCells;
         public int WorldX;
         public int WorldY;
         public bool DugeonMap { get { return DungeonRecord.IsDungeonMap(this.Id); } }

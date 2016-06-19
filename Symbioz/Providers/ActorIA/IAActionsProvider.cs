@@ -16,12 +16,12 @@ namespace Symbioz.Providers.ActorIA
         public static void Initialize()
         {
             var types = Assembly.GetAssembly(typeof(IAActionsProvider)).GetTypesWithAttribute(typeof(IAAction));
+
             foreach (var type in types)
             {
                 IAAction attribute = type.GetCustomAttribute<IAAction>();
-                IAActions.Add(attribute.Action,Activator.CreateInstance(type) as AbstractIAAction);
+                IAActions.Add(attribute.Action, Activator.CreateInstance(type) as AbstractIAAction);
             }
-
         }
         public static AbstractIAAction GetAction(IAActionsEnum action)
         {
