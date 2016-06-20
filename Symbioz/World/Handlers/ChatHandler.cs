@@ -129,7 +129,7 @@ namespace Symbioz.World.Handlers
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_SEEK;
             if (client.Character.CanSendSeekMessage())
             {
-                WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
+                WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
                 client.Character.UpdateLastSeekMessage();
             }
         }
@@ -138,14 +138,14 @@ namespace Symbioz.World.Handlers
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_SALES;
             if (client.Character.CanSendSalesMessage())
             {
-                WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
+                WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
                 client.Character.UpdateLastSalesMessage();
             }
         }
         public static void Global(WorldClient client, string message)
         {
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_GLOBAL;
-            ChatServerMessage chatMessage = new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id);
+            ChatServerMessage chatMessage = new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id);
             if (client.Character.IsFighting)
                 client.Character.FighterInstance.Fight.Send(chatMessage);
             else
@@ -162,7 +162,7 @@ namespace Symbioz.World.Handlers
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_ADMIN;
             if (client.Account.Role >= ServerRoleEnum.ADMINISTRATOR)
             {
-                WorldServer.Instance.SendToOnlineCharacters(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                WorldServer.Instance.SendToOnlineCharacters(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
             }
             else
                 client.Character.Reply("Vous n'avez pas les droits pour utiliser ce chat");
@@ -174,7 +174,7 @@ namespace Symbioz.World.Handlers
             {
                 foreach(WorldClient c in client.Character.PartyMember.Party.Members)
                 {
-                    c.Send(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                    c.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace Symbioz.World.Handlers
                 GuildRecord guild = client.Character.GetGuild();
                 foreach (WorldClient c in WorldServer.Instance.GetAllClientsOnline().FindAll(x=>x.Character.GetGuild() == guild))
                 {
-                    c.Send(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                    c.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
                 }
             }
         }
@@ -198,7 +198,7 @@ namespace Symbioz.World.Handlers
             {
                 AllianceRecord alliance = client.Character.GetAlliance();
                 foreach (WorldClient c in WorldServer.Instance.GetAllClientsOnline().FindAll(x => x.Character.GetAlliance() == alliance))
-                    c.Send(new ChatServerMessage(channel, message, 1, "Symbioz", client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                    c.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
             }
         }
     }

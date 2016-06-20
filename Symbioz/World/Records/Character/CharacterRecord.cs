@@ -109,7 +109,16 @@ namespace Symbioz.World.Records
         public int MoodSmileyId;
         [Update]
         public int MerchantMode;
-        
+        [Ignore]
+        public bool IsMerchantMode
+        {
+            get
+            {
+                return this.MerchantMode == 1 ? true : false;
+            }
+        }
+        [Ignore]
+        public string MerchantMessage;
 
         public CharacterRecord(int id, string name, int accountid, string look, string oldLook, byte level, sbyte breed,
             bool sex, int mapid, short cellid, sbyte direction, int kamas, ulong exp, int titleid,
@@ -227,5 +236,17 @@ namespace Symbioz.World.Records
             }
         }
 
+        public static void AddKamasOnCharacterId(int CharacterId, int Kamas)
+        {
+            foreach (var character in Characters)
+            {
+                if (character.Id == CharacterId)
+                {
+                    character.Kamas += Kamas;
+                    SaveTask.UpdateElement(character);
+                    break;
+                }
+            }
+        }
     }
 }

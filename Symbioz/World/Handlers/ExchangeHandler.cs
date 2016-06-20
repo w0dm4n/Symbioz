@@ -22,6 +22,8 @@ namespace Symbioz.World.Handlers
 
             if (client.Character.NpcShopExchange != null)
                 client.Character.NpcShopExchange.Buy((ushort)message.objectToBuyId, message.quantity);
+            if (client.Character.ShopStockInstance != null)
+                client.Character.ShopStockInstance.Buy(message.objectToBuyId, message.quantity);
 
         }
         [MessageHandler]

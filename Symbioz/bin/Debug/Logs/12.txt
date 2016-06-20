@@ -1,9 +1,6 @@
-Client: 127.0.0.1:57235
-At: 19/06/2016 06:25:00
-MySql.Data.MySqlClient.MySqlException (0x80004005): There is already an open DataReader associated with this Connection which must be closed first.
-   à MySql.Data.MySqlClient.ExceptionInterceptor.Throw(Exception exception)
-   à MySql.Data.MySqlClient.MySqlConnection.Ping()
-   à Symbioz.Core.AuthDatabaseProvider.CheckConnectionState() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\SQL\AuthDatabaseProvider.cs:ligne 26
-   à Symbioz.Core.AuthDatabaseProvider.get_Connection() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Core\SQL\AuthDatabaseProvider.cs:ligne 37
-   à Symbioz.Auth.Records.AccountsProvider.GetAccountFromDb(String username) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Records\AccountsProvider.cs:ligne 70
-   à Symbioz.Auth.Handlers.ConnectionHandler.HandleIdentificationMessage(IdentificationMessage message, AuthClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Auth\Handlers\ConnectionHandler.cs:ligne 30
+Client: 127.0.0.1:63009
+At: 20/06/2016 01:26:56
+System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
+   à Symbioz.World.Models.Inventory.AddItemRecordWithQuantity(CharacterItemRecord item, UInt32 quantity, Boolean refresh) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 117
+   à Symbioz.World.Models.Exchanges.ShopStockExchange.Buy(UInt32 ObjectUID, UInt32 Quantity) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Exchanges\ShopStockExchange.cs:ligne 184
+   à Symbioz.World.Handlers.ExchangeHandler.HandleExchangeBuy(ExchangeBuyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ExchangeHandler.cs:ligne 26

@@ -142,7 +142,11 @@ namespace Symbioz.World.Models
         public void OnConnectedBasicActions()
         {
             if (this.Record.MerchantMode == 1)
+            {
+                this.Inventory.Refresh();
+                this.UnSetMerchantLook();
                 this.Record.MerchantMode = 0;
+            }
             this.SendOnlineFriendsCountMessage();
             this.GetLifeBackAtConnection();
             this.RegenLife(10);
@@ -724,6 +728,23 @@ namespace Symbioz.World.Models
                 Client.Account.Id, GetActorAlignement());
         }
 
+        public void SetMerchantLook()
+        {
+            this.Look.subentities.Add(new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MERCHANT_BAG, 0, new ContextActorLook(237, new List<ushort>(), new List<int>(), new List<short>() { 100 }, new List<SubEntity>())));
+            this.Look.UnsetAura();
+        }
+
+        public void UnSetMerchantLook()
+        {
+            foreach (var subs in this.Look.subentities)
+            {
+                if (subs.bindingPointCategory == (sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MERCHANT_BAG)
+                {
+                    this.Look.subentities.Remove(subs);
+                    break;
+                }
+            }
+        }
 
         public GameRolePlayMerchantInformations GetRolePlayMerchantInformations()
         {

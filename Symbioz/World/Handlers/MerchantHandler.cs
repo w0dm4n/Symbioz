@@ -87,18 +87,7 @@ namespace Symbioz.World.Handlers
                     client.Send(new TextInformationMessage(0, 57, data));
                     return;
                 }
-                client.Character.RemoveKamas((int)client.Character.GetTaxCost(), false);
-                var clientsOnMap = WorldServer.Instance.GetOnlineClientOnMap(client.Character.Record.MapId);
-                var Informations = new GameRolePlayMerchantInformations(client.Character.Record.Id, client.Character.Look.Clone(), new EntityDispositionInformations(client.Character.Record.CellId, client.Character.Record.Direction), client.Character.Record.Name
-                    , 3, client.Character.HumanOptions);
-                foreach (var target in clientsOnMap)
-                {
-                    if (target != client)
-                        target.Send(new GameRolePlayShowActorMessage(Informations));
-                }
-                client.Character.Record.MerchantMode = 1;
-                SaveTask.UpdateElement(client.Character.Record, client.Character.Record.Id);
-                client.Disconnect();
+                client.SendRaw("merchant");
             }
            
         }
@@ -116,6 +105,7 @@ namespace Symbioz.World.Handlers
                     if (item != null)
                         ItemsObject.Add(new ObjectItemToSellInHumanVendorShop(item.GID, item.GetEffects(), item.UID, itemList.Quantity, itemList.Price, itemList.Price));
                 }
+                client.Character.ShopStockInstance = new ShopStockExchange(client);
                 client.Character.CurrentDialogType = DialogTypeEnum.DIALOG_EXCHANGE;
                 client.Send(new ExchangeStartOkHumanVendorMessage(message.humanVendorId, ItemsObject));
             }
@@ -123,7 +113,6 @@ namespace Symbioz.World.Handlers
             {
                 client.Character.Reply("Impossible car ce joueur n'a aucun item a vendre !", Color.Red);
             }
-            //ExchangeStartOkHumanVendorMessage
         }
     }
 }

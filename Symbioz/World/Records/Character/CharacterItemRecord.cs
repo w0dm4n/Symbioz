@@ -224,5 +224,30 @@ namespace Symbioz.World.Models
         {
             return new CharacterItemRecord(UID, 63, GID, CharacterId, Quantity, Effects);
         }
+
+        public static void DeleteItemByUID(int ObjectUID)
+        {
+            foreach (var item in CharactersItems)
+            {
+                if (item.UID == ObjectUID)
+                {
+                    SaveTask.RemoveElement(item);
+                    break;
+                }
+            }
+        }
+
+        public static void UpdateItemQuantityByUID(int ObjectUID, int newQuantity)
+        {
+            foreach (var item in CharactersItems)
+            {
+                if (item.UID == ObjectUID)
+                {
+                    item.Quantity = (uint)newQuantity;
+                    SaveTask.UpdateElement(item);
+                    break;
+                }
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using Symbioz.ORM;
 using Symbioz.World.Records;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -156,6 +157,57 @@ namespace Symbioz.World.Models.Exchanges
                         }
                     }
                     break;
+                }
+            }
+        }
+
+        public void Buy(uint ObjectUID, uint Quantity)
+        {
+            var ItemMerchant = CharactersMerchantsRecord.GetItemFromUID((int)ObjectUID);
+            var price = 0;
+            var tmpQuantity = Quantity;
+            if (tmpQuantity > ItemMerchant.Quantity)
+            {
+                Client.Character.Reply("Impossible d'effectuer cet achat !", Color.Red);
+                return;
+            }
+            if (ItemMerchant != null)
+            {
+                if (tmpQuantity <= ItemMerchant.Quantity)
+                {
+                    while (tmpQuantity > 0)
+                    {
+                        price += (int)ItemMerchant.Price;
+                        tmpQuantity--;
+                    }
+                    if (Client.Character.Record.Kamas >= price)
+                    {
+                        var item = CharacterItemRecord.GetItemByUID((uint)ItemMerchant.ItemUID);
+                        if (item != null)
+                        {
+                            Client.Character.RemoveKamas(price);
+                            CharacterRecord.AddKamasOnCharacterId(ItemMerchant.CharacterId, price);
+                            Client.Character.Inventory.AddItemRecordWithQuantity(item.CloneAndGetNewUID(), Quantity, true, Client.Character.Record.Id);
+                            if ((ItemMerchant.Quantity - Quantity) <= 0)
+                            {
+                                Client.Send(new ExchangeShopStockMovementRemovedMessage(item.UID));
+                                CharacterItemRecord.DeleteItemByUID(ItemMerchant.ItemUID);
+                                CharactersMerchantsRecord.DeleteFromUID(ItemMerchant.ItemUID);
+                            }
+                            else
+                            {
+                                var itemObject = new ObjectItemToSell(item.GID, item.GetEffects(), item.UID, (uint)(ItemMerchant.Quantity - Quantity), ItemMerchant.Price);
+                                Client.Send(new ExchangeShopStockMovementUpdatedMessage(itemObject));
+
+                                CharacterItemRecord.UpdateItemQuantityByUID((int)item.UID, (int)(item.Quantity - Quantity));
+                                CharactersMerchantsRecord.UpdateItemQuantityFromUID((int)item.UID, (int)(ItemMerchant.Quantity - Quantity));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Client.Character.Reply("Vous n'avez pas assez de kamas pour effecter cet achat.", Color.Red);
+                    }
                 }
             }
         }

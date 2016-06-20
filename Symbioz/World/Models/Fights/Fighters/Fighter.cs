@@ -636,7 +636,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 OnSpellCastFailed(CastFailedReason.RANGE, level);
                 return false;
             }
-            if (level.CastTestLos && )
+            if (level.CastTestLos)
             {
                 OnSpellCastFailed(CastFailedReason.RANGE, level);
                 return false;

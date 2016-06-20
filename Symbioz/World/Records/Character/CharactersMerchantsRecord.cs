@@ -67,6 +67,18 @@ namespace Symbioz.World.Records
             }
         }
 
+        public static CharactersMerchantsRecord GetItemFromUID(int itemUID)
+        {
+            foreach (var item in CharactersMerchants)
+            {
+                if (item.ItemUID == itemUID)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+
         public static uint GetQuantityFromUID(int itemUID)
         {
             foreach (var m in CharactersMerchantsRecord.CharactersMerchants)
@@ -84,6 +96,31 @@ namespace Symbioz.World.Records
                 if (all.CharacterId == characterId)
                     items.Add(all);
             return (items.Count != 0) ? items : null;
+        }
+
+        public static void DeleteFromUID(int ObjectUID)
+        {
+            foreach (var item in CharactersMerchants)
+            {
+                if (item.ItemUID == ObjectUID)
+                {
+                    SaveTask.RemoveElement(item);
+                    break;
+                }
+            }
+        }
+
+        public static void UpdateItemQuantityFromUID(int ObjectUID, int newQuantity)
+        {
+            foreach (var item in CharactersMerchants)
+            {
+                if (item.ItemUID == ObjectUID)
+                {
+                    item.Quantity = (uint)newQuantity;
+                    SaveTask.UpdateElement(item);
+                    break;
+                }
+            }
         }
     }
 }

@@ -135,8 +135,11 @@
     <Compile Include="Providers\CustomObjectUseHandler.cs" />
     <Compile Include="Providers\CustomTargetableObjectHandler.cs" />
     <Compile Include="Providers\DataWriter\DataWriterProvider.cs" />
+    <Compile Include="RawData\RawMessages\MerchantMessage.cs" />
     <Compile Include="RawData\RawMessages\MotdAllianceMessage.cs" />
     <Compile Include="RawData\RawMessages\RawMessage.cs" />
+    <Compile Include="World\CyclicMerchantAdsTask.cs" />
+    <Compile Include="World\Handlers\ActorLook.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
     <Compile Include="World\Handlers\ApproachHandler.cs" />
     <Compile Include="World\Handlers\FriendsHandler.cs" />

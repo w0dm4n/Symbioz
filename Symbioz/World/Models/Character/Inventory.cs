@@ -81,14 +81,12 @@ namespace Symbioz.World.Models
                 Items.Add(item);
                 if (!CharacterItemRecord.CharactersItems.Contains(item))
                 {
-                    Console.WriteLine("UID : " + item.UID);
                     SaveTask.AddElement(item, this.Character.Id);
                 }
             }
             else
             {
                 existingItem.Quantity += item.Quantity;
-                Console.WriteLine("UpdateElement");
                 SaveTask.UpdateElement(existingItem, this.Character.Id);
             }
             if (refresh)
@@ -97,6 +95,32 @@ namespace Symbioz.World.Models
                 Character.RefreshShortcuts();
             }
         }
+
+        public void AddItemRecordWithQuantity(CharacterItemRecord item, uint quantity, bool refresh = true, int characterId = 0)
+        {
+            var existingItem = Items.ExistingItem(item);
+            item.CharacterId = characterId;
+            item.Quantity = quantity;
+            if (existingItem == null)
+            {
+                Items.Add(item);
+                SaveTask.AddElement(item, this.Character.Id);
+            }
+            else
+            {
+                existingItem.Quantity += item.Quantity;
+                SaveTask.UpdateElement(existingItem, this.Character.Id);
+            }
+            if (refresh)
+            {
+                ItemRecord template = ItemRecord.GetItem(item.GID);
+                if (template != null)
+                    Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + " !");
+                Refresh();
+                Character.RefreshShortcuts();
+            }
+        }
+
         public CharacterItemRecord Add(ushort gid, uint quantity, bool notif = true, bool refresh = true)
         {
             ItemRecord template = ItemRecord.GetItem(gid);

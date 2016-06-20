@@ -15,6 +15,8 @@ using Symbioz.ORM;
 using Symbioz.Network.Servers;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Models.Alliances;
+using Symbioz.World.Records;
+using Symbioz.DofusProtocol.Types;
 
 namespace Symbioz.RawData
 {
@@ -82,6 +84,29 @@ namespace Symbioz.RawData
                         worldClient.Character.Reply("Vous avez modifié le message d'accueil de votre alliance.");
                     }
                 }
+            }
+        }
+
+        [RawHandlerAttribute(MerchantMessage.Id)]
+        public static void HandleMerchantMessage(DofusClient client, MerchantMessage message)
+        {
+            var worldClient = WorldServer.Instance.GetOnlineClientByAccountId(client.Account.Id);
+            if (worldClient != null)
+            {
+                worldClient.Character.RemoveKamas((int)worldClient.Character.GetTaxCost(), false);
+                worldClient.Character.SetMerchantLook();
+                var clientsOnMap = WorldServer.Instance.GetOnlineClientOnMap(worldClient.Character.Record.MapId);
+                var Informations = new GameRolePlayMerchantInformations(worldClient.Character.Record.Id, worldClient.Character.Look.Clone(), new EntityDispositionInformations(worldClient.Character.Record.CellId, worldClient.Character.Record.Direction), worldClient.Character.Record.Name
+                    , 3, worldClient.Character.HumanOptions);
+                foreach (var target in clientsOnMap)
+                {
+                    if (target != client)
+                        target.Send(new GameRolePlayShowActorMessage(Informations));
+                }
+                worldClient.Character.Record.MerchantMessage = message.Message;
+                worldClient.Character.Record.MerchantMode = 1;
+                SaveTask.UpdateElement(worldClient.Character.Record, worldClient.Character.Record.Id);
+                worldClient.Disconnect();
             }
         }
     }
