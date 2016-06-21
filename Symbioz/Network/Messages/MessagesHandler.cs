@@ -44,7 +44,7 @@ namespace Symbioz.Network.Messages
                     {
                         Logger.Error(string.Format("Unable to handle message {0} {1} : '{2}'", message.ToString(), handler.Value.Method.Name, ex.InnerException.ToString()));
                         ErrorLogsManager.AddLog(ex.InnerException.ToString(), client.SSyncClient.Ip);
-                        client.SendRaw("forcedbugreport");
+                        //client.SendRaw("forcedbugreport");
                     }
                 }
             }

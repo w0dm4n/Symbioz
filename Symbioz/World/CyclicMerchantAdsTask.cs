@@ -13,7 +13,7 @@ namespace Symbioz.World
 {
     public static class CyclicMerchantAdsTask
     {
-        public const short AdsInstanceInterval = 20000;
+        public const int AdsInstanceInterval = 40000;
 
         private static System.Timers.Timer CyclicMerchantAdsTimer { get; set; }
 

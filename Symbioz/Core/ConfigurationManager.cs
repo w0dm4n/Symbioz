@@ -138,6 +138,8 @@ namespace Symbioz.Core
 
         public int TimeBetweenSpawnArchMonster { get; set; }
 
+        public string WelcomeSystemMessage { get; set; }
+
         public static Configuration Default()
         {
             Configuration config = new Configuration();
@@ -172,6 +174,7 @@ namespace Symbioz.Core
             config.TimeForUseKeyring = 7200;
             config.ArchMonsterBySubArea = 1;
             config.TimeBetweenSpawnArchMonster = 1800;
+            config.WelcomeSystemMessage = "Bienvenue sur notre serveur !";
             return config;
         }
     }

@@ -232,7 +232,10 @@ namespace Symbioz.Providers.FightResults
                 foreach (var item in template.Drops.FindAll(x => x.ProspectingLock <= prospectingSum))
                 {
                     int D = random.Next(0, 201);
-                    double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.CharacterStatsRecord.Prospecting / 100) / 3) * ConfigurationManager.Instance.ItemsDropRatio);
+                    double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.CharacterStatsRecord.Prospecting / 100) / 4.5) * ConfigurationManager.Instance.ItemsDropRatio);
+
+                    if ((int)dropchancePercent == 0)
+                        dropchancePercent = 2;
 
                     if (D <= dropchancePercent)
                     {
@@ -244,7 +247,19 @@ namespace Symbioz.Providers.FightResults
                             uint Q = (uint)random.Next(1, (int)(dropMax + 1));
                             if (Q > item.Count)
                                 Q = 1;
-                            m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                            ItemRecord templateItem = ItemRecord.GetItem(item.ObjectId);
+                            if (templateItem != null)
+                            {
+                                if (client.Character.Record.Level >= templateItem.Level)
+                                    m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                                else
+                                {
+                                    if ((templateItem.Level - client.Character.Record.Level) <= 10)
+                                    {
+                                        m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                                    }
+                                }
+                            }
                         }
                         else
                             alreadyDropped.Quantity++;

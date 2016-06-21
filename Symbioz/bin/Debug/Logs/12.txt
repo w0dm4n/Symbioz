@@ -1,6 +1,8 @@
-Client: 127.0.0.1:63009
-At: 20/06/2016 01:26:56
+Client: 127.0.0.1:60095
+At: 21/06/2016 02:52:01
 System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Inventory.AddItemRecordWithQuantity(CharacterItemRecord item, UInt32 quantity, Boolean refresh) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Inventory.cs:ligne 117
-   à Symbioz.World.Models.Exchanges.ShopStockExchange.Buy(UInt32 ObjectUID, UInt32 Quantity) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Exchanges\ShopStockExchange.cs:ligne 184
-   à Symbioz.World.Handlers.ExchangeHandler.HandleExchangeBuy(ExchangeBuyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\ExchangeHandler.cs:ligne 26
+   à Symbioz.World.Models.Character.RejoinMap(Boolean spawnjoin, Boolean winner) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Character\Character.cs:ligne 676
+   à Symbioz.World.Models.Fights.Fight.Dispose() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 680
+   à Symbioz.World.Models.Fights.Fight.EndFight() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 594
+   à Symbioz.World.Models.Fights.ClientsSynchronizer.ToggleReady(CharacterFighter fighter) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\ClientsSynchronizer.cs:ligne 60
+   à Symbioz.World.Handlers.FightHandler.HandleTurnReady(GameFightTurnReadyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 25

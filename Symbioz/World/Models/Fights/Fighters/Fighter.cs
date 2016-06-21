@@ -967,7 +967,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         public short CalculateJetPush(int push, short statdata)
         {
             short jet = (short)(push * 25);//25 degat/cases
-            return (short)(Math.Floor((double)jet * (100 + statdata + FighterStats.Stats.AllDamagesBonusPercent) / 100) + FighterStats.Stats.AllDamagesBonus);
+            return (short)(Math.Floor((double)jet));
         }
         public bool IsAligned(Fighter fighter)
         {

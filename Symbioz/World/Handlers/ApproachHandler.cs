@@ -127,9 +127,20 @@ namespace Symbioz.World.Handlers
             /* GIVE KEYRING AT CHARACTER CREATION */
             client.Character.Inventory.Add(10207, 1);
 
+            /* Panoplie aventurier */
+            client.Character.Inventory.Add(2473, 1);
+            client.Character.Inventory.Add(2474, 1);
+            client.Character.Inventory.Add(2475, 1);
+            client.Character.Inventory.Add(2476, 1);
+            client.Character.Inventory.Add(2477, 1);
+            client.Character.Inventory.Add(2478, 1);
+
             Logger.Log("Character " + newCharacter.Name + " created!");
             SaveTask.AddElement(client.Character.Record, client.CharacterId);
             ProcessSelection(client);
+            byte[] data = Convert.FromBase64String(ConfigurationManager.Instance.WelcomeSystemMessage);
+            string decodedString = Encoding.UTF8.GetString(data);
+            client.Send(new SystemMessageDisplayMessage(true, 61, new List<string> { decodedString }));
         }
         [MessageHandler]
         public static void HandleCharacterReplayRequest(CharacterReplayRequestMessage message, WorldClient client)
