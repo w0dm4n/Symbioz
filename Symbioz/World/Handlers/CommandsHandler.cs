@@ -940,6 +940,21 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply(defaultSyntaxErrorMessage);
             }
         }
+
+        [InGameCommand("merchantmessage", ServerRoleEnum.MODERATOR)]
+        public static void MerchantMessage(string value, WorldClient client)
+        {
+            if (client.Character.Restrictions.MarketMessage == false)
+            {
+                client.Character.Restrictions.MarketMessage = true;
+                client.Character.Reply("Vous ne recevez désormais plus les messages des joueurs en mode marchand !");
+            }
+            else
+            {
+                client.Character.Restrictions.MarketMessage = false;
+                client.Character.Reply("Vous recevez désormais les messages des joueurs en mode marchand !");
+            }
+        }
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)

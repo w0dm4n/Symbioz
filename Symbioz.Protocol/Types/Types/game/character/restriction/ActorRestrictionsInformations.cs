@@ -58,13 +58,14 @@ public virtual short TypeId
         public bool cantAttackMonster;
         public bool cantWalk8Directions;
         public bool isDead;
-        
+        public bool MarketMessage;
+
 
 public ActorRestrictionsInformations()
 {
 }
 
-public ActorRestrictionsInformations(bool cantBeAggressed, bool cantBeChallenged, bool cantTrade, bool cantBeAttackedByMutant, bool cantRun, bool forceSlowWalk, bool cantMinimize, bool cantMove, bool cantAggress, bool cantChallenge, bool cantExchange, bool cantAttack, bool cantChat, bool cantBeMerchant, bool cantUseObject, bool cantUseTaxCollector, bool cantUseInteractive, bool cantSpeakToNPC, bool cantChangeZone, bool cantAttackMonster, bool cantWalk8Directions, bool isMuted)
+public ActorRestrictionsInformations(bool cantBeAggressed, bool cantBeChallenged, bool cantTrade, bool cantBeAttackedByMutant, bool cantRun, bool forceSlowWalk, bool cantMinimize, bool cantMove, bool cantAggress, bool cantChallenge, bool cantExchange, bool cantAttack, bool cantChat, bool cantBeMerchant, bool cantUseObject, bool cantUseTaxCollector, bool cantUseInteractive, bool cantSpeakToNPC, bool cantChangeZone, bool cantAttackMonster, bool cantWalk8Directions, bool isMuted, bool MarketMessage)
         {
             this.isMuted = isMuted;
             this.cantBeAggressed = cantBeAggressed;
@@ -88,6 +89,7 @@ public ActorRestrictionsInformations(bool cantBeAggressed, bool cantBeChallenged
             this.cantChangeZone = cantChangeZone;
             this.cantAttackMonster = cantAttackMonster;
             this.cantWalk8Directions = cantWalk8Directions;
+            this.MarketMessage = MarketMessage;
         }
         
 

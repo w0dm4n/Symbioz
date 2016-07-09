@@ -116,6 +116,8 @@ namespace Symbioz.World.Models
                 ItemRecord template = ItemRecord.GetItem(item.GID);
                 if (template != null)
                     Character.Reply("Vous avez obtenu " + quantity + " " + template.Name + " !");
+                else
+                    Character.Reply("Vous avez obtenu " + quantity + " " + WeaponRecord.GetWeapon(item.GID).Name + " !");
                 Refresh();
                 Character.RefreshShortcuts();
             }

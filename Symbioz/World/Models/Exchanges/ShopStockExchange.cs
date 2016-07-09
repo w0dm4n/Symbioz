@@ -1,4 +1,5 @@
-﻿using Symbioz.DofusProtocol.Messages;
+﻿using Symbioz.Auth.Records;
+using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Network.Clients;
@@ -166,6 +167,16 @@ namespace Symbioz.World.Models.Exchanges
             var ItemMerchant = CharactersMerchantsRecord.GetItemFromUID((int)ObjectUID);
             var price = 0;
             var tmpQuantity = Quantity;
+            if (ItemMerchant == null) // trying to buy an object that doesn't exist
+                return;
+            var character = CharacterRecord.GetCharacterRecordById(ItemMerchant.CharacterId);
+            if (character == null)
+                return;
+            if (character.MerchantMode != 1)
+            {
+                Client.Character.Reply("Impossible car ce joueur n'est pas actuellement en mode marchand !", Color.Red);
+                return;
+            }
             if (tmpQuantity > ItemMerchant.Quantity)
             {
                 Client.Character.Reply("Impossible d'effectuer cet achat !", Color.Red);
@@ -198,7 +209,6 @@ namespace Symbioz.World.Models.Exchanges
                             {
                                 var itemObject = new ObjectItemToSell(item.GID, item.GetEffects(), item.UID, (uint)(ItemMerchant.Quantity - Quantity), ItemMerchant.Price);
                                 Client.Send(new ExchangeShopStockMovementUpdatedMessage(itemObject));
-
                                 CharacterItemRecord.UpdateItemQuantityByUID((int)item.UID, (int)(item.Quantity - Quantity));
                                 CharactersMerchantsRecord.UpdateItemQuantityFromUID((int)item.UID, (int)(ItemMerchant.Quantity - Quantity));
                             }

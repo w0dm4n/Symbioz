@@ -42,6 +42,7 @@ namespace Symbioz.World.Models
             this.Npcs = NpcSpawnRecord.GetMapNpcs(Record.Id);
             this.Interactives = InteractiveRecord.GetInteractivesOnMap(Record.Id);
         }
+
         public void AddClient(WorldClient client)
         {
             this.Send(new GameRolePlayShowActorMessage(client.Character.GetRolePlayActorInformations()));
@@ -49,21 +50,25 @@ namespace Symbioz.World.Models
             if (!Clients.Contains(client))
                 Clients.Add(client);
         }
+
         public void RemoveClient(WorldClient client) // OnLeavingMap
         {
             client.Character.Map = null;
             Clients.Remove(client);
             RemoveEntity(client.Character.Id);
         }
+
         void RemoveEntity(int id)
         {
             this.Send(new GameContextRemoveElementMessage(id));
         }
+
         public void RemoveMonsterGroup(int groupid)
         {
             MonstersGroups.Remove(MonstersGroups.Find(x => x.MonsterGroupId == groupid));
             RemoveEntity(groupid);
         }
+
         public void Send(Message message)
         {
             for (int i = 0; i < Clients.Count(); i++)
@@ -71,6 +76,18 @@ namespace Symbioz.World.Models
                 Clients[i].Send(message);
             }
         }
+
+        public void SendMerchantAds(ChatServerMessage message)
+        {
+            for (int i = 0; i < Clients.Count(); i++)
+            {
+                if (Clients[i].Character.Restrictions.MarketMessage == false)
+                {
+                    Clients[i].Send(message);
+                }
+             }
+        }
+
         List<GameRolePlayCharacterInformations> GetPlayers()
         {
             List<GameRolePlayCharacterInformations> ListPlayers = new List<GameRolePlayCharacterInformations>();
@@ -79,7 +96,8 @@ namespace Symbioz.World.Models
                 if (client.Character.Record.MerchantMode == 0)
                     ListPlayers.Add(client.Character.GetRolePlayActorInformations());
             }
-            return Clients.ConvertAll<GameRolePlayCharacterInformations>(x => x.Character.GetRolePlayActorInformations());
+            //return Clients.ConvertAll<GameRolePlayCharacterInformations>(x => x.Character.GetRolePlayActorInformations());
+            return ListPlayers;
         }
 
         List<GameRolePlayMerchantInformations> GetPlayersMerchant()
@@ -89,8 +107,9 @@ namespace Symbioz.World.Models
             {
                 if (client.Character.Record.MerchantMode == 1)
                 {
-                    ListPlayersMerchant.Add(client.Character.GetRolePlayMerchantInformations());
-                }
+                    if (CharactersMerchantsRecord.GetItemsFromCharacterId((uint)client.Character.Id) != null)
+                        ListPlayersMerchant.Add(client.Character.GetRolePlayMerchantInformations());
+               }
             }
             return ListPlayersMerchant;
         }
@@ -99,10 +118,12 @@ namespace Symbioz.World.Models
         {
             return Interactives.ConvertAll<InteractiveElement>(x => x.GetInteractiveElement());
         }
+
         public List<GameRolePlayNpcInformations> GetNpcsInformations()
         {
             return Npcs.ConvertAll<GameRolePlayNpcInformations>(x => x.GetGameRolePlayNpcInformations());
         }
+
         public List<GameRolePlayActorInformations> GetActors(WorldClient client)
         {
             List<GameRolePlayActorInformations> actors = new List<GameRolePlayActorInformations>();
@@ -181,12 +202,14 @@ namespace Symbioz.World.Models
                 }
             }
         }
+
         public void AddFightSword(FightCommonInformations commonInfos)
         {
             Fights.Add(commonInfos);
             Send(new MapFightCountMessage((ushort)Fights.Count()));
             Send(new GameRolePlayShowChallengeMessage(commonInfos));
         }
+
         public void OnFighterAdded(int fightid, int teamid, FightTeamMemberInformations addedmember)
         {
             var fight = Fights.Find(x => x.fightId == fightid);
@@ -195,6 +218,7 @@ namespace Symbioz.World.Models
             Send(new GameRolePlayRemoveChallengeMessage(fightid));
             Send(new GameRolePlayShowChallengeMessage(fight));
         }
+
         public void OnFighterRemoved(int fightid, int teamid, int fighterid)
         {
             var fight = Fights.Find(x => x.fightId == fightid);
@@ -206,20 +230,24 @@ namespace Symbioz.World.Models
                 Send(new GameRolePlayShowChallengeMessage(fight));
             }
         }
+
         public void ShowFightsCount(WorldClient client)
         {
             client.Send(new MapFightCountMessage((ushort)FightProvider.Instance.m_worldFights.FindAll(x => x.Map.Id == client.Character.Map.Id).Count()));
         }
+
         public void RemoveFightSword(int fightid)
         {
             Fights.Remove(Fights.Find(x => x.fightId == fightid));
             Send(new MapFightCountMessage((ushort)Fights.Count()));
             Send(new GameRolePlayRemoveChallengeMessage(fightid));
         }
+
         public MonsterGroup GetMapMonsterGroup(int id)
         {
             return MonstersGroups.Find(x => x.MonsterGroupId == id);
         }
+
         List<GameRolePlayGroupMonsterInformations> GetMonsters()
         {
             return MonsterGroup.GetActorsInformations(Record, MonstersGroups);

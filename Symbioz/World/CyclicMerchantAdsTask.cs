@@ -34,8 +34,8 @@ namespace Symbioz.World
                 {
                     foreach (var merchant in mapAndMerchants.Value)
                     {
-                        if (merchant.IsMerchantMode && !string.IsNullOrEmpty(merchant.MerchantMessage))
-                            mapRecord.Instance.Send(new ChatServerMessage((sbyte)ChatActivableChannelsEnum.CHANNEL_GLOBAL, merchant.MerchantMessage, 1, string.Empty, merchant.Id, merchant.Name, merchant.AccountId));
+                        if (merchant.IsMerchantMode && !string.IsNullOrEmpty(merchant.MerchantMessage) && CharactersMerchantsRecord.GetItemsFromCharacterId((uint)merchant.Id) != null)
+                            mapRecord.Instance.SendMerchantAds(new ChatServerMessage((sbyte)ChatActivableChannelsEnum.CHANNEL_GLOBAL, merchant.MerchantMessage, 1, string.Empty, merchant.Id, merchant.Name, merchant.AccountId));
                     }
                 }
             }

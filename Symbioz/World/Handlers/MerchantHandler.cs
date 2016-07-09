@@ -111,7 +111,7 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-                client.Character.Reply("Impossible car ce joueur n'a aucun item a vendre !", Color.Red);
+                client.Character.Reply("Impossible car ce joueur n'a plus aucun item a vendre !", Color.Red);
             }
         }
     }
