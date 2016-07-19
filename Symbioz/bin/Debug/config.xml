@@ -7,7 +7,7 @@
   <DatabaseName>Symbioz</DatabaseName>
   <ServerId>22</ServerId>
   <AuthPort>443</AuthPort>
-  <WorldPort>5555</WorldPort>
+  <WorldPort>5556</WorldPort>
   <StartLevel>1</StartLevel>
   <StartMapId>154010883</StartMapId>
   <StartCellId>370</StartCellId>

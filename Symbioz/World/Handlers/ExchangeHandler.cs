@@ -127,10 +127,6 @@ namespace Symbioz.World.Handlers
                 case ExchangeTypeEnum.RUNES_TRADE:
                     client.Character.SmithMagicInstance.MoveItem(message.objectUID, message.quantity);
                     break;
-
-                case ExchangeTypeEnum.SHOP_STOCK:
-                    client.Character.Reply("Crève");
-                    break;
             }
 
         }

@@ -18,6 +18,7 @@ using Symbioz.Helper;
 using Symbioz.World.Models.Fights.Marks;
 using Symbioz.Network.Servers;
 using Symbioz.World.Models.Parties;
+using Symbioz.World.Models.Challenges;
 
 namespace Symbioz.World.Models.Fights
 {
@@ -77,6 +78,8 @@ namespace Symbioz.World.Models.Fights
         public FightTeam BlueTeam { get; set; }
 
         public FightTeam RedTeam { get; set; }
+
+        public ChallengesInstance ChallengesInstance { get; set; }
 
         public bool Started = false;
 
@@ -155,10 +158,11 @@ namespace Symbioz.World.Models.Fights
             Started = true;
             Send(new GameFightStartMessage(new Idol[0]));
             Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
+            if (this is FightPvM)
+                ChallengesInstance = new ChallengesInstance(this);
             SyncFighters();
             TimeLine.StartFight();
             TimeLine.GetFirstFighter().StartTurn();
-
         }
 
         public void FighterDisconnect(CharacterFighter f)
@@ -685,6 +689,7 @@ namespace Symbioz.World.Models.Fights
             this.RedTeam = null;
             this.BlueTeam = null;
             this.Synchronizer = null;
+            this.ChallengesInstance = null;
         }
         public void NewTurn()
         {
