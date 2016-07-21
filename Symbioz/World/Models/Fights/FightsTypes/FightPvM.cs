@@ -72,9 +72,10 @@ namespace Symbioz.World.Models.Fights
         }
         public override void ShowFightResults(List<FightResultListEntry> results, WorldClient client)
         {
+            //todo: print chall failed if fight lose
+            if (this.ChallengesInstance != null)
+                this.ChallengesInstance.SendResultMessage(client);
             client.Send(new GameFightEndMessage(this.GetFightDuration(), MonsterGroup.AgeBonus, 0, results, new NamedPartyTeamWithOutcome[0]));
         }
-
-
     }
 }

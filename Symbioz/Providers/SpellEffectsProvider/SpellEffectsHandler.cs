@@ -35,12 +35,27 @@ namespace Symbioz.Providers
                 }
             }
         }
-        public static void Handle(Fighter fighter, SpellLevelRecord record, ExtendedSpellEffect effect,List<Fighter> affecteds, short castcellid)
+
+        public static int[] GetActorsShieldPoints(List<Fighter> actors, int[] array)
+        {
+            int i = 0;
+            foreach (var actor in actors)
+                array[i++] = actor.FighterStats.ShieldPoints;
+            return (array);
+        }
+
+        public static void Handle(Fighter fighter, SpellLevelRecord record, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
             var handler = Handlers.FirstOrDefault(x => x.Key == effect.BaseEffect.EffectType);
             if (handler.Value != null)
             {
-               handler.Value(fighter, record, effect,affecteds, castcellid);
+                int[] actorsShieldPointsBeforeApplyEffect = new int[affecteds.Count()];
+                actorsShieldPointsBeforeApplyEffect = GetActorsShieldPoints(affecteds, actorsShieldPointsBeforeApplyEffect);
+
+                handler.Value(fighter, record, effect, affecteds, castcellid);
+
+                if (fighter.Fight.ChallengesInstance != null)
+                    fighter.Fight.ChallengesInstance.HandleSpellCast(fighter, affecteds, effect, actorsShieldPointsBeforeApplyEffect);
             }
             else
             {

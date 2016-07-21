@@ -35,7 +35,7 @@ namespace Symbioz.World.Records
         public ItemEffectsParser RealEffects;
         public string Criteria;
 
-        public ItemRecord(int id,int nameid,string name,int typeid,int appearanceid,int level,int price,int weight,string effects,string criteria)
+        public ItemRecord(int id, int nameid, string name, int typeid, int appearanceid, int level, int price, int weight, string effects, string criteria)
         {
             this.Id = id;
             this.NameId = nameid;
@@ -51,7 +51,7 @@ namespace Symbioz.World.Records
         }
         public ObjectItem GenerateRandomObjectItem()
         {
-            return new ObjectItem(63, (ushort)Id, GenerateRandomEffect(), CharacterItemRecord.PopNextUID(),1);
+            return new ObjectItem(63, (ushort)Id, GenerateRandomEffect(), CharacterItemRecord.PopNextUID(), 1);
         }
         public List<ObjectEffect> GenerateRandomEffect()
         {

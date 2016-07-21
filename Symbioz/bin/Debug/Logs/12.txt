@@ -1,5 +1,10 @@
-Client: 127.0.0.1:50994
-At: 08/07/2016 22:50:03
-System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Exchanges.ShopStockExchange.UpdateItem(UInt32 objectUID, Int32 quantity, UInt32 price) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Exchanges\ShopStockExchange.cs:ligne 143
-   à Symbioz.World.Handlers.MerchantHandler.HandleExchangeObjectModifyPricedMessage(ExchangeObjectModifyPricedMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\MerchantHandler.cs:ligne 56
+Client: 127.0.0.1:51679
+At: 21/07/2016 10:50:31
+System.ArgumentOutOfRangeException: L'index était hors limites. Il ne doit pas être négatif et doit être inférieur à la taille de la collection.
+Nom du paramètre : index
+   à System.ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument argument, ExceptionResource resource)
+   à System.Collections.Generic.List`1.get_Item(Int32 index)
+   à Symbioz.World.Models.Fights.Fighters.Fighter.HandleSpellEffects(SpellLevelRecord spell, Int16 cellid, FightSpellCastCriticalEnum critical) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\Fighter.cs:ligne 424
+   à Symbioz.World.Models.Fights.Fighters.Fighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\Fighter.cs:ligne 584
+   à Symbioz.World.Models.Fights.Fighters.CharacterFighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\CharacterFighter.cs:ligne 123
+   à Symbioz.World.Handlers.FightHandler.HandleSpellCast(GameActionFightCastRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 40

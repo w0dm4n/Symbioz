@@ -18,6 +18,8 @@ namespace Symbioz.World.Records.Challenges
         public string ChallengeName;
         public int ChallengeXpBonus;
         public int ChallengeDropBonus;
+        [Ignore]
+        public bool ChallengeSuccess;
 
         public ChallengesRecord(int id, int challengeId, string challengeName, int challengeXpBonus, int challengeDropBonus)
         {
@@ -32,12 +34,14 @@ namespace Symbioz.World.Records.Challenges
         {
             Random rand = new Random();
             int challengesNumber = rand.Next(1, (ChallengesRecord.Challenges.Count() + 1));
-            Logger.Log(challengesNumber);
             int i = 1;
             foreach (var challenge in ChallengesRecord.Challenges)
             {
                 if (i == challengesNumber)
+                {
+                    challenge.ChallengeSuccess = true;
                     return (challenge);
+                }
                 i++;
             }
             return (null);

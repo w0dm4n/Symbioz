@@ -233,10 +233,10 @@ namespace Symbioz.Providers.FightResults
                 {
                     int D = random.Next(0, 201);
                     double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.CharacterStatsRecord.Prospecting / 100) / 4.5) * ConfigurationManager.Instance.ItemsDropRatio);
-
+                    if (pvmfight.ChallengesInstance != null)
+                        dropchancePercent = pvmfight.ChallengesInstance.GetDropBonus(dropchancePercent);
                     if ((int)dropchancePercent == 0)
                         dropchancePercent = 2;
-
                     if (D <= dropchancePercent)
                     {
                         var alreadyDropped = m_drops.FirstOrDefault(x => x.GID == item.ObjectId);
@@ -265,7 +265,6 @@ namespace Symbioz.Providers.FightResults
                             alreadyDropped.Quantity++;
                     }
                 }
-
                 #endregion
             }
 

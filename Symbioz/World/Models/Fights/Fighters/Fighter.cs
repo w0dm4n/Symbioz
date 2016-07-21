@@ -78,6 +78,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.Team = team;
             this.m_turnEngine = new FightTurnEngine(this);
         }
+
         /// <summary>
         /// montre le fighter a tout les clients
         /// </summary>
@@ -86,6 +87,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             RefreshStats();
             Fight.Send(new GameFightShowFighterMessage(FighterInformations));
         }
+
         /// <summary>
         /// Montre le fighter au clients
         /// </summary>
@@ -95,19 +97,23 @@ namespace Symbioz.World.Models.Fights.Fighters
             RefreshStats();
             client.Send(new GameFightShowFighterMessage(FighterInformations));
         }
+
         public virtual void SwapPosition(Fighter fighter)
         {
 
         }
+
         public IdentifiedEntityDispositionInformations GetIdentifiedEntityDisposition()
         {
             return new IdentifiedEntityDispositionInformations(CellId, Direction, ContextualId);
         }
+
         public void ShowFighterWithRandomStaticPose()
         {
             RefreshFighter();
             Fight.Send(new GameFightShowFighterRandomStaticPoseMessage(FighterInformations));
         }
+
         public void RefreshFighter()
         {
             RefreshStats();
@@ -144,21 +150,25 @@ namespace Symbioz.World.Models.Fights.Fighters
                 this.visible = false;
             }
         }
+
         public virtual void Initialize()
         {
             CellId = Fight.GetPlacementCell(Team.TeamColor);
             Direction = 3;
         }
+
         public abstract FightTeamMemberInformations GetFightMemberInformations();
         public virtual void OnAdded()
         {
             Fight.TimeLine.Add(this);
             Initialize();
         }
+
         public void IncrementBombs()
         {
             GetBombs().ForEach(x => x.Increment());
         }
+
         public virtual void StartTurn()
         {
 
@@ -179,25 +189,30 @@ namespace Symbioz.World.Models.Fights.Fighters
 
 
         }
+
         public void DecrementGlyphsDuration()
         {
             List<Glyph> glyphs = Fight.GetMarks<Glyph>(x => x.Caster == this);
             glyphs.ForEach(x => x.DecrementDuration());
         }
+
         public void AddState(uint buffid, short stateid, int sourceid, short duration, short spellid)
         {
             Fight.Send(new GameActionFightDispellableEffectMessage((ushort)EffectsEnum.Eff_AddState, sourceid, new FightTemporaryBoostStateEffect(buffid, ContextualId, duration, 1, (ushort)spellid, 0, 1, 0, stateid)));
             m_stateIds.Add(stateid);
         }
+
         public void RemoveState(short stateid, short sourcespellid)
         {
             Fight.Send(new GameActionFightDispellSpellMessage(951, ContextualId, ContextualId, (ushort)sourcespellid));
             m_stateIds.Remove(stateid);
         }
+
         public bool HaveState(short stateid)
         {
             return m_stateIds.Contains(stateid);
         }
+
         public virtual void EndTurn()
         {
             if (Fight.Ended)
@@ -362,6 +377,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return result;
         }
+
         public FightSpellCastCriticalEnum RollCriticalDice(WeaponRecord weapon)
         {
             AsyncRandom asyncRandom = new AsyncRandom();
@@ -373,6 +389,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return result;
         }
+
         public void SelectRandomEffect(List<ExtendedSpellEffect> effects)
         {
             List<ExtendedSpellEffect> randomEffects = effects.FindAll(x => x.BaseEffect.Random != 0);
@@ -383,19 +400,18 @@ namespace Symbioz.World.Models.Fights.Fighters
                 effects.Add(reffect);
             }
         }
+
+
         public void HandleSpellEffects(SpellLevelRecord spell, short cellid, FightSpellCastCriticalEnum critical)
         {
             List<ExtendedSpellEffect> handledEffects = critical == FightSpellCastCriticalEnum.CRITICAL_HIT ? spell.CriticalEffects : spell.Effects;
-
             Dictionary<ExtendedSpellEffect, List<Fighter>> validatedEffectsDatas = new Dictionary<ExtendedSpellEffect, List<Fighter>>();
-
 
             SelectRandomEffect(handledEffects);
             foreach (var effect in handledEffects)
             {
-
                 short[] cells = ShapesProvider.Handle(effect.ZoneShape, cellid, CellId, effect.ZoneSize).ToArray();
-                var actors = GetAffectedActors(cells, effect.Targets);
+                var actors = GetAffectedActors(cells, effect.Targets);       
                 CharacterStates.CharacterSpellStatesChecker(this, actors, spell, effect);
                 MonsterStates.MonsterSpellStatesChecker(this, actors, spell, effect);
                 validatedEffectsDatas.Add(effect, actors);
@@ -406,7 +422,6 @@ namespace Symbioz.World.Models.Fights.Fighters
                 SpellEffectsHandler.Handle(this, spell, data.Key, data.Value, cellid);
                 Fight.TryEndSequence(1, 0);
             }
-
         }
         bool ValidState(SpellLevelRecord spellLevel)
         {
@@ -422,6 +437,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             m_buffedSpells.Add(new SpellBoost(spellId, delta));
         }
+
         public void RemoveSpellBoost(ushort spellId, short delta)
         {
             m_buffedSpells.RemoveAll(x => x.SpellId == spellId && x.Delta == delta);
@@ -449,41 +465,36 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return true;
         }
+
         public virtual bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
         {
             SpellLevelRecord spellLevl = GetSpellLevel(spellid);
 
-            Logger.Log("la1");
             if (!IsPlaying)
             {
                 OnSpellCastFailed(CastFailedReason.NOT_PLAYING, spellLevl);
                 return false;
             }
-            Logger.Log("la2");
             if (Fight.Ended)
             {
                 OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spellLevl);
                 return false;
             }
-            Logger.Log("la3");
             if (!ValidState(spellLevl))
             {
                 OnSpellCastFailed(CastFailedReason.FORBIDDEN_STATE, spellLevl);
                 return false;
             }
-            Logger.Log("la4" + spellLevl.ApCost + " PA :" + FighterStats.Stats.ActionPoints);
             if (spellLevl.ApCost > FighterStats.Stats.ActionPoints)
             {
                 OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
                 return false;
             }
-            Logger.Log("la5");
             if (!HaveConditionToLunchSpell(spellLevl))
             {
                 OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
-            Logger.Log("la6");
             if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
             {
                 short[] portal = new short[0];
@@ -492,20 +503,17 @@ namespace Symbioz.World.Models.Fights.Fighters
                 UsingWeapon = false;
                 return result;
             }
-            Logger.Log("la7");
             if (targetId == 0)
             {
                 var target = Fight.GetFighter(cellid);
                 if (target != null)
                     targetId = target.ContextualId;
             }
-            Logger.Log("la8");
             if (!SpellHistory.CanCast(spellLevl, targetId))
             {
                 OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
                 return false;
             }
-            Logger.Log("la9");
 
             this.Fight.TryStartSequence(this.ContextualId, 1);
             FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
@@ -603,6 +611,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             var t = results.Distinct().ToList();
             return t;
         }
+
         public virtual void OnSpellCastFailed(CastFailedReason reason, SpellLevelRecord spelllevel) { }
 
         public virtual void OnSpellCasted(SpellLevelRecord spelllevel) { }
@@ -643,6 +652,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return true;
         }
+
         public virtual bool UseWeapon(short cellid) { return false; }
 
         public virtual bool CastSpellOnTarget(ushort spellid, int targetid)
@@ -663,6 +673,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             return CastSpellOnCell(spellid, target.CellId, targetid);
 
         }
+
         bool CheckFighterDie()
         {
             if (FighterStats.Stats.LifePoints <= 0)
@@ -673,6 +684,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return false;
         }
+
         public virtual int CalculateErosionDamage(int damages)
         {
             int num = FighterStats.ErosionPercentage;
@@ -682,6 +694,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return (int)((double)damages * ((double)num / 100.0));
         }
+
         public void LoseLife(TakenDamages damages, int sourceid)
         {
             damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
@@ -702,8 +715,6 @@ namespace Symbioz.World.Models.Fights.Fighters
                         FighterStats.Stats.LifePoints = 0;
                         RefreshStats();
                         Die();
-
-
                     }
                     else
                     {
@@ -800,6 +811,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             Fight.TryEndSequence(1, 103);
         }
+
         public void AddBuff(Buff buff)
         {
             buff.Initialize(this);
@@ -808,22 +820,27 @@ namespace Symbioz.World.Models.Fights.Fighters
             Buffs.Add(buff);
             buff.OnBuffAdded();
         }
+
         public List<BombFighter> GetBombs()
         {
             return Team.GetFighters().OfType<BombFighter>().ToList().FindAll(x => x.Master == this);
         }
+
         public List<Fighter> GetAliveFighterSummons()
         {
             return Fight.GetAllSummons().FindAll(x => x.FighterStats.SummonerId == ContextualId);
         }
+
         public List<T> GetAllBuffs<T>(Predicate<T> predicate) where T : Buff
         {
             return Buffs.OfType<T>().ToList().FindAll(predicate);
         }
+
         public List<T> GetAllBuffs<T>() where T : Buff
         {
             return Buffs.OfType<T>().ToList();
         }
+
         public void UpdateBuffs()
         {
             Fight.TryStartSequence(ContextualId, 1);
@@ -859,12 +876,14 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(1, 0);
 
         }
+
         public void DispellSpell(ushort spellid)
         {
             var buffs = Buffs.FindAll(x => x.SourceSpellId == spellid);
             buffs.ForEach(x => x.RemoveBuff());
             buffs.ForEach(x => Buffs.Remove(x));
         }
+
         public virtual void Heal(short delta, int sourceid)
         {
             if (HaveState(76)) // state spécial (76) insoignable
@@ -883,6 +902,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(1, 0);
 
         }
+
         /// <summary>
         /// Dégâts subis =dégâts totaux - résistance fixe - (dégâts totaux / 100/pourcentage de résistance) 
         /// </summary>
@@ -894,14 +914,17 @@ namespace Symbioz.World.Models.Fights.Fighters
                 return;
             LoseLife(damages, sourceid);
         }
+
         public virtual void OnMoved(List<short> cells)
         {
 
         }
+
         public virtual void BeforeMove(List<short> cells)
         {
 
         }
+
         public bool ApplyFighterEvent(FighterEventType eventtype, object arg1, object arg2 = null, object arg3 = null)
         {
             if (eventtype == FighterEventType.BEFORE_MOVE)
@@ -932,6 +955,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return result;
         }
+
         public void AddShieldPoints(uint buffid, short amount, short duration, int sourceid, ushort spellid)
         {
             Fight.TryStartSequence(this.ContextualId, 1);
@@ -941,6 +965,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(1, 100);
 
         }
+
         public bool IsPlaying { get; set; }
         public object TackenDamages { get; private set; }
 
@@ -954,6 +979,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             var valuePair = m_buffedSpells.FirstOrDefault(x => x.SpellId == spellid);
             return (short)(valuePair != null ? valuePair.Delta : 0);
         }
+
         public short CalculateJet(ExtendedSpellEffect record, short statdata)
         {
             short jet = (short)(SpellEffectsHandler.GetRandom(record));
@@ -964,11 +990,13 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             return (short)(Math.Floor((double)jet * (100 + statdata + FighterStats.Stats.AllDamagesBonusPercent) / 100) + FighterStats.Stats.AllDamagesBonus);
         }
+
         public short CalculateJetPush(int push, short statdata)
         {
             short jet = (short)(push * 25);//25 degat/cases
             return (short)(Math.Floor((double)jet));
         }
+
         public bool IsAligned(Fighter fighter)
         {
             var direction = ShapesProvider.GetDirectionFromTwoCells(this.CellId, fighter.CellId);
