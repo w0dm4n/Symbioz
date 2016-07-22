@@ -20,6 +20,8 @@ namespace Symbioz.World.Models.Challenges
 
         public List<ChallengesRecord> CurrentChallenges = new List<ChallengesRecord>();
 
+        public List<MonsterFighter> ToFocus = new List<MonsterFighter>();
+
         public void GetRandomChallenges()
         {
             int infinite = 0;
@@ -99,6 +101,21 @@ namespace Symbioz.World.Models.Challenges
                 return currentRate;
         }
 
+        public double GetXpBonus(double currentRate)
+        {
+            double bonus = 0;
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == true)
+                    bonus += challenge.ChallengeXpBonus;
+            }
+            bonus = (bonus / 100) * 2;
+            if (bonus > 1.0)
+                return currentRate * bonus;
+            else
+                return currentRate;
+        }
+
         static void SendMessageFailure(Fight CurrentFight, ChallengesRecord challenge, Fighter dueTo, System.Timers.Timer Timer)
         {
             var characters = CurrentFight.GetAllCharacterFighters(true);
@@ -138,6 +155,136 @@ namespace Symbioz.World.Models.Challenges
             return (0);
         }
 
+        public void HandleWeaponUse(CharacterFighter fighter)
+        {
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == false)
+                    continue;
+                switch (challenge.ChallengeId)
+                {
+                    case 11: // Mystique - utiliser uniquement des sorts pendant toute la durée du combat.
+                        this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 9: // Barbare - Occasionner des dommages avec une arme sur alliés ou ennemis, à chaque tour de jeu.
+                        fighter.WeaponUsedOnLastTurn = true;
+                    break;
+                }
+            }
+        }
+
+        public void HandleDeath(Fighter fighter)
+        {
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == false)
+                    continue;
+                switch (challenge.ChallengeId)
+                {
+                    case 33: // Survivant - Tous les alliés doivent terminer le combat vivants.
+                        this.ChallengeFailure(challenge, fighter);
+                    break;
+                }
+            }
+        }
+
+        public void HandleMonsterDeath(Fighter fighter)
+        {
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == false)
+                    continue;
+                switch (challenge.ChallengeId)
+                {
+                    case 31: // Focus - Lorsqu'un adversaire est attaqué, il doit être achevé avant qu'un autre adversaire soit attaqué..
+                        foreach (var tmp in this.ToFocus)
+                        {
+                            if (tmp == fighter)
+                            {
+                                this.ToFocus.Remove(tmp);
+                                break;
+                            }
+                        }
+                    break;
+                }
+            }
+        }
+
+        public void HandleEndTurn(CharacterFighter fighter)
+        {
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == false)
+                    continue;
+                switch (challenge.ChallengeId)
+                {
+                    case 41: // Pétulant - Utiliser tous les points d'action disponibles avant la fin de son tour de jeu.
+                        if (fighter.FighterStats.Stats.ActionPoints != 0)
+                            this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 8: // Nomade - Utiliser tous ses PM disponibles à chaque tour et ne pas se faire tacler pendant toute la durée du combat.
+                        if (fighter.FighterStats.Stats.MovementPoints != 0)
+                            this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 1: //Zombie - Utiliser un seul point de mouvement par tour de jeu.
+                        if ((fighter.FighterStats.RealStats.MovementPoints - 1) > 0)
+                        {
+                            if (fighter.FighterStats.Stats.MovementPoints != (fighter.FighterStats.RealStats.MovementPoints - 1))
+                                this.ChallengeFailure(challenge, fighter);
+                        }
+                        else
+                        {
+                            if (fighter.FighterStats.Stats.MovementPoints != 0)
+                                this.ChallengeFailure(challenge, fighter);
+                        }
+                    break;
+
+                    case 6: // Versatile - Chaque joueur n'a le droit d'effectuer qu'une seule fois une même action pendant son tour de jeu.
+                        if (fighter.CastedOnTurn != null)
+                            fighter.CastedOnTurn.Clear();
+                    break;
+
+                    case 9:  // Barbare - Occasionner des dommages avec une arme sur alliés ou ennemis, à chaque tour de jeu.
+                        if (fighter.WeaponUsedOnLastTurn == false)
+                            this.ChallengeFailure(challenge, fighter);
+                        else
+                            fighter.WeaponUsedOnLastTurn = false;
+                    break;
+                }
+            }
+        }
+
+        public void HandleSpellLaunch(Fighter fighter, SpellLevelRecord spell)
+        {
+            foreach (var challenge in CurrentChallenges)
+            {
+                if (challenge.ChallengeSuccess == false)
+                    continue;
+                switch (challenge.ChallengeId)
+                {
+                    case 5: // Econome - Tous les personnages ne doivent utiliser qu'une seule fois la même action durant toute la durée du combat.
+                        if (fighter.CastedOnFight.Contains(spell))
+                            this.ChallengeFailure(challenge, fighter);
+                        else
+                            fighter.CastedOnFight.Add(spell);
+                    break;
+
+                    case 6: // Versatile - Chaque joueur n'a le droit d'effectuer qu'une seule fois une même action pendant son tour de jeu.
+                        if (fighter.CastedOnTurn != null)
+                        {
+                            if (fighter.CastedOnTurn.Contains(spell))
+                                this.ChallengeFailure(challenge, fighter);
+                            else
+                                fighter.CastedOnTurn.Add(spell);
+                        }
+                    break;
+                }
+            }
+        }
+
         public void HandleSpellCast(Fighter fighter, List<Fighter> actors, ExtendedSpellEffect effect, int[] actorsShieldPoints)
         {
             /*if (fighter is MonsterFighter)
@@ -161,7 +308,7 @@ namespace Symbioz.World.Models.Challenges
                                 {
                                     if (actor.FighterStats.ShieldPoints != actorShieldPoint)
                                     {
-                                        this.ChallengeFailure(challenge, actor);
+                                        this.ChallengeFailure(challenge, actor); 
                                         break;
                                     }
                                 }
@@ -172,6 +319,7 @@ namespace Symbioz.World.Models.Challenges
                                 }
                             }
                         }
+
                         /*var Fighters = CurrentFight.GetAllCharacterFighters();
                         foreach (var tmp in Fighters)
                         {
@@ -195,6 +343,107 @@ namespace Symbioz.World.Models.Challenges
                                 Logger.Log("Fighter hit by one spell : " + effect.BaseEffect.Value);
                             }
                         }*/
+                    break;
+
+                    case 18: // Incurable - Ne pas regagner de points de vie pendant toute la durée du combat.
+                        if (fighter is MonsterFighter)
+                            return;
+                        foreach (var actor in actors)
+                        {
+                            if (actor is CharacterFighter)
+                            {
+                                if (effect.BaseEffect.EffectType == EffectsEnum.Eff_HealHP_108)
+                                {
+                                    this.ChallengeFailure(challenge, actor);
+                                    break;
+                                }
+                            }
+                        }
+                    break;
+
+                    case 20: // Elementaire - Utiliser le même élément d'attaque pendant toute la durée du combat.
+                        if (fighter is MonsterFighter)
+                            return;
+                        if (fighter.LastElementUse.Count() == 0)
+                        {
+                            switch (effect.BaseEffect.EffectType)
+                            {
+                                case EffectsEnum.Eff_DamagePercentWater:
+                                case EffectsEnum.Eff_DamagePercentEarth:
+                                case EffectsEnum.Eff_DamagePercentAir:
+                                case EffectsEnum.Eff_DamagePercentFire:
+                                case EffectsEnum.Eff_DamagePercentNeutral:
+                                case EffectsEnum.Eff_DamageWater:
+                                case EffectsEnum.Eff_DamageEarth:
+                                case EffectsEnum.Eff_DamageAir:
+                                case EffectsEnum.Eff_DamageFire:
+                                case EffectsEnum.Eff_DamageNeutral:
+                                    fighter.LastElementUse.Add(effect.BaseEffect.EffectType);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            switch (effect.BaseEffect.EffectType)
+                            {
+                                case EffectsEnum.Eff_DamagePercentWater:
+                                case EffectsEnum.Eff_DamagePercentEarth:
+                                case EffectsEnum.Eff_DamagePercentAir:
+                                case EffectsEnum.Eff_DamagePercentFire:
+                                case EffectsEnum.Eff_DamagePercentNeutral:
+                                case EffectsEnum.Eff_DamageWater:
+                                case EffectsEnum.Eff_DamageEarth:
+                                case EffectsEnum.Eff_DamageAir:
+                                case EffectsEnum.Eff_DamageFire:
+                                case EffectsEnum.Eff_DamageNeutral:
+                                    if (!fighter.LastElementUse.Contains(effect.BaseEffect.EffectType))
+                                        this.ChallengeFailure(challenge, fighter);
+                                break;
+                            }
+                        }
+                    break;
+
+                    case 21: // Circulez - Ne pas retirer de PM aux adversaires pendant toute la durée du combat.
+                        if (fighter is MonsterFighter)
+                            return;
+                        if (effect.BaseEffect.EffectType == EffectsEnum.Eff_LostMP)
+                            this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 22: // Le temps qui court - Ne pas retirer de PA aux adversaires pendant toute la durée du combat.
+                        if (fighter is MonsterFighter)
+                            return;
+                        if (effect.BaseEffect.EffectType == EffectsEnum.Eff_RemoveAP)
+                            this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 23: // Perdu de vue - Ne pas retirer de portée aux adversaires pendant toute la durée du combat.
+                        if (fighter is MonsterFighter)
+                            return;
+                        if (effect.BaseEffect.EffectType == EffectsEnum.Eff_SubRange)
+                            this.ChallengeFailure(challenge, fighter);
+                    break;
+
+                    case 31: // Focus - Lorsqu'un adversaire est attaqué, il doit être achevé avant qu'un autre adversaire soit attaqué.
+                        if (fighter is MonsterFighter)
+                            return;
+                        foreach (var actor in actors)
+                        {
+                            if (actor is MonsterFighter)
+                            {
+                                if (this.ToFocus.Count() == 0)
+                                    this.ToFocus.Add((MonsterFighter)actor);
+                                else
+                                {
+                                    if (!this.ToFocus.Contains(actor))
+                                        this.ChallengeFailure(challenge, fighter);
+                                }
+                            }
+                        }
+                    break;
+
+                    case 32: // Elitiste - Toutes les attaques doivent être concentrées sur un adversaire jusqu'à ce qu'il meurt.
+
                     break;
                 }
             }

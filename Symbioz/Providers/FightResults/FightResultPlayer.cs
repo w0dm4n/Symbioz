@@ -314,7 +314,7 @@ namespace Symbioz.Providers.FightResults
             }
             var team = Fighter.Team.GetFighters().FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x); ;
             ExperienceFormulas formulas = new ExperienceFormulas();
-            formulas.InitXpFormula(new PlayerData(client.Character.Record.Level, client.Character.CharacterStatsRecord.Wisdom, client.Character.Record.DeathMaxLevel), monsters, team.ConvertAll<GroupMemberData>(x => new GroupMemberData(x.Client.Character.Record.Level, false)), pvmfight.MonsterGroup.AgeBonus);
+            formulas.InitXpFormula(new PlayerData(client.Character.Record.Level, client.Character.CharacterStatsRecord.Wisdom, client.Character.Record.DeathMaxLevel), monsters, team.ConvertAll<GroupMemberData>(x => new GroupMemberData(x.Client.Character.Record.Level, false)), this.Fighter.Fight, pvmfight.MonsterGroup.AgeBonus);
             if (client.Character.Record.Level >= 200)
                 formulas._xpSolo = 0;
             client.Character.AddXp((ulong)formulas._xpSolo);

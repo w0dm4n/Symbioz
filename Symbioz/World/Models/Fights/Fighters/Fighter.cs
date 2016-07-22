@@ -69,6 +69,14 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public List<short> LastPosition = new List<short>();
 
+        public List<SpellLevelRecord> CastedOnTurn = new List<SpellLevelRecord>();
+
+        public List<SpellLevelRecord> CastedOnFight = new List<SpellLevelRecord>();
+
+        public List<EffectsEnum> LastElementUse = new List<EffectsEnum>();
+
+        public bool WeaponUsedOnLastTurn = false;
+
         public short LastTurnPosition = 0;
 
         public bool visible = true;
@@ -341,6 +349,13 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public virtual void Die()
         {
+            if (this.Fight.ChallengesInstance != null)
+            {
+                if (this is CharacterFighter)
+                    this.Fight.ChallengesInstance.HandleDeath(this);
+                else if (this is MonsterFighter)
+                    this.Fight.ChallengesInstance.HandleMonsterDeath(this);
+            }
             ApplyFighterEvent(FighterEventType.BEFORE_DIED, null);
             GetAliveFighterSummons().ForEach(x => x.Die());
             OnDied();
@@ -406,7 +421,11 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             List<ExtendedSpellEffect> handledEffects = critical == FightSpellCastCriticalEnum.CRITICAL_HIT ? spell.CriticalEffects : spell.Effects;
             Dictionary<ExtendedSpellEffect, List<Fighter>> validatedEffectsDatas = new Dictionary<ExtendedSpellEffect, List<Fighter>>();
-
+            if (this.Fight.ChallengesInstance != null)
+            {
+                if (this is CharacterFighter)
+                    this.Fight.ChallengesInstance.HandleSpellLaunch(this, spell);
+            }
             SelectRandomEffect(handledEffects);
             foreach (var effect in handledEffects)
             {

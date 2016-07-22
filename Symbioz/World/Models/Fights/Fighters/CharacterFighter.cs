@@ -33,6 +33,7 @@ namespace Symbioz.World.Models.Fights.Fighters
 
             }
         }
+
         public bool HasLeft = false;
         public bool ReadyToSee = false;
         public bool Disconnected = false;
@@ -44,6 +45,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             this.Client = client;
         }
+
         public override void Initialize()
         {
             base.Initialize();
@@ -58,6 +60,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 Client.Character.Record.Level, Client.Character.GetActorAlignement(), Client.Character.Record.Breed,
                 Client.Character.Record.Sex);
         }
+
         public override void OnAdded()
         {
             Client.Character.StopRegenLife();
@@ -75,6 +78,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 Fight.NewTurn();
             }
         }
+
         public override void Move(List<short> keys, short cellid, sbyte direction)
         {
             CompanionFighter companion = GetCompanion();
@@ -83,6 +87,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             else
                 base.Move(keys, cellid, direction);
         }
+
         public override void EndTurn()
         {
             CompanionFighter companion = GetCompanion();
@@ -92,6 +97,8 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             else if (IsPlaying)
             {
+                if (this.Fight.ChallengesInstance != null)
+                    this.Fight.ChallengesInstance.HandleEndTurn(this);
                 base.EndTurn();
                 if (companion != null && !companion.Dead)
                     companion.SwitchContext();
@@ -124,10 +131,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
 
         }
+
         public CompanionFighter GetCompanion()
         {
             return Fight.GetFighter<CompanionFighter>(x => x.Master == this);
         }
+
         public void RemoveCompanion()
         {
             CompanionFighter fighter = GetCompanion();
@@ -149,6 +158,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 }
             }
         }
+
         public void Leave()
         {
             if (this.Disconnected)
@@ -178,6 +188,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 Fight.Synchronizer.Start(AknowlegeAndLeave);
             }
         }
+
         public void AknowlegeAndLeave()
         {
             try // if two players leave at the same time, because of non acknowlege action
@@ -209,6 +220,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             catch { }
 
         }
+
         public override void Die()
         {
             CompanionFighter companion = GetCompanion();
@@ -257,15 +269,18 @@ namespace Symbioz.World.Models.Fights.Fighters
             Client.Send(new FighterStatsListMessage(FighterStats.GetCharacterCharacteristics(Client.Character)));
 
         }
+
         public override SpellLevelRecord GetSpellLevel(ushort spellid)
         {
             var spell = Client.Character.Spells.Find(x => x.spellId == spellid);
             return SpellLevelRecord.GetLevel(spellid, spell.spellLevel);
         }
+
         public override FightTeamMemberInformations GetFightMemberInformations()
         {
             return new FightTeamMemberCharacterInformations(ContextualId, Client.Character.Record.Name, Client.Character.Record.Level);
         }
+
         public void ToogleReady(bool ready)
         {
             ReadyToFight = ready;
@@ -275,6 +290,7 @@ namespace Symbioz.World.Models.Fights.Fighters
                 Fight.StartFight();
             }
         }
+
         public override void StartTurn()
         {
             if (this.Disconnected)
@@ -287,10 +303,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             if (this.Disconnected)
                 base.EndTurn();
         }
+
         public void ShowPlacementCells()
         {
             Client.Send(new GameFightPlacementPossiblePositionsMessage(Fight.BlueTeam.PlacementCells.ListCast<short, ushort>(), Fight.RedTeam.PlacementCells.ListCast<short, ushort>(), Team.Id));
         }
+
         public override void OnSpellCastFailed(CastFailedReason reason, SpellLevelRecord spelllevel)
         {
             switch (reason)
@@ -317,14 +335,17 @@ namespace Symbioz.World.Models.Fights.Fighters
             }
             Fight.Send(new GameActionFightNoSpellCastMessage((uint)spelllevel.Grade));
         }
+
         public override string GetName()
         {
             return Client.Character.Record.Name;
         }
+
         public override int GetInitiative()
         {
             return Client.Character.Initiative;
         }
+
         public void UsePunch(short cellid)
         {
             Fight.TryStartSequence(this.ContextualId, 2);
@@ -346,9 +367,12 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.TryEndSequence(2, 0);
             Fight.CheckFightEnd();
         }
+
         public override bool UseWeapon(short cellid)
         {
             var target = Fight.GetFighter(cellid);
+            if (this.Fight.ChallengesInstance != null)
+                this.Fight.ChallengesInstance.HandleWeaponUse(this);
             if (Client.Character.isGod == true)
             {
                 if (target != null)

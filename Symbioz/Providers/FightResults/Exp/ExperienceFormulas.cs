@@ -1,4 +1,5 @@
 ﻿using Symbioz.Core;
+using Symbioz.World.Models.Fights;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Symbioz.Providers.FightResults.Exp
             return (truncatedVal / multiplier);
         }
 
-        public void InitXpFormula(PlayerData pPlayerData, List<MonsterData> pMonstersList, List<GroupMemberData> pMembersList, double StarsBonus = 0)
+        public void InitXpFormula(PlayerData pPlayerData, List<MonsterData> pMonstersList, List<GroupMemberData> pMembersList, Fight fight, double StarsBonus = 0)
         {
             double lvlPlayers = 0;
             double lvlMaxGroup = 0;
@@ -134,6 +135,8 @@ namespace Symbioz.Providers.FightResults.Exp
                 this._xpSolo = (xpTotalOnePlayer * ConfigurationManager.Instance.ExperienceRatio) * 2;
             else
                 this._xpSolo = xpTotalOnePlayer * ConfigurationManager.Instance.ExperienceRatio;
+            if (fight.ChallengesInstance != null)
+                this._xpSolo = fight.ChallengesInstance.GetXpBonus(this._xpSolo);
             this._xpGroup = xpTotalGroup;
         }
     }
