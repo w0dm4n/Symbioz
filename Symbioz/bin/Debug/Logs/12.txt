@@ -1,8 +1,6 @@
-Client: 127.0.0.1:55531
-At: 22/07/2016 17:00:51
+Client: 127.0.0.1:55492
+At: 23/07/2016 23:25:38
 System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.World.Models.Challenges.ChallengesInstance.HandleSpellLaunch(Fighter fighter, SpellLevelRecord spell) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Challenges\ChallengesInstance.cs:ligne 242
-   à Symbioz.World.Models.Fights.Fighters.Fighter.HandleSpellEffects(SpellLevelRecord spell, Int16 cellid, FightSpellCastCriticalEnum critical) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\Fighter.cs:ligne 421
-   à Symbioz.World.Models.Fights.Fighters.Fighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\Fighter.cs:ligne 585
-   à Symbioz.World.Models.Fights.Fighters.CharacterFighter.CastSpellOnCell(UInt16 spellid, Int16 cellid, Int32 targetId) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\Fighters\CharacterFighter.cs:ligne 130
-   à Symbioz.World.Handlers.FightHandler.HandleSpellCast(GameActionFightCastRequestMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 40
+   à Symbioz.Providers.CustomObjectUseHandler.HandleAlliancePrism(WorldClient client, CharacterItemRecord item) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\CustomObjectUseHandler.cs:ligne 81
+   à Symbioz.Providers.CustomObjectUseHandler.HandleByItemGID(WorldClient client, CharacterItemRecord item, Int32 repeatCount) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\CustomObjectUseHandler.cs:ligne 52
+   à Symbioz.World.Handlers.InventoryHandler.HandleObjectUse(ObjectUseMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\InventoryHandler.cs:ligne 31

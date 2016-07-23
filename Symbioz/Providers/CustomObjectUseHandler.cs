@@ -64,6 +64,8 @@ namespace Symbioz.Providers
 
         private static void HandleMimicry(WorldClient client, CharacterItemRecord item)
         {
+            if (client.Character.IsFighting)
+                return;
             client.Character.CurrentDialogType = DialogTypeEnum.DIALOG_EXCHANGE;
             client.Send(new ClientUIOpenedByObjectMessage(3, item.UID));
         }
@@ -74,6 +76,8 @@ namespace Symbioz.Providers
 
         private static void HandleAlliancePrism(WorldClient client, CharacterItemRecord item)
         {
+            if (client.Character.IsFighting)
+                return;
             if (client.Character.HasGuild && client.Character.HasAlliance)
             {
                 if (CharacterGuildRecord.GetCharacterGuild(client.Character.Id).HasRight(GuildRightsBitEnum.GUILD_RIGHT_SET_ALLIANCE_PRISM))
@@ -120,6 +124,8 @@ namespace Symbioz.Providers
 
         public static void HandleLinkedParchment(WorldClient client, CharacterItemRecord item)
         {
+            if (client.Character.IsFighting)
+                return;
             var target = WorldServer.Instance.GetOnlineClient(TrackRecord.GetCharacterIdTrackedFromItemUID((int)item.UID));
             if (target != null)
             {
@@ -160,6 +166,8 @@ namespace Symbioz.Providers
 
         public static void HandleByItemTypeId(WorldClient client, CharacterItemRecord item, int repeatCount = 0)
         {
+            if (client.Character.IsFighting)
+                return;
             var itemRecord = ItemRecord.GetItem(item.GID);
             if (itemRecord != null)
             {

@@ -7,6 +7,7 @@ using Symbioz.Network.Servers;
 using Symbioz.Providers;
 using Symbioz.World.Models.Fights;
 using Symbioz.World.Models.Fights.Fighters;
+using Symbioz.World.Models.Fights.FightsTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +97,14 @@ namespace Symbioz.World.Handlers
                 Message sMessage = new GameRolePlayPlayerFightFriendlyRequestedMessage(fight.Id, (uint)client.Character.Id, message.targetId);
                 client.Send(sMessage);
                 target.Send(sMessage);
+            }
+            else
+            {
+               FightAgression fight = (FightAgression)FightProvider.Instance.CreateAgressionFight(client.Character.Map, client.Character.Record.CellId, target.Character.Record.CellId);
+               Logger.Log(message.targetCellId);
+               fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
+               fight.RedTeam.AddFighter(target.Character.CreateFighter(fight.RedTeam));
+               fight.StartPlacement();
             }
         }
 

@@ -74,6 +74,8 @@ namespace Symbioz.World.Models
             for (int i = 0; i < Clients.Count(); i++)
             {
                 Clients[i].Send(message);
+                if (message is GameRolePlayShowActorMessage)
+                    AvAState.GetState(Clients[i], Clients[i].Character.Map.Instance.GetPlayers());
             }
         }
 
@@ -88,7 +90,7 @@ namespace Symbioz.World.Models
              }
         }
 
-        List<GameRolePlayCharacterInformations> GetPlayers()
+        public List<GameRolePlayCharacterInformations> GetPlayers()
         {
             List<GameRolePlayCharacterInformations> ListPlayers = new List<GameRolePlayCharacterInformations>();
             foreach (var client in Clients)

@@ -38,10 +38,12 @@ namespace Symbioz.World.Handlers
     {
         public ServerRoleEnum Role { get; set; }
         public string Name { get; set; }
-        public InGameCommand(string name, ServerRoleEnum role)
+        public string Description { get; set; }
+        public InGameCommand(string name, ServerRoleEnum role, string description = "Aucune description")
         {
             this.Name = name;
             this.Role = role;
+            this.Description = description;
         }
         public InGameCommand(string name)
         {
@@ -56,13 +58,15 @@ namespace Symbioz.World.Handlers
 
     public class Command
     {
-        public Command(string value, ServerRoleEnum role)
+        public Command(string value, ServerRoleEnum role, string description = "Aucune description")
         {
             this.Value = value;
             this.MinimumRoleRequired = role;
+            this.Description = description;
         }
         public string Value { get; set; }
         public ServerRoleEnum MinimumRoleRequired { get; set; }
+        public string Description { get; set; }
     }
 
     public class CommandsHandler
@@ -82,7 +86,7 @@ namespace Symbioz.World.Handlers
                     if (attribute != null)
                     {
                         Delegate del = Delegate.CreateDelegate(typeof(Action<string, WorldClient>), subItem);
-                        Commands.Add(new Command(attribute.Name.Split('.')[0], attribute.Role), del);
+                        Commands.Add(new Command(attribute.Name.Split('.')[0], attribute.Role, attribute.Description), del);
                     }
                 }
             }
@@ -148,22 +152,23 @@ namespace Symbioz.World.Handlers
 
         #region Commands Repertory
 
-        [InGameCommand("help", ServerRoleEnum.PLAYER)]
+        [InGameCommand("help", ServerRoleEnum.PLAYER, "Affiche toutes les commandes disponibles")]
         public static void CommandsHelp(string value, WorldClient client)
         {
-            client.Character.Reply("Commandes :");
+            client.Character.Reply("Liste des commandes disponibles : ");
             foreach (var item in Commands)
             {
                 if (client.Account.Role >= item.Key.MinimumRoleRequired)
+                {
                     if (client.Account.Role > ServerRoleEnum.MODERATOR)
-                    {
                         client.Character.ReplyInConsole("- " + item.Key.Value);
-                    }
-                client.Character.Reply("- " + item.Key.Value);
+            
+                    client.Character.Reply("<b>" + item.Key.Value + "</b> - " + item.Key.Description);
+                }
             }
         }
 
-        [InGameCommand("start", ServerRoleEnum.PLAYER)]
+        [InGameCommand("start", ServerRoleEnum.PLAYER, "Téléporte a la carte de départ")]
         public static void StartCommand(string value, WorldClient client)
         {
 
@@ -223,7 +228,7 @@ namespace Symbioz.World.Handlers
             {
                 var target = WorldServer.Instance.GetOnlineClient(Array[0]);
                 if (target != null)
-                    client.Character.SetLevel(uint.Parse(Array[1]));
+                    target.Character.SetLevel(uint.Parse(Array[1]));
                 else
                     client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
             }
@@ -231,17 +236,10 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Syntaxe incorrecte : (joueur, level)");
         }
 
-        [InGameCommand("bug", ServerRoleEnum.PLAYER)]
+        [InGameCommand("bug", ServerRoleEnum.PLAYER, "Permet de reporter un bug")]
         public static void BugCommand(string value, WorldClient client)
         {
             client.SendRaw("bugreport");
-        }
-
-        [InGameCommand("event", ServerRoleEnum.PLAYER)]
-        public static void EventCommad(string value, WorldClient client)
-        {
-            client.Character.Teleport(144443396, 393);
-            client.Character.ShowNotification("Vous avez été téléporté sur la carte \"Event\".");
         }
 
         [InGameCommand("spell", ServerRoleEnum.ADMINISTRATOR)]
@@ -265,7 +263,7 @@ namespace Symbioz.World.Handlers
         [InGameCommand("infos", ServerRoleEnum.ANIMATOR)]
         public static void InfosCommand(string value, WorldClient client)
         {
-            client.Character.Reply("Il y a " + WorldServer.Instance.WorldClients.Count() + " client(s) actuellement connecté(s). <br/>Record : " + WorldServer.Instance.InstanceMaxConnected);
+            client.Character.Reply("Il y a " + WorldServer.Instance.WorldClients.Count() + " client(s) actuellement connecté(s). <br/>Record de client(s) en ligne : " + WorldServer.Instance.InstanceMaxConnected);
         }
 
         [InGameCommand("clist", ServerRoleEnum.ADMINISTRATOR)]
@@ -726,7 +724,7 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
         }
 
-        [InGameCommand("guild", ServerRoleEnum.PLAYER)]
+        [InGameCommand("guild", ServerRoleEnum.PLAYER, "Permet de créer une guilde")]
         public static void CreateGuildCommand(string value, WorldClient client)
         {
             if (!client.Character.HasGuild)
@@ -735,7 +733,7 @@ namespace Symbioz.World.Handlers
                 client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_ERROR_ALREADY_IN_GUILD));
         }
 
-        [InGameCommand("alliance", ServerRoleEnum.PLAYER)]
+        [InGameCommand("alliance", ServerRoleEnum.PLAYER, "Permet de créer une alliance")]
         public static void CreateAllianceCommand(string value, WorldClient client)
         {
             if (!client.Character.HasGuild)
@@ -806,7 +804,7 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Le joueur n'est pas mute.");
         }
 
-        [InGameCommand("save", ServerRoleEnum.PLAYER)]
+        [InGameCommand("save", ServerRoleEnum.PLAYER, "Sauvegarde votre personnage")]
         public static void SavePlayer(string value, WorldClient client)
         {
             if (client.Character.IsFighting)
@@ -885,7 +883,7 @@ namespace Symbioz.World.Handlers
             client.Character.Reply("Génération des fichiers de données forcée.");
         }
 
-        [InGameCommand("motd", ServerRoleEnum.PLAYER)]
+        [InGameCommand("motd", ServerRoleEnum.PLAYER, "Définis un message d'accueil pour votre guilde/alliance")]
         public static void SetMotd(string value, WorldClient client)
         {
             string defaultSyntaxErrorMessage = "Arguments incorrects :<br/>- <b>.motd guild</b> (Pour définir le message d'accueil de votre guilde).<br/>- <b>.motd alliance</b> (Pour définir le message d'accueil de votre alliance).";
@@ -941,7 +939,7 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("merchantmessage", ServerRoleEnum.MODERATOR)]
+        [InGameCommand("merchantmessage", ServerRoleEnum.PLAYER, "Affiche ou cache les messages de publicité des joueurs en mode marchand")]
         public static void MerchantMessage(string value, WorldClient client)
         {
             if (client.Character.Restrictions.MarketMessage == false)
@@ -953,6 +951,17 @@ namespace Symbioz.World.Handlers
             {
                 client.Character.Restrictions.MarketMessage = false;
                 client.Character.Reply("Vous recevez désormais les messages des joueurs en mode marchand !");
+            }
+        }
+
+        [InGameCommand("say", ServerRoleEnum.ANIMATOR, "Envoi un message a tout les joueurs en ligne")]
+        public static void SayMessage(string value, WorldClient client)
+        {
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            if (!string.IsNullOrEmpty(value))
+            {
+                foreach (var tmp in clients)
+                    tmp.Character.Reply("[" + client.Character.Record.Name + "]" + ": " + value, Color.DeepSkyBlue, true, false);
             }
         }
         #endregion

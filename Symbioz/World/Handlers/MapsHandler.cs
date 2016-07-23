@@ -24,7 +24,6 @@ namespace Symbioz.World.Handlers
     class MapsHandler
     {
         public const string MapKey = "649ae451ca33ec53bbcbcc33becf15f4";
-
         [MessageHandler]
         public static void HandleMapInformations(MapInformationsRequestMessage message, WorldClient client)
         {
@@ -41,7 +40,8 @@ namespace Symbioz.World.Handlers
             client.Send(new MapComplementaryInformationsDataMessage(client.Character.SubAreaId, message.mapId, new List<HouseInformations>(),
                client.Character.Map.Instance.GetActors(client), client.Character.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
                 new List<MapObstacle>(), client.Character.Map.Instance.Fights));
-
+            AvAState.GetState(client, client.Character.Map.Instance.GetPlayers());
+            
             //TODO:TaxCollectors
             client.Character.Map.Instance.ShowFightsCount(client);
             client.Character.CheckMapTip(message.mapId);

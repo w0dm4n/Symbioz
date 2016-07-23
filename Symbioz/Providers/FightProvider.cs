@@ -58,9 +58,13 @@ namespace Symbioz.Providers
             return fight;
         }
 
-        public void CreateAgressionFight(MapRecord record)
+        public Fight CreateAgressionFight(MapRecord map, short fightcellid, short secondplayercellid)
         {
-
+            FightTeam blueteam = new FightTeam(0, map.BlueCells, TeamColorEnum.BLUE_TEAM, TeamTypeEnum.TEAM_TYPE_PLAYER);
+            FightTeam redteam = new FightTeam(1, map.RedCells, TeamColorEnum.RED_TEAM, TeamTypeEnum.TEAM_TYPE_PLAYER);
+            var fight = new FightAgression(PopNextFightId(), map, blueteam, redteam, fightcellid, secondplayercellid);
+            m_worldFights.Add(fight);
+            return fight;
         }
 
         public void RemoveFight(int id)

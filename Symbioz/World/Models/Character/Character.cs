@@ -349,10 +349,12 @@ namespace Symbioz.World.Models
         }
         public ActorExtendedAlignmentInformations GetActorExtendedAlignement()
         {
-            AggressableStatusEnum agressableStatus = Record.PvPEnable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE;
-            var align = new ActorExtendedAlignmentInformations(Record.AlignmentSide, (sbyte)(Record.PvPEnable ? Record.AlignmentValue : 0), (sbyte)(Record.PvPEnable ? Record.AlignmentGrade : 0), Record.CharacterPower,
-               Record.Honor, ExperienceRecord.GetHonorForGrade(Record.AlignmentGrade), ExperienceRecord.GetHonorForGrade((sbyte)(Record.AlignmentGrade + 1)), (sbyte)agressableStatus);
-            return align;
+            /*AggressableStatusEnum agressableStatus = Record.PvPEnable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE;
+             var align = new ActorExtendedAlignmentInformations(Record.AlignmentSide, (sbyte)(Record.PvPEnable ? Record.AlignmentValue : 0), (sbyte)(Record.PvPEnable ? Record.AlignmentGrade : 0), Record.CharacterPower,
+                Record.Honor, ExperienceRecord.GetHonorForGrade(Record.AlignmentGrade), ExperienceRecord.GetHonorForGrade((sbyte)(Record.AlignmentGrade + 1)), (sbyte)agressableStatus);
+             return align;*/
+            var align = new ActorExtendedAlignmentInformations(1, 1, 1, 0, 1, 1, 1, (sbyte)AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE);
+            return (align);
         }
         public void TooglePvPMode(bool state)
         {
@@ -810,6 +812,7 @@ namespace Symbioz.World.Models
         {
             Reply("[Erreur] " + value, Color.Red, false, true);
         }
+
         public void ReplyInConsole(string content, ConsoleMessageTypeEnum type = ConsoleMessageTypeEnum.CONSOLE_TEXT_MESSAGE)
         {
             this.Client.Send(new ConsoleMessage((sbyte)type, content));
@@ -1482,11 +1485,10 @@ namespace Symbioz.World.Models
 
         public void OnTrackingTimeElapsed(WorldClient target, Timer actionTimer, CharacterItemRecord itemRecord)
         {
+            this.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
             if (target.Character.CurrentlyInTrackRequest)
             {
-                this.OnEndingUseDelayedObject(DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE);
                 target.Character.Reply("Le joueur <b>" + this.Record.Name + "</b>" + " détient désormais un parchemin de recherche lié à votre nom !", Color.Orange);
-
                 this.Inventory.RemoveItem(itemRecord.UID, 1);
 
                 List<ObjectEffect> objectEffects = new List<ObjectEffect>();

@@ -39,7 +39,7 @@ namespace Symbioz.Providers.FightResults
                 WorldClient client = (Fighter as CharacterFighter).Client;
                 if (winner == fighter.Team.TeamColor)
                 {
-                    if (ConfigurationManager.Instance.ServerId == 22 && fighter.Fight is FightDual)
+                    if (ConfigurationManager.Instance.ServerId == 22 && fighter.Fight is FightAgression)
                     {
                         if (!fighter.Fight.DeadItemsLoaded)
                             fighter.Fight.LoadDeadItems((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.RedTeam.GetCharacterFighters(true) : fighter.Fight.BlueTeam.GetCharacterFighters(true));
@@ -76,21 +76,24 @@ namespace Symbioz.Providers.FightResults
                     GenerateArenaLoot();
                 }
 
-                if (fighter.Fight is FightAgression && winner == fighter.Team.TeamColor)//WINNER
+                if (fighter.Fight is FightAgression && winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)
                 {
-                    // add honor
-                    if (ConfigurationManager.Instance.ServerId == 22)
+                    if (!client.Character.Restrictions.isDead)
                     {
-                        // heroique drop item
+                        client.Character.Record.DeathCount++;
+                        if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
+                            client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
+                        client.Character.Record.Energy = 0;
+                        client.Character.Look = ContextActorLook.Parse("{24}");
+                        client.Character.Restrictions.cantMove = true;
+                        client.Character.Restrictions.cantSpeakToNPC = true;
+                        client.Character.Restrictions.cantExchange = true;
+                        client.Character.Restrictions.cantAttackMonster = true;
+                        client.Character.Restrictions.isDead = true;
+                        String[] Data = new string[1];
+                        Data[0] = client.Character.Record.Name;
+                        client.Send(new TextInformationMessage(1, 190, Data));
                     }
-                }
-                else if (fighter.Fight is FightAgression && winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)//LOOSER
-                {
-                    client.Character.Record.DeathCount++;
-                    if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
-                        client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
-                    client.Character.Record.Energy = 0;
-                    client.Character.Look = ContextActorLook.Parse("{24}");
                 }
                 if (fighter.Disconnected)
                 {

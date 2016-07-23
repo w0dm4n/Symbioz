@@ -19,6 +19,8 @@ using Symbioz.World.Models.Fights.Marks;
 using Symbioz.Network.Servers;
 using Symbioz.World.Models.Parties;
 using Symbioz.World.Models.Challenges;
+using Symbioz.World.Models.Fights.FightsTypes;
+using Symbioz.World.Models.Maps;
 
 namespace Symbioz.World.Models.Fights
 {
@@ -236,6 +238,14 @@ namespace Symbioz.World.Models.Fights
                         client.Character.Reply("Ce combat est reserver aux membres du groupe");
                         return false;
                     }
+                }
+            }
+            if (this is FightAgression)
+            {
+                if (!AvAState.CanJoinFight(mainFighter, client))
+                {
+                    client.Character.Reply("Vous devez être dans la même alliance que ce personnage pour rejoindre ce combat !");
+                    return false;
                 }
             }
             return true;

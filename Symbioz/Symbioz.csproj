@@ -162,6 +162,7 @@
     <Compile Include="World\Models\Fights\FightsTypes\FightAvA.cs" />
     <Compile Include="World\Models\Fights\StartTurn\StartTurnSadida.cs" />
     <Compile Include="World\Models\Items\CharacterKeyring.cs" />
+    <Compile Include="World\Models\Maps\AvAState.cs" />
     <Compile Include="World\Models\Parties\Dungeon\DungeonPartyProvider.cs" />
     <Compile Include="Providers\FightResults\Exp\ExperienceFormulas.cs" />
     <Compile Include="Providers\FightResults\Exp\GroupMemberData.cs" />

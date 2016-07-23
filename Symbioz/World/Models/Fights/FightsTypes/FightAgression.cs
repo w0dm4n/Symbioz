@@ -51,7 +51,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
             List<ushort> positions = new List<ushort>();
             positions.Add((ushort)SecondFighterCellId);
             positions.Add((ushort)FightCellId);
-            return new FightCommonInformations(Id, (sbyte)FightType, teams, positions, new List<FightOptionsInformations>() { BlueTeam.TeamOptions, RedTeam.TeamOptions });
+            return new FightCommonInformations(Id, (sbyte)8, teams, positions, new List<FightOptionsInformations>() { BlueTeam.TeamOptions, RedTeam.TeamOptions });
         }
         public override void StartPlacement()
         {
@@ -62,7 +62,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
 
             var mainFighter = GetAllFighters().Find(x => x.ContextualId == mainfighterid);
 
-            if (CanJoin(client, mainFighter.Team))
+            if (CanJoin(client, mainFighter.Team, mainFighter))
             {
                 var newFighter = client.Character.CreateFighter(mainFighter.Team);
                 mainFighter.Team.AddFighter(newFighter);

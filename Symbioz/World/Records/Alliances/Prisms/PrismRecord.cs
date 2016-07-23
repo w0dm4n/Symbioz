@@ -343,5 +343,15 @@ namespace Symbioz.World.Records.Alliances.Prisms
         }
 
         #endregion
+
+        public static bool PrismOnSubArea(int subArea)
+        {
+            foreach (var prism in PrismRecord.Prisms)
+            {
+                if (prism.SubAreaId == subArea)
+                    return true;
+            }
+            return false;
+        }
     }
 }
