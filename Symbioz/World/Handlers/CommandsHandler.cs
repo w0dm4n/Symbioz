@@ -961,8 +961,43 @@ namespace Symbioz.World.Handlers
             if (!string.IsNullOrEmpty(value))
             {
                 foreach (var tmp in clients)
-                    tmp.Character.Reply("[" + client.Character.Record.Name + "]" + ": " + value, Color.DeepSkyBlue, true, false);
+                    tmp.Character.Reply("[" + client.Character.Record.Name + "]" + ": " + value, Color.DeepSkyBlue, false, false);
             }
+        }
+
+        static void ExitLoop(System.Timers.Timer Timer, int timeElapsed)
+        {
+            Timer.Enabled = false;
+            var Accounts = AuthDatabaseProvider.GetAccountsOnline();
+            foreach (var account in Accounts)
+                AccountsProvider.UpdateAccountsOnlineState(account, false);
+            SaveTask.Save();
+            var fileName = Assembly.GetExecutingAssembly().Location;
+            System.Diagnostics.Process.Start("Symbioz.exe");
+            Environment.Exit(0);
+        }
+
+        [InGameCommand("exit", ServerRoleEnum.FONDATOR, "Ferme le serveur en sauvegardant en 2 minutes")]
+        public static void SaveAndExit(string value, WorldClient client)
+        {
+            var timeElapsed = 0;
+            var Timer = new System.Timers.Timer();
+            Timer.Interval = 120000;
+            Timer.Elapsed += (sender, e) => { ExitLoop(Timer, timeElapsed); };
+            Timer.Enabled = true;
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            foreach (var tmp in clients)
+                tmp.Character.Reply("[SERVEUR] Redémarrage automatique du serveur dans <b>2 minutes</b>.", Color.OrangeRed, false, false);
+            client.Character.Reply("Redémarrage du serveur dans 2 minutes lancé avec succès");
+        }
+
+        [InGameCommand("resetonline", ServerRoleEnum.MODERATOR, "Reset le nombre de joueurs en ligne")]
+        public static void ResetOnlinePlayers(string value, WorldClient client)
+        {
+            var Accounts = AuthDatabaseProvider.GetAccountsOnline();
+            foreach (var account in Accounts)
+                AccountsProvider.UpdateAccountsOnlineState(account, false);
+            client.Character.Reply("Reset effectué avec succès !");
         }
         #endregion
 

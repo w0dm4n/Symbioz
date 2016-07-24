@@ -111,5 +111,20 @@ namespace Symbioz.Core
             dataReader.Close();
             return result;
         }
+
+        public static List<int> GetAccountsOnline()
+        {
+            List<int> Accounts = new List<int>();
+            CheckConnectionState();
+            string query = "SELECT * FROM accounts WHERE isOnline = '1'";
+            MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                Accounts.Add(Int32.Parse(dataReader["Id"].ToString()));
+            }
+            dataReader.Close();
+            return (Accounts);
+        }
     }
 }

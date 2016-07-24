@@ -30,5 +30,7 @@ namespace Symbioz.Auth.Models
         public bool WarnOnFriendConnection { get; set; }
 
         public int PointsCount { get; set; }
+
+        public int isOnline { get; set; }
     }
 }
