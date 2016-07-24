@@ -6,6 +6,8 @@ using Symbioz.Enums;
 using Symbioz.Network.Clients;
 using Symbioz.ORM;
 using Symbioz.World.Models;
+using Symbioz.World.Models.Fights;
+using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Records.Alliances.Prisms.Modules;
 using System;
 using System.Collections.Generic;
@@ -122,7 +124,7 @@ namespace Symbioz.World.Records.Alliances.Prisms
                 {
                     this.CheckPrismInvulnerability();
                 }
-                return (PrismStateEnum)this.State;
+                return PrismStateEnum.PRISM_STATE_NORMAL;
             }
             set
             {
@@ -352,6 +354,33 @@ namespace Symbioz.World.Records.Alliances.Prisms
                     return true;
             }
             return false;
+        }
+
+        [Ignore]
+        public PrismFighter Fighter = null;
+
+        public PrismFighter CreateFighter(FightTeam team)
+        {
+            this.Fighter = new PrismFighter(this, team, this.AllianceId);
+            return this.Fighter;
+        }
+
+        public ContextActorLook GetContextActorLook()
+        {
+            return new ContextActorLook(BonesId, new List<ushort>() { (ushort)(2569 + this.Alliance.SymbolShape) },
+                this.GetColors(), new List<short>(), new List<SubEntity>());
+        }
+
+        public static void RemovePrismFromMapid(int mapId)
+        {
+            foreach (var prism in PrismRecord.Prisms)
+            {
+                if (prism.MapId == mapId)
+                {
+                    SaveTask.RemoveElement(prism);
+                    break;
+                }
+            }
         }
     }
 }

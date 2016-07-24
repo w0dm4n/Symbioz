@@ -17,17 +17,20 @@ namespace Symbioz.World.Models.Fights
         public TeamTypeEnum TeamType { get; set; }
         public TeamColorEnum TeamColor { get; set; }
         public FightOptionsInformations TeamOptions = new FightOptionsInformations(false, false, false, false);
-        public FightTeam(sbyte id, List<short> placementcells, TeamColorEnum teamcolor, TeamTypeEnum teamtype)
+        public FightTeam(sbyte id, List<short> placementcells, TeamColorEnum teamcolor, TeamTypeEnum teamtype, bool isDefenders = false)
         {
             this.PlacementCells = placementcells;
             this.TeamColor = teamcolor;
             this.TeamType = teamtype;
             this.Id = id;
+            this.IsDefenders = isDefenders;
         }
         List<Fighter> m_fighters = new List<Fighter>();
         public List<short> PlacementCells = new List<short>();
         public Fight Fight { get; set; }
         public int FightersCount { get { return m_fighters.Count; } }
+        public bool IsDefenders { get; set; }
+
         public List<CharacterFighter> GetCharacterFighters(bool deaths = false)
         {
             return GetFighters(deaths).FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x);

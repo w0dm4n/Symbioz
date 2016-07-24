@@ -90,7 +90,7 @@ namespace Symbioz.Providers
                             PrismsManager.Instance.AddPrismOnSubArea(client.Character, client.Character.Map.SubAreaId, client.Character.Map.Id);
                             client.Character.Inventory.RemoveItem(item.UID, 1);
                             client.Character.Reply(string.Format("Vous venez de poser un prisme dans la zone \"<b>{0}</b>\".", SubAreaRecord.GetSubAreaName(subAreaId)));
-                            client.Character.Reply("L'heure de vulnérabilitée par défaut est à <b>17h30</b>, vous pouvez changer cet horraire à tout moment depuis l'onglet <b>\"Conquêtes\"</b> du panel de votre alliance.", Color.Orange);
+                            //client.Character.Reply("L'heure de vulnérabilitée par défaut est à <b>17h30</b>, vous pouvez changer cet horraire à tout moment depuis l'onglet <b>\"Conquêtes\"</b> du panel de votre alliance.", Color.Orange);
                             break;
 
                         case CanAddPrismOnSubAreaResult.SUBAREA_ALREADY_TAKEN:

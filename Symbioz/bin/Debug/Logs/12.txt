@@ -1,6 +1,9 @@
-Client: 127.0.0.1:55492
-At: 23/07/2016 23:25:38
+Client: 127.0.0.1:60136
+At: 24/07/2016 18:42:37
 System.NullReferenceException: La référence d'objet n'est pas définie à une instance d'un objet.
-   à Symbioz.Providers.CustomObjectUseHandler.HandleAlliancePrism(WorldClient client, CharacterItemRecord item) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\CustomObjectUseHandler.cs:ligne 81
-   à Symbioz.Providers.CustomObjectUseHandler.HandleByItemGID(WorldClient client, CharacterItemRecord item, Int32 repeatCount) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\CustomObjectUseHandler.cs:ligne 52
-   à Symbioz.World.Handlers.InventoryHandler.HandleObjectUse(ObjectUseMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\InventoryHandler.cs:ligne 31
+   à Symbioz.Providers.FightResults.FightResult..ctor(Fighter fighter, TeamColorEnum winner) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\FightResults\FightResult.cs:ligne 20
+   à Symbioz.Providers.FightResults.FightResultMonster..ctor(MonsterFighter fighter, TeamColorEnum winner) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\Providers\FightResults\FightResultMonster.cs:ligne 15
+   à Symbioz.World.Models.Fights.Fight.GetFightResults(TeamColorEnum winner) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 761
+   à Symbioz.World.Models.Fights.Fight.EndFight() dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\FightsTypes\Fight.cs:ligne 616
+   à Symbioz.World.Models.Fights.ClientsSynchronizer.ToggleReady(CharacterFighter fighter) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Models\Fights\ClientsSynchronizer.cs:ligne 60
+   à Symbioz.World.Handlers.FightHandler.HandleTurnReady(GameFightTurnReadyMessage message, WorldClient client) dans C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz\World\Handlers\FightHandler.cs:ligne 25

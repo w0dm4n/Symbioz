@@ -5,6 +5,7 @@ using Symbioz.Network.Servers;
 using Symbioz.ORM;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Alliances;
+using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records.Guilds;
 using System;
@@ -43,6 +44,8 @@ namespace Symbioz.World.Records.Alliances
         public DateTime CreationDate;
         [Update]
         public string AllianceWelcomeMessage;
+        [Ignore]
+        List<FightAvAPrism> Fights = new List<FightAvAPrism>();
 
         public AllianceRecord(int id, string name, string tag, int symbolColor, ushort symbolShape, int backgroundColor, sbyte backgroundShape, int leader, DateTime creationDate, string allianceWelcomeMessage)
         {
@@ -203,5 +206,20 @@ namespace Symbioz.World.Records.Alliances
         }
 
         #endregion
+
+        public void AddPrismFight(FightAvAPrism fight)
+        {
+            this.Fights.Add(fight);
+            this.Send(new PrismFightAddedMessage(fight.GetPrismFightersInformation()));
+        }
+
+        public void RemovePrismFight(FightAvAPrism fight)
+        {
+            if (this.Fights.Contains(fight))
+            {
+                this.Fights.Remove(fight);
+                this.Send(new PrismFightRemovedMessage((ushort)fight.GetPrism().SubAreaId));
+            }
+        }
     }
 }

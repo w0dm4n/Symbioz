@@ -21,6 +21,10 @@ using Symbioz.World.Models.Parties;
 using Symbioz.World.Models.Challenges;
 using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models.Maps;
+using Symbioz.World.Models.Alliances;
+using System.Drawing;
+using Symbioz.World.Records.Alliances.Prisms;
+using Symbioz.World.Records.SubAreas;
 
 namespace Symbioz.World.Models.Fights
 {
@@ -75,6 +79,8 @@ namespace Symbioz.World.Models.Fights
 
         public MapRecord Map { get; set; }
 
+        public DateTime CreationTime { get; set; }
+
         public short FightCellId { get; set; }
 
         public FightTeam BlueTeam { get; set; }
@@ -90,6 +96,16 @@ namespace Symbioz.World.Models.Fights
         /// </summary>
         public bool WaitAcknowledgment { get; set; }
 
+        public int AllianceId { get; set; }
+
+        public virtual short FightPreparationTime
+        {
+            get
+            {
+                return 30000;
+            }
+        }
+
         public UIDProvider MarkIdProvider = new UIDProvider();
 
         public List<MarkTrigger> Marks = new List<MarkTrigger>();
@@ -99,7 +115,7 @@ namespace Symbioz.World.Models.Fights
         public List<MarkInteraction> MarkInteractions = new List<MarkInteraction>();
 
 
-        public Fight(int id, MapRecord map, FightTeam blueteam, FightTeam redteam, short fightcellid)
+        public Fight(int id, MapRecord map, FightTeam blueteam, FightTeam redteam, short fightcellid, bool customFightPreparation = false)
         {
             this.Id = id;
             this.BlueTeam = blueteam;
@@ -711,6 +727,31 @@ namespace Symbioz.World.Models.Fights
 
         public List<FightResultListEntry> GetFightResults(TeamColorEnum winner)
         {
+            if (this is FightAvAPrism)
+            {
+                if (winner == TeamColorEnum.RED_TEAM)
+                {
+                    var AlliancePlayers = AllianceProvider.GetClients(this.AllianceId);
+                    foreach (var tmp in AlliancePlayers)
+                        tmp.Character.Reply("Votre prisme en  (<b>" + this.Map.WorldX + "," + this.Map.WorldY + "</b>, " + SubAreaRecord.GetSubAreaName(this.Map.SubAreaId) + "), à survécu !", Color.Orange);
+                    var prism = PrismRecord.GetPrismByMapId(this.Map.Id);
+                    if (prism != null)
+                        prism.ParsedState = PrismStateEnum.PRISM_STATE_NORMAL;
+                }
+                else
+                {
+                    var AlliancePlayers = AllianceProvider.GetClients(this.AllianceId);
+                    foreach (var tmp in AlliancePlayers)
+                        tmp.Character.Reply("Votre prisme en  (<b>" + this.Map.WorldX + "," + this.Map.WorldY + "</b>, " + SubAreaRecord.GetSubAreaName(this.Map.SubAreaId) + "), n'a pas survécu !", Color.Orange);
+                    var prism = PrismRecord.GetPrismByMapId(this.Map.Id);
+                    if (prism != null)
+                    {
+                        PrismRecord.RemovePrismFromMapid(this.Map.Id);
+                        this.Map.Instance.Prism = null;
+                        prism.RefreshOnMapInstance();
+                    }
+                }
+            }
             List<FightResultListEntry> results = new List<FightResultListEntry>();
             var fighters = GetAllFighters(true);
             foreach (Fighter fighter in fighters)
@@ -750,6 +791,16 @@ namespace Symbioz.World.Models.Fights
         public int GetFightDuration()
         {
             return (!this.Started) ? 0 : ((int)(DateTime.Now - this.StartTime).TotalMilliseconds);
+        }
+
+        public virtual double GetPlacementTimeLeft(Fighter fighter = null)
+        {
+            double timeLeft = this.FightPreparationTime - (DateTime.Now - this.CreationTime).TotalMilliseconds;
+
+            if (timeLeft < 0)
+                timeLeft = 0;
+
+            return timeLeft / 100;
         }
 
         #region FightDeadCharacterItemsLoot

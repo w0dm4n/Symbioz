@@ -7,7 +7,10 @@ using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Servers;
 using Symbioz.ORM;
+using Symbioz.Providers;
 using Symbioz.World.Handlers;
+using Symbioz.World.Models.Fights.FightsTypes;
+using Symbioz.World.Records;
 using Symbioz.World.Records.Alliances.Prisms;
 using Symbioz.World.Records.SubAreas;
 using System;
@@ -101,7 +104,7 @@ namespace Symbioz.World.Models.Alliances.Prisms
         public void AddPrismOnSubArea(Character character, int subAreaId, int mapId)
         {
             PrismRecord newPrismRecord = new PrismRecord(PrismRecord.PopNextId(), character.AllianceId, subAreaId, mapId,
-                1, (int)PrismStateEnum.PRISM_STATE_INVULNERABLE, 70, DateTime.Now.ToEpochTime(), 0, DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0, 0)).ToEpochTime(), DateTime.Now.ToEpochTime(),
+                1, (int)PrismStateEnum.PRISM_STATE_NORMAL, 70, DateTime.Now.ToEpochTime(), 0, DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0, 0)).ToEpochTime(), DateTime.Now.ToEpochTime(),
                 character.GuildId, character.Id, character.Record.Name);
             newPrismRecord.Save();
             this.OnPrismAdded(newPrismRecord, character);
@@ -114,6 +117,67 @@ namespace Symbioz.World.Models.Alliances.Prisms
             {
                 map.AddPrism(newPrismRecord, character.Record.CellId);
                 PrismsHandler.SendPrismListUpdateMessage();
+            }
+        }
+
+        #endregion
+
+        #region AttackPrisms
+
+        public void AttackPrism(WorldClient client, PrismRecord prism)
+        {
+            if (client.Character.Map == null)
+                return;
+
+            if (!client.Character.Map.IsValid())
+            {
+                if (client.Character.isDebugging)
+                    client.Character.Reply("Impossible de démarrer la phase de placement sur cette carte.");
+                return;
+            }
+
+            var alliance = prism.Alliance;
+            if (alliance != null)
+            {
+                var AlliancePlayers = AllianceProvider.GetClients(prism.AllianceId);
+                var map = MapRecord.GetMap(prism.MapId);
+                foreach (var tmp in AlliancePlayers)
+                    tmp.Character.Reply("Un prisme de votre alliance est attaqué en (<b>" + map.WorldX + "," + map.WorldY + "</b>, " + SubAreaRecord.GetSubAreaName(map.SubAreaId) + "), rendez vous à cette position et battez vous pour conserver votre territoire !", Color.Orange);
+                FightAvAPrism fight = FightProvider.Instance.CreateAvAPrismFight(prism, client.Character.Map, (short)prism.CellId, client.Character.Record.CellId);
+                fight.AllianceId = alliance.Id;
+                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
+                fight.RedTeam.AddFighter(prism.CreateFighter(fight.RedTeam));
+                fight.StartPlacement();
+
+                alliance.AddPrismFight(fight);
+            }
+        }
+
+        public void TryJoinLeavePrismFight(WorldClient client, PrismRecord prism, bool join)
+        {
+            if (prism.Fighter != null && prism.Fighter.Fight != null)
+            {
+                var fight = prism.Fighter.Fight as FightAvAPrism;
+                if (join)
+                {
+                    if (fight.IsAttackersPlacementPhase && fight.DefendersSlotAvailable())
+                    {
+                        if (fight.AddDefenderToQueue(client.Character))
+                        {
+                            client.Character.GetAlliance().Send(new PrismFightDefenderAddMessage((ushort)prism.SubAreaId, (ushort)fight.Id,
+                                client.Character.GetCharacterMinimalPlusLookInformations()));
+                        }
+                    }
+                }
+                else
+                {
+                    if (fight.IsAttackersPlacementPhase && fight.IsInDefendersQueue(client.Character))
+                    {
+                        fight.RemoveDefenderFromQueue(client.Character);
+                        client.Character.GetAlliance().Send(new PrismFightDefenderLeaveMessage((ushort)prism.SubAreaId, (ushort)prism.Id,
+                            (uint)client.Character.Id));
+                    }
+                }
             }
         }
 

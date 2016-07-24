@@ -949,6 +949,11 @@ namespace Symbioz.World.Models
             return new CharacterMinimalInformations((uint)this.Id, (byte)this.Record.Level, this.Record.Name);
         }
 
+        public CharacterMinimalPlusLookInformations GetCharacterMinimalPlusLookInformations()
+        {
+            return new CharacterMinimalPlusLookInformations((uint)this.Id, (byte)this.Record.Level, this.Record.Name, this.Look);
+        }
+
         public void SendMessage(string message)
         {
             Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new string[] { message }));

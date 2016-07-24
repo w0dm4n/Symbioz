@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Models.Fights.FightsTypes;
+using Symbioz.World.Records.Alliances.Prisms;
 
 namespace Symbioz.Providers
 {
@@ -63,6 +64,15 @@ namespace Symbioz.Providers
             FightTeam blueteam = new FightTeam(0, map.BlueCells, TeamColorEnum.BLUE_TEAM, TeamTypeEnum.TEAM_TYPE_PLAYER);
             FightTeam redteam = new FightTeam(1, map.RedCells, TeamColorEnum.RED_TEAM, TeamTypeEnum.TEAM_TYPE_PLAYER);
             var fight = new FightAgression(PopNextFightId(), map, blueteam, redteam, fightcellid, secondplayercellid);
+            m_worldFights.Add(fight);
+            return fight;
+        }
+
+        public FightAvAPrism CreateAvAPrismFight(PrismRecord prism, MapRecord map, short cellId, short battleLauncherCellId)
+        {
+            FightTeam blueTeam = new FightTeam(0, map.BlueCells, TeamColorEnum.BLUE_TEAM, TeamTypeEnum.TEAM_TYPE_PRISM, false);
+            FightTeam redTeam = new FightTeam(1, map.RedCells, TeamColorEnum.RED_TEAM, TeamTypeEnum.TEAM_TYPE_PLAYER, true);
+            var fight = new FightAvAPrism(PopNextFightId(), map, blueTeam, redTeam, cellId, battleLauncherCellId, prism);
             m_worldFights.Add(fight);
             return fight;
         }

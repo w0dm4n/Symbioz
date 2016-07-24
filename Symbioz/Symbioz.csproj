@@ -156,10 +156,12 @@
     <Compile Include="World\Models\Exchanges\ShopStockExchange.cs" />
     <Compile Include="World\Models\Fights\CastSpellCheck\CharacterStates.cs" />
     <Compile Include="World\Models\Fights\CastSpellCheck\MonsterStates.cs" />
+    <Compile Include="World\Models\Fights\Fighters\PrismFighter.cs" />
     <Compile Include="World\Models\Fights\Fighters\SacrifierFighter.cs" />
     <Compile Include="World\Models\Fights\Fighters\TreeFighter.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAgression.cs" />
     <Compile Include="World\Models\Fights\FightsTypes\FightAvA.cs" />
+    <Compile Include="World\Models\Fights\FightsTypes\FightAvAPrism.cs" />
     <Compile Include="World\Models\Fights\StartTurn\StartTurnSadida.cs" />
     <Compile Include="World\Models\Items\CharacterKeyring.cs" />
     <Compile Include="World\Models\Maps\AvAState.cs" />

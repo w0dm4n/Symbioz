@@ -19,6 +19,7 @@ using Symbioz.Network.Servers;
 using Symbioz.Network;
 using Shader.Helper;
 using Symbioz.DofusProtocol.Messages;
+using System.Drawing;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -68,6 +69,40 @@ namespace Symbioz.Providers.FightResults
                             String[] Data = new string[1];
                             Data[0] = client.Character.Record.Name;
                             client.Send(new TextInformationMessage(1, 190, Data));
+                        }
+                    }
+                }
+                if (fighter.Fight is FightAvAPrism)
+                {
+                    if (winner != fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)
+                    {
+                        client.Character.Record.DeathCount++;
+                        if (client.Character.Record.DeathMaxLevel < client.Character.Record.Level)
+                            client.Character.Record.DeathMaxLevel = client.Character.Record.Level;
+                        client.Character.Record.Energy = 0;
+                        client.Character.Look = ContextActorLook.Parse("{24}");
+                        client.Character.Restrictions.cantMove = true;
+                        client.Character.Restrictions.cantSpeakToNPC = true;
+                        client.Character.Restrictions.cantExchange = true;
+                        client.Character.Restrictions.cantAttackMonster = true;
+                        client.Character.Restrictions.isDead = true;
+                        String[] Data = new string[1];
+                        Data[0] = client.Character.Record.Name;
+                        client.Send(new TextInformationMessage(1, 190, Data));
+                    }
+                    else if (winner == fighter.Team.TeamColor && ConfigurationManager.Instance.ServerId == 22)
+                    {
+                        if (!fighter.Fight.DeadItemsLoaded)
+                            fighter.Fight.LoadDeadItems((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.RedTeam.GetCharacterFighters(true) : fighter.Fight.BlueTeam.GetCharacterFighters(true));
+                        GeneratePlayerLoot((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.BlueTeam.GetCharacterFighters(true) : fighter.Fight.RedTeam.GetCharacterFighters(true), fighter);
+                        fighter.AlreadyDropped = true;
+
+                        if (fighter.Team.IsDefenders)
+                        {
+                            //client.Character.Reply("Votre prisme a survécu, félicitations !", Color.Orange);
+                        }
+                        else
+                        {
                         }
                     }
                 }

@@ -58,7 +58,7 @@ namespace Symbioz.World.Models
             RemoveEntity(client.Character.Id);
         }
 
-        void RemoveEntity(int id)
+        public void RemoveEntity(int id)
         {
             this.Send(new GameContextRemoveElementMessage(id));
         }

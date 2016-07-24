@@ -75,6 +75,8 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public List<EffectsEnum> LastElementUse = new List<EffectsEnum>();
 
+        public int AllianceId { get; set; }
+
         public bool WeaponUsedOnLastTurn = false;
 
         public short LastTurnPosition = 0;

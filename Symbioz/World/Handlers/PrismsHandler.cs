@@ -121,11 +121,25 @@ namespace Symbioz.World.Handlers
             if(client.Character.HasGuild && client.Character.HasAlliance)
             {
                 var prism = PrismRecord.GetPrismByMapId(client.Character.Map.Id);
-                if(prism != null)
+                if (prism != null)
                 {
-                    if(prism.ParsedState == PrismStateEnum.PRISM_STATE_NORMAL)
+                    if (client.Character.HasAlliance)
                     {
-                        //TODO:AttackPrism
+                        if (client.Character.Restrictions.isDead)
+                        {
+                            client.Character.Reply("Impossible en étant mort !");
+                            return;
+                        }
+                        if (client.Character.Busy || client.Character.IsFighting)
+                            return;
+                        if (client.Character.AllianceId != prism.AllianceId)
+                        {
+                            PrismsManager.Instance.AttackPrism(client, prism);
+                        }
+                    }
+                    /*if(prism.ParsedState == PrismStateEnum.PRISM_STATE_NORMAL)
+                    {
+                        PrismsManager.Instance.AttackPrism(client, prism);
                     }
                     else
                     {
@@ -138,7 +152,7 @@ namespace Symbioz.World.Handlers
                         {
                             client.Character.Reply("Impossible d'attaquer ce prisme pour le moment.", Color.Orange);
                         }
-                    }
+                    }*/
                 }
             }
             else
