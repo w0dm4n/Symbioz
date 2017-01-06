@@ -1,4 +1,4 @@
-Author: Wodman, Sylis, Gygy, Yamisaaf
+Author: Wodman, Sylly, Gygy, Yamisaaf
 
 Heroic mode, challenge, merchant mode, reconnection in fight, AvA..
 
