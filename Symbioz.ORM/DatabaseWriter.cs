@@ -4,6 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dapper;
+using System.Data.SqlClient;
+using System.Data;
+using System.Timers;
+using System.Threading;
 
 namespace Symbioz.ORM
 {
@@ -31,7 +36,6 @@ namespace Symbioz.ORM
         public DatabaseWriter(DatabaseAction action, params ITable[] elements)
         {
             this.Initialize(action);
-
             switch (action)
             {
                 case DatabaseAction.Add:
@@ -61,6 +65,31 @@ namespace Symbioz.ORM
 
             if (action != DatabaseAction.Add)
                 this.GetPrimaryField();
+        }
+
+       /* private void TryToExecute(string query, Timer actionTimer)
+        {
+            var Provider = DatabaseManager.GetNonQueryProvider();
+            if (Provider.State != ConnectionState.Fetching &&
+                Provider.State != ConnectionState.Executing)
+            {
+                Provider.ExecuteAsync(query);
+                actionTimer.Stop();
+            }
+        }
+        */
+
+        private void ExecuteAction(string command)
+        {
+            Monitor.Enter(DatabaseManager.GetNonQueryProvider());
+            try
+            {
+                DatabaseManager.GetNonQueryProvider().Execute(command);
+            }
+            finally
+            {
+                Monitor.Exit(DatabaseManager.GetNonQueryProvider());
+            }
         }
 
         private void AddElements(ITable[] elements)
@@ -94,8 +123,13 @@ namespace Symbioz.ORM
 
                 try
                 {
-                    this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
-                    this.m_command.ExecuteNonQuery();
+                    //Console.WriteLine(command);
+                    //var connection = DatabaseManager.GetSqlConnection();
+                    //connection.Execute(command);
+                    //this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
+                    //this.m_command.ExecuteNonQuery();
+                    //Console.WriteLine(command);
+                    this.ExecuteAction(command);
                 }
                 catch (Exception ex)
                 {
@@ -108,8 +142,6 @@ namespace Symbioz.ORM
         {
             foreach (var element in elements)
             {
-                lock (element)
-                {
                     var values = this.m_fields.ConvertAll<string>(field => string.Format("{0} = {1}", field.Name, this.GetFieldValue(field, element)));
                     if (values.Count > 0)
                     {
@@ -117,8 +149,9 @@ namespace Symbioz.ORM
 
                         try
                         {
-                            this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
-                            this.m_command.ExecuteNonQuery();
+                            //this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
+                            //this.m_command.ExecuteNonQuery();
+                            this.ExecuteAction(command);
                         }
                         catch (Exception ex)
                         {
@@ -129,7 +162,6 @@ namespace Symbioz.ORM
                     {
                         Logger.Error("Missing [UpdateAttribute] for table '" + this.m_tableName + "' !");
                     }
-                }
             }
         }
 
@@ -137,21 +169,19 @@ namespace Symbioz.ORM
         {
             foreach (var element in elements)
             {
-                lock (element)
-                {
                     var command = string.Format(REMOVE_ELEMENTS, this.m_tableName, this.GetPrimaryField().Name, this.GetPrimaryField().GetValue(element));
                     var sw = System.Diagnostics.Stopwatch.StartNew();
 
                     try
                     {
-                        this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
-                        this.m_command.ExecuteNonQuery();
+                        //this.m_command = new MySqlCommand(command, DatabaseManager.GetNonQueryProvider());
+                        //this.m_command.ExecuteNonQuery();
+                        this.ExecuteAction(command);
                     }
                     catch (Exception ex)
                     {
                         Logger.Log("Error (DeleteElements) : " + ex.ToString());
                     }
-                }
             }
         }
 
@@ -203,7 +233,9 @@ namespace Symbioz.ORM
                                 var newValues = new List<string>();
 
                                 foreach (var ele in values)
+                                {
                                     newValues.Add((string)method.Invoke(ele, new object[] { }));
+                                }
 
                                 value = string.Join(DICTIONARY_SPLITTER, newValues);
                                 break;
@@ -231,7 +263,10 @@ namespace Symbioz.ORM
                 }
             }
 
-            return string.Format("'{0}'", value);
+            if (value != null && value.ToString() != null)
+                return string.Format("'{0}'", value.ToString().Replace(@"\", @"\\").Replace("'", @"\'"));
+            else
+                return string.Format("'{0}'", value);
         }
 
         private FieldInfo GetPrimaryField()

@@ -25,8 +25,7 @@ namespace Symbioz.Enums
 
 public enum CharacterInventoryPositionEnum
 {
-
-ACCESSORY_POSITION_HAT = 6,
+        ACCESSORY_POSITION_HAT = 6,
         ACCESSORY_POSITION_CAPE = 7,
         ACCESSORY_POSITION_BELT = 3,
         ACCESSORY_POSITION_BOOTS = 5,
@@ -53,8 +52,9 @@ ACCESSORY_POSITION_HAT = 6,
         INVENTORY_POSITION_FOLLOWER = 27,
         INVENTORY_POSITION_COMPANION = 28,
         INVENTORY_POSITION_NOT_EQUIPED = 63,
-        
+
 
 }
+
 
 }

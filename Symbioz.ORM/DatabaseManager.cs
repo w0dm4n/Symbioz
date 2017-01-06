@@ -6,6 +6,8 @@ using System.Linq;
 using System.Collections;
 using Symbioz;
 using Symbioz.Helper;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace Symbioz.ORM
 {
@@ -13,6 +15,7 @@ namespace Symbioz.ORM
     {
         private static MySqlConnection Provider;
         private static MySqlConnection NonQueryProvider;
+        private static SqlConnection DapperProvider;
 
         private static string Host;
         private static string Database;
@@ -55,8 +58,11 @@ namespace Symbioz.ORM
             }
             if (!NonQueryProvider.Ping())
             {
-                NonQueryProvider.Close();
-                NonQueryProvider.Open();
+                if (NonQueryProvider.State != ConnectionState.Executing && NonQueryProvider.State != ConnectionState.Fetching)
+                {
+                    NonQueryProvider.Close();
+                    NonQueryProvider.Open();
+                }
             }
             return NonQueryProvider;
         }

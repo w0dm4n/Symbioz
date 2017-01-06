@@ -33,7 +33,7 @@ namespace Symbioz.DofusProtocol.D2O
 
             int position = m_Reader.ReadInt();
             int seachIndex = (int) (m_Reader.Position + position + 4);
-
+            var infinite = 0;
             while (position > 0)
             {
                 int bytesAvaible = (int) m_Reader.BytesAvailable;
@@ -45,6 +45,9 @@ namespace Symbioz.DofusProtocol.D2O
                 m_SearchFieldCount.Add(field, m_Reader.ReadInt());
 
                 position -= (int)(bytesAvaible - m_Reader.BytesAvailable);
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
         }
         #endregion

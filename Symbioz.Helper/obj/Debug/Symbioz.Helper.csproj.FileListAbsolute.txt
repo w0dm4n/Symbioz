@@ -13,3 +13,27 @@ C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\bin\
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
 C:\Users\W0dm4\Documents\Visual Studio 2015\Projects\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
+C:\Users\root\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz.Helper\obj\Debug\Shader.Helper.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.Helper\bin\Debug\Shader.Helper.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.Helper\bin\Debug\Shader.Helper.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.Helper\obj\Debug\Symbioz.Helper.csprojResolveAssemblyReference.cache
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.Helper\obj\Debug\Shader.Helper.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.Helper\obj\Debug\Shader.Helper.pdb

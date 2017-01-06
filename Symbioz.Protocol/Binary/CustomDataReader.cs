@@ -44,6 +44,7 @@ namespace Symbioz.Utils
             int value = 0;
             int offset = 0;
             bool hasNext = false;
+            var infinite = 0;
             while (offset < INT_SIZE)
             {
                 b = _data.ReadByte();
@@ -61,8 +62,12 @@ namespace Symbioz.Utils
                 {
                     return value;
                 }
+                infinite++;
+                if (infinite > 1000000)
+                    break;
             }
-            throw new Exception("Too much data");
+            return 0;
+            //throw new Exception("Too much data");
         }
 
         public uint ReadVarUhInt()
@@ -71,6 +76,7 @@ namespace Symbioz.Utils
             uint value = 0;
             int offset = 0;
             bool hasNext = false;
+            var infinite = 0;
             while (offset < INT_SIZE)
             {
                 b = _data.ReadByte();
@@ -88,8 +94,12 @@ namespace Symbioz.Utils
                 {
                     return value;
                 }
+                infinite++;
+                if (infinite > 1000000)
+                    break;
             }
-            throw new Exception("Too much data");
+            // throw new Exception("Too much data");
+            return 0;
         }
 
         public short ReadVarShort()
@@ -98,6 +108,7 @@ namespace Symbioz.Utils
             short value = 0;
             int offset = 0;
             bool hasNext = false;
+            var infinite = 0;
             while (offset < SHORT_SIZE)
             {
                 b = _data.ReadByte();
@@ -119,8 +130,12 @@ namespace Symbioz.Utils
                     }
                     return value;
                 }
+                infinite++;
+                if (infinite > 1000000)
+                    break;
             }
-            throw new Exception("Too much data");
+            return 0;
+            //throw new Exception("Too much data");
         }
 
         public ushort ReadVarUhShort()
@@ -129,6 +144,7 @@ namespace Symbioz.Utils
             ushort value = 0;
             int offset = 0;
             bool hasNext = false;
+            var infinite = 0;
             while (offset < SHORT_SIZE)
             {
                 b = _data.ReadByte();
@@ -150,8 +166,12 @@ namespace Symbioz.Utils
                     }
                     return value;
                 }
+                infinite++;
+                if (infinite > 1000000)
+                    break;
             }
-            throw new Exception("Too much data");
+            return 0;
+            //throw new Exception("Too much data");
         }
 
         public long ReadVarLong()
@@ -269,6 +289,7 @@ namespace Symbioz.Utils
             uint b = 0;
             CustomInt64 result = new CustomInt64();
             int i = 0;
+            var infinite = 0;
             while (true)
             {
                 b = input.ReadByte();
@@ -284,8 +305,12 @@ namespace Symbioz.Utils
                 }
                 result.low = result.low | b << i;
                 return result;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
 
+            var infinite2 = 0;
             if (b >= 128)
             {
                 b = b & 127;
@@ -307,6 +332,9 @@ namespace Symbioz.Utils
                         }
                     }
                     i = i + 7;
+                    infinite2++;
+                    if (infinite2 > 100000)
+                        break;
                 }
 
                 result.high = (uint)(result.high | (b << i));
@@ -322,6 +350,7 @@ namespace Symbioz.Utils
             uint b = 0;
             var result = new CustomUInt64();
             int i = 0;
+            var infinite = 0;
             while (true)
             {
                 b = input.ReadByte();
@@ -337,6 +366,9 @@ namespace Symbioz.Utils
                 }
                 result.low = result.low | b << i;
                 return result;
+                infinite++;
+                if (infinite > 1000000)
+                    break;
             }
 
             if (b >= 128)
@@ -345,6 +377,7 @@ namespace Symbioz.Utils
                 result.low = result.low | b << i;
                 result.high = b >> 4;
                 i = 3;
+                var infinite2 = 0;
                 while (true)
                 {
                     b = input.ReadByte();
@@ -359,6 +392,9 @@ namespace Symbioz.Utils
                             break;
                         }
                     }
+                    infinite2++;
+                    if (infinite2 > 1000000)
+                        break;
                     i = i + 7;
                 }
 

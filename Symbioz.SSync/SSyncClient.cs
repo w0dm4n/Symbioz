@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -24,6 +24,13 @@ namespace Symbioz.SSync
             {
                 return EndPoint.Address + ":" + EndPoint.Port;
 
+            }
+        }
+        public string OnlyIp
+        {
+            get
+            {
+                return EndPoint.Address.ToString();
             }
         }
         public bool DataArrivals(BufferSegment data)

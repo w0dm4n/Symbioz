@@ -506,7 +506,7 @@ namespace Symbioz.Enums
         Eff_AddWeaponDamagePercent = 1144,
         Eff_Mimicry = 1151,
         Eff_Summon_TaxCollector = 1153,
-        Eff_SpawnGlyphOnDied = 1160,
+        Eff_AddStateTelefrag = 1160,
         Eff_Companion = 1161,
         Eff_MultiplyTakenDamages = 1163,
         Eff_SwapDamages = 1164,

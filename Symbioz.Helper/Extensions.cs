@@ -161,12 +161,16 @@ namespace Symbioz
                 {
                     T[] array = new T[str.CountOccurences(',', num, str.Length - num) + 1];
                     int num3 = 0;
+                    var infinite = 0;
                     while (num2 != -1)
                     {
                         array[num3] = converter(str.Substring(num, num2 - num));
                         num = num2 + 1;
                         num2 = str.IndexOf(',', num);
                         num3++;
+                        infinite++;
+                        if (infinite > 100000)
+                            break;
                     }
                     array[num3] = converter(str.Substring(num, str.Length - num));
                     result = array;

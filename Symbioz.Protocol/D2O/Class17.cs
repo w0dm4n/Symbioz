@@ -53,10 +53,14 @@ namespace Symbioz.DofusProtocol.D2O
             ArrayList list = new ArrayList();
             int num = dofusReader_0.ReadInt();
             int i = 1;
+            var infinite = 0;
             while ((i <= num))
             {
                 list.Add(RuntimeHelpers.GetObjectValue(this.class17_0.delegate0_0.Invoke(string_1, dofusReader_0)));
                 i += 1;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             return list;
         }

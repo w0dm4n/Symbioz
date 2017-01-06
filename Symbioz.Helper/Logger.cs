@@ -13,7 +13,7 @@ namespace Symbioz
 
         public static void OnStartup()
         {
-            Console.Title = "Symbioz";
+            Console.Title = "Hestia";
             Logger.Init2("Version " + ConstantsRepertory.VERSION);
         }
         public static void NewLine()
@@ -22,7 +22,9 @@ namespace Symbioz
         }
         public static void Error(object value)
         {
-            Write("Error: "+ value, ConsoleColor.Red);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Error: " + value, ConsoleColor.Red);
+            //Write("Error: "+ value, ConsoleColor.Red);
         }
         public static void Info(object value)
         {
@@ -30,11 +32,14 @@ namespace Symbioz
         }
         public static void Auth(object value)
         {
-            Log("[AuthServer] " + value);
+            Console.ForegroundColor = ConsoleColor.White;
+            //Log("[AuthServer] " + value);
+            Console.WriteLine("[AuthServer]: " + value, ConsoleColor.White);
         }
         public static void World(object value)
         {
-            Log("[WorldServer] " + value);
+            //Log("[WorldServer] " + value);
+            Console.WriteLine("[WorldServer]: " + value, ConsoleColor.White);
         }
         public static void Log(object value)
         {
@@ -50,11 +55,11 @@ namespace Symbioz
         }
         public static void Write(object value,ConsoleColor color,bool symbol = true)
         {
-            Console.ForegroundColor = color;
+            /*Console.ForegroundColor = color;
             if (symbol)
                 Console.WriteLine(LogSymbol + " " + value.ToString());
             else
-                Console.WriteLine(value.ToString());
+                Console.WriteLine(value.ToString());*/
         }
     }
 }

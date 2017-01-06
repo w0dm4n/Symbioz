@@ -50,3 +50,33 @@ C:\Users\Master\Desktop\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
 C:\Users\Master\Desktop\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
 C:\Users\Master\Desktop\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
 C:\Users\Master\Desktop\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\root\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.SSync\bin\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.SSync\bin\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.SSync\obj\Debug\Symbioz.SSync.csprojResolveAssemblyReference.cache
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.SSync\obj\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz.SSync\obj\Debug\Shader.SSync.pdb
