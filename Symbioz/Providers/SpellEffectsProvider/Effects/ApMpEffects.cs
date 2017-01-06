@@ -18,11 +18,26 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
     class ApMpEffects
     {
         #region Action Points Effects
+        /// <summary>
+        /// retrait PA
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="effect"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
+        [EffectHandler(EffectsEnum.Eff_1079)]
+        public static void LosingAp1079(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
+        {
+            RemoveAP(fighter, level, effect, affecteds, castcellid);
+        }
+
         [EffectHandler(EffectsEnum.Eff_LosingAP)]
         public static void LosingAp(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
             RemoveAP(fighter, level, effect, affecteds, castcellid);
         }
+
         [EffectHandler(EffectsEnum.Eff_RemoveAP)]
         public static void RemoveAP(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
@@ -38,6 +53,8 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                 }
                 else 
                 {
+                    if (calculretrait > baseretrait)
+                        calculretrait = baseretrait;
                     var buff = new APBuff((uint)affected.BuffIdProvider.Pop(), (short)calculretrait, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType, effect.BaseEffect.Delay);
                     affected.AddBuff(buff);
                 }
@@ -97,16 +114,15 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                 int baseretrait = effect.BaseEffect.DiceNum;
                 int wisdom = fighter.FighterStats.Stats.Wisdom;
                 int calculretrait = baseretrait * wisdom / 100;
-
-
-
-
+                
                 if (calculretrait == 0)
                 {
                     fighter.Fight.Send(new GameActionFightDodgePointLossMessage((ushort)ActionsEnum.ACTION_FIGHT_SPELL_DODGED_PM, fighter.ContextualId, affected.ContextualId, (ushort)calculretrait));
                 }
                 else
                 {
+                    if (calculretrait > baseretrait)
+                        calculretrait = baseretrait;
                     var buff = new MPBuff((uint)affected.BuffIdProvider.Pop(), (short)calculretrait, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.EffectType, effect.BaseEffect.Delay);
                     affected.AddBuff(buff);
                 }

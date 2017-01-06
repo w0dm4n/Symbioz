@@ -14,7 +14,6 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.World.Models;
 using Symbioz.Providers.SpellEffectsProvider.Buffs;
 using Symbioz.Network.Servers;
-using Symbioz.World.Models.Parties.Dungeon;
 
 namespace Symbioz.World.Handlers
 {
@@ -49,6 +48,7 @@ namespace Symbioz.World.Handlers
                 {
                     uint[][] thresholds = breed.GetThresholds(statId);
                     int thresholdIndex = breed.GetThresholdIndex(num, thresholds);
+                    var infinite = 0;
                     while ((long)num2 >= (long)((ulong)thresholds[thresholdIndex][1]))
                     {
                         short num3;
@@ -74,6 +74,9 @@ namespace Symbioz.World.Handlers
                         num += (int)num3;
                         num2 -= (ushort)num4;
                         thresholdIndex = breed.GetThresholdIndex(num, thresholds);
+                        if (infinite > 100000)
+                            break;
+                        infinite++;
                     }
           
                    
@@ -117,7 +120,12 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleLeaveDialog(LeaveDialogRequestMessage message, WorldClient client)
         {
-            if (client.Character.CurrentDialogType == DialogTypeEnum.DIALOG_EXCHANGE)
+            if (client.Character.Request != null)
+            {
+                client.Character.Request.Deny();
+                client.Character.Request = null;
+            }
+            if (client.Character.CurrentDialogType == DialogTypeEnum.DIALOG_EXCHANGE || client.Character.PlayerTradeInstance != null)
             {
                 client.Character.LeaveExchange();
             }
@@ -129,6 +137,14 @@ namespace Symbioz.World.Handlers
             if (client.Character.ShopStockInstance != null)
             {
                 client.Character.ShopStockInstance.CancelExchange();
+            }
+            if (client.Character.NpcTradeExchange != null)
+            {
+                client.Character.NpcTradeExchange.CancelExchange();
+            }
+            if (client.Character.NpcPointsExchange != null)
+            {
+                client.Character.NpcPointsExchange.CancelExchange();
             }
         }
         [MessageHandler]
@@ -165,12 +181,18 @@ namespace Symbioz.World.Handlers
             WorldClient target = WorldServer.Instance.GetOnlineClient(message.name);
             if (target != null)
             {
-                client.Character.Teleport(target.Character.Record.MapId, target.Character.Record.CellId);
-                client.Character.Reply("Vous avez été téléporté a " + message.name);
+                if (target.Character.Map.SubAreaId == 450 || target.Character.Map.SubAreaId == 442 || target.Character.Map.SubAreaId == 444
+                    || target.Character.Map.SubAreaId == 443 || target.Character.Map.SubAreaId == 449)
+                {
+                    client.Character.Teleport(target.Character.Record.MapId, target.Character.Record.CellId);
+                    client.Character.Reply("Vous avez été téléporté a " + message.name);
+                }
+                else
+                    client.Character.Reply("Impossible car ce joueur n'est pas à Incarnam.");
             }
             else
             {
-                client.Character.Reply("Le personnage n'existe pas ou n'est pas connécté.");
+                client.Character.Reply("Le personnage n'existe pas ou n'est pas connecté.");
             }
         }
         [MessageHandler]
@@ -182,7 +204,20 @@ namespace Symbioz.World.Handlers
                     if (message.shortcut is ShortcutObjectItem)
                     {
                         ShortcutObjectItem shortcutObj = (ShortcutObjectItem)message.shortcut;
-                        GeneralShortcutRecord.AddShortcut(client.Character.Id, shortcutObj.slot, ShortcutObjectItem.Id, shortcutObj.itemUID, shortcutObj.itemGID);
+                        var playerItem = CharacterItemRecord.GetItemByUID((uint)shortcutObj.itemUID);
+                        ItemRecord item = ItemRecord.GetItem(playerItem.GID);
+                        if (item != null)
+                        {
+                            if (item.TypeId == 43 || item.TypeId == 33 || item.TypeId == 87 || item.TypeId == 14)
+                            {
+                                if (!client.Character.Inventory.GetEquipedItems().Contains(CharacterItemRecord.GetItemByUID((uint)shortcutObj.itemUID)))
+                                {
+                                    GeneralShortcutRecord.AddShortcut(client.Character.Id, shortcutObj.slot, ShortcutObjectItem.Id, shortcutObj.itemUID, shortcutObj.itemGID);
+                                }
+                            }
+                            else
+                                client.Character.Reply("Cette option a été désactivé pour le moment pour cette catégorie d'objets.", System.Drawing.Color.Orange);
+                        }
                     }
                     if (message.shortcut is ShortcutSmiley)
                     {
@@ -209,10 +244,7 @@ namespace Symbioz.World.Handlers
             client.Character.PlayerStatus = message.status;
             if((PlayerStatusEnum)message.status.statusId == PlayerStatusEnum.PLAYER_STATUS_AFK || (PlayerStatusEnum)message.status.statusId == PlayerStatusEnum.PLAYER_STATUS_PRIVATE || (PlayerStatusEnum)message.status.statusId == PlayerStatusEnum.PLAYER_STATUS_SOLO)
             {
-                if(DungeonPartyProvider.Instance.GetDPCByCharacterId(client.Character.Id) != null)
-                {
-                    DungeonPartyProvider.Instance.RemoveCharacter(client.Character);
-                }
+             
             }
             client.Send(new PlayerStatusUpdateMessage(client.Character.Record.AccountId, (uint)client.Character.Id, message.status));
         }

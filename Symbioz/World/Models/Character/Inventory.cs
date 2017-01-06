@@ -146,7 +146,7 @@ namespace Symbioz.World.Models
             WeaponRecord template = WeaponRecord.GetWeapon(gid);
             if (template == null)
             {
-                Character.Reply("L'arme n'existe pas");
+                //Character.Reply("L'arme n'existe pas");
                 return null;
             }
             var newObjitem = template.GenerateRandomObjectItem();
@@ -261,13 +261,13 @@ namespace Symbioz.World.Models
             {
                 switch (template.Type)
                 {
-                    case ItemTypeEnum.PET:
+                    /*case ItemTypeEnum.PET:
                         Character.Look.subentities.Add(new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET,
                        0, ContextActorLook.SimpleBonesLook((ushort)template.AppearenceId, PET_SIZE).ToEntityLook()));
                         return;
                     case ItemTypeEnum.PETSMOUNT:
                         Character.Look = Character.Look.CharacterToRider((ushort)template.AppearenceId, new List<ushort>(), Character.Look.indexedColors.Take(3).ToList(), 100);
-                        return;
+                        return;*/
                     default:
                         if (record.ContainEffect(EffectsEnum.Eff_Mimicry))
                         {
@@ -325,23 +325,149 @@ namespace Symbioz.World.Models
         }
         bool CheckDofusStacks(CharacterItemRecord item, byte newposition)
         {
-            return false; // TODO
+            var record = ItemRecord.GetItem(item.GID);
+            if (record.TypeId == 23 || record.TypeId == 151)
+            {
+                var items = this.GetEquipedItems();
+                foreach (var tmp in items)
+                    if (tmp.GID == item.GID)
+                        return true;
+            }
+            return false;
         }
+        
+        bool CheckPosition(CharacterItemRecord item, byte newposition)
+        {
+            ItemRecord record = null;
+            WeaponRecord recordWeapon = null;
+            var items = this.GetEquipedItems();
+            foreach (var tmp in items)
+            {
+                record = ItemRecord.GetItem(tmp.GID);
+                if (record != null)
+                {
+                    if (tmp.Position == newposition)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    recordWeapon = WeaponRecord.GetWeapon(tmp.GID);
+                    if (tmp.Position == newposition)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        bool CheckItemPosition(CharacterItemRecord item, byte newposition)
+        {
+            var record = ItemRecord.GetItem(item.GID);
+            var weapon = WeaponRecord.GetWeapon(item.GID);
+            if (record != null)
+            {
+                switch (record.TypeId)
+                {
+                    case 16:
+                    case 113:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT)
+                            return false;
+                        break;
+
+                    case 9:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_RING_LEFT ||
+                            newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_RING_RIGHT)
+                            return false;
+                        break;
+
+                    case 17:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE)
+                            return false;
+                        break;
+
+                    case 121:
+                    case 18:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)
+                            return false;
+                        break;
+
+                    case 1:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_AMULET)
+                            return false;
+                        break;
+
+                    case 82:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD)
+                            return false;
+                        break;
+
+                    case 10:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_BELT)
+                            return false;
+                        break;
+
+                    case 11:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_BOOTS)
+                            return false;
+                        break;
+
+                    case 169:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_COMPANION)
+                            return false;
+                        break;
+
+                    case 23:
+                    case 151:
+                        if (newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_1
+                        || newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_2
+                        || newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_3
+                        || newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_4
+                        || newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_5
+                        || newposition == (byte)CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_6)
+                            return false;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else if (weapon != null)
+            {
+                if (newposition == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)
+                    return false;
+            }
+            return true;
+        }
+
         public void EquipItem(CharacterItemRecord item, ItemRecord template, byte newposition, uint quantity)
         {
             if (!ConditionProvider.ParseAndEvaluate(Character.Client, template.Criteria))
             {
-                Character.Reply("Vous n'avez pas les critères nessessaire pour équiper cet objet");
+                Character.ReplyError("Vous n'avez pas les critères nessessaire pour équiper cet objet");
                 return;
             }
             if (CheckRingStacks(item, newposition))
             {
-                Character.Reply("Vous avez déja équipé cet anneau!");
+                Character.ReplyError("Vous avez déja équipé cet anneau !");
                 return;
             }
             if (CheckDofusStacks(item, newposition))
             {
-                Character.Reply("Vous avez déja équipé ce dofus");
+                Character.ReplyError("Impossible d'équipé cet objet !");
+                return;
+            }
+            if (CheckPosition(item, newposition))
+            {
+                Character.ReplyError("Impossible d'équipé cet objet !");
+                return;
+            }
+
+            if (CheckItemPosition(item, newposition))
+            {
+                Character.ReplyError("Impossible car la catégorie est incorrect.");
                 return;
             }
             if (DOFUS_POSITIONS.Contains((CharacterInventoryPositionEnum)item.Position) && DOFUS_POSITIONS.Contains((CharacterInventoryPositionEnum)newposition))
@@ -388,12 +514,22 @@ namespace Symbioz.World.Models
                 ItemEffectsProvider.AddEffects(Character.Client, items.BaseItem.GetEffects());
                 AddItemSkin(item, template);
             }
-            Character.RefreshGroupInformations();
 
         }
 
         public void EquipWeapon(CharacterItemRecord item, WeaponRecord template, byte newposition, uint quantity)
         {
+            if (CheckPosition(item, newposition))
+            {
+                Character.ReplyError("Impossible d'équipé cet objet !");
+                return;
+            }
+
+            if (CheckItemPosition(item, newposition))
+            {
+                Character.ReplyError("Impossible car la catégorie est incorrect.");
+                return;
+            }
             if (!ConditionProvider.ParseAndEvaluate(Character.Client, template.Criteria))
             {
                 Character.Reply("Vous n'avez pas les critères nessessaire pour équiper cet arme");
@@ -428,17 +564,17 @@ namespace Symbioz.World.Models
                 ItemEffectsProvider.AddEffects(Character.Client, items.BaseItem.GetEffects());
                 AddWeaponSkin(item, template);
             }
-            Character.RefreshGroupInformations();
         }
 
-        public void UnequipItem(CharacterItemRecord item, byte newposition, ItemRecord template, uint quantity)
+        public void UnequipItem(CharacterItemRecord item, byte newposition, ItemRecord template, uint quantity, bool removeEffect = true)
         {
             var existing = Items.ExistingItem(item);
             if (existing == null)
             {
                 item.Position = newposition;
                 SaveTask.UpdateElement(item, this.Character.Id);
-                ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
+                if (removeEffect)
+                    ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                 if (template != null)
                     RemoveItemSkin(item, template);
             }
@@ -448,11 +584,11 @@ namespace Symbioz.World.Models
                 {
                     existing.Quantity += quantity;
                     RemoveItem(item.UID, item.Quantity);
-                    ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
+                    if (removeEffect)
+                        ItemEffectsProvider.RemoveEffects(Character.Client, item.GetEffects());
                     RemoveItemSkin(item, template);
                 }
             }
-            Character.RefreshGroupInformations();
         }
 
         public void UnequipWeapon(CharacterItemRecord item, byte newposition, WeaponRecord template, uint quantity)
@@ -476,13 +612,13 @@ namespace Symbioz.World.Models
                     RemoveWeaponSkin(item, template);
                 }
             }
-            Character.RefreshGroupInformations();
         }
-
+    
         public CharacterItemRecord GetEquipedWeapon()
         {
             return Items.Find(x => x.Position == (byte)CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         }
+
         public void MoveItem(uint uid, byte newposition, uint quantity)
         {
             if (Character.IsFighting)
@@ -538,7 +674,7 @@ namespace Symbioz.World.Models
             var item = GetItem(id);
             if (item == null)
             {
-                Character.NotificationError("Impossible de retirer l'item, il n'existe pas...");
+                //Character.NotificationError("Impossible de retirer l'item, il n'existe pas...");
                 return;
             }
 
@@ -566,7 +702,7 @@ namespace Symbioz.World.Models
             var item = GetItem(id);
             if (item == null)
             {
-                Character.NotificationError("Impossible de retirer l'item, il n'existe pas...");
+                //Character.NotificationError("Impossible de retirer l'item, il n'existe pas...");
                 return;
             }
             if (quantity == item.Quantity)

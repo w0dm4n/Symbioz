@@ -46,6 +46,20 @@ namespace Symbioz.World.Models.Fights
             else
                 return m_fighters;
         }
+
+        public Fighter getFighterById(int Id)
+        {
+            Fighter f = null;
+            foreach (Fighter c in m_fighters)
+            {
+                if (c.ContextualId == Id)
+                {
+                    f = c;
+                    break ;
+                }
+            }
+            return (f);
+        }
         public void Send(Message message)
         {
             GetCharacterFighters(true).ForEach(x => x.Client.Send(message));
@@ -128,7 +142,7 @@ namespace Symbioz.World.Models.Fights
             foreach (Fighter f in selected)
             {
                 int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
-                if (nbr <= pmOrpo && f is MonsterFighter)
+                /*if (nbr <= pmOrpo && f is MonsterFighter)
                 {
                     MonsterFighter mob = f as MonsterFighter;
                     if (mob.isSummon)
@@ -136,7 +150,7 @@ namespace Symbioz.World.Models.Fights
                     else
                         potential.Add(f);
                 }
-                else if (nbr <= pmOrpo)
+                else */if (nbr <= pmOrpo)
                     potential.Add(f);
             }
             if (potential.Count > 0)
@@ -147,14 +161,7 @@ namespace Symbioz.World.Models.Fights
                 foreach (Fighter f in selected)
                 {
                     int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
-                    if (f is MonsterFighter)
-                    {
-                        MonsterFighter mob = f as MonsterFighter;
-                        if (!mob.isSummon)
-                            result.Add(f);
-                    }
-                    else
-                        result.Add(f);
+                    result.Add(f);
                 }
                 if (result.Count > 0)
                     return GetFighterGoodByResistance(result);
@@ -162,7 +169,52 @@ namespace Symbioz.World.Models.Fights
             }
             return GetFighterGoodByResistance(result);
         }
+        public Fighter LowerProchDiagonalFighter(Fighter searcher, int pmOrpo)
+        {
 
+            var sorted = m_fighters.Alives().OrderByDescending(x => x.FighterStats.Stats.LifePoints);
+
+            var selected = sorted;
+            List<Fighter> result = new List<Fighter>();
+            List<Fighter> potential = new List<Fighter>();
+            List<short> casesline = PathHelper.GetalldirectionDiagonal(this.Fight, searcher.CellId);
+            foreach (Fighter f in selected)
+            {
+                if (!casesline.Contains(f.CellId))
+                    continue;
+                int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
+                if (nbr <= pmOrpo)
+                    potential.Add(f);
+            }
+            if (potential.Count > 0)
+                return (GetFighterGoodByResistance(potential));
+            if (result.Count <= 0)
+            {
+                result = new List<Fighter>();
+                foreach (Fighter f in selected)
+                {
+                    if (!casesline.Contains(f.CellId))
+                        continue;
+                    int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
+                    result.Add(f);
+                }
+                if (result.Count > 0)
+                    return GetFighterGoodByResistance(result);
+                return sorted.Count() > 0 ? sorted.Last() : null;
+            }
+            return GetFighterGoodByResistance(result);
+        }
+        public System.Collections.Generic.IEnumerable<Fighter> GetAllFighters(System.Predicate<Fighter> predicate)
+        {
+            return
+                from entry in this.GetAllFighters()
+                where predicate(entry)
+                select entry;
+        }
+        public System.Collections.Generic.IEnumerable<Fighter> GetAllFighters()
+        {
+            return this.m_fighters;
+        }
         public Fighter LowerProchAlignFighter(Fighter searcher, int pmOrpo)
         {
 
@@ -187,15 +239,7 @@ namespace Symbioz.World.Models.Fights
             foreach (Fighter f in selected)
             {
                 int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
-                if (nbr <= pmOrpo && f is MonsterFighter)
-                {
-                    MonsterFighter mob = f as MonsterFighter;
-                    if (mob.isSummon)
-                        result.Add(f);
-                    else
-                        return (f);
-                }
-                else if (nbr <= pmOrpo)
+                if (nbr <= pmOrpo)
                     return (f);
             }
             if (result.Count <= 0)
@@ -204,14 +248,7 @@ namespace Symbioz.World.Models.Fights
                 foreach (Fighter f in selected)
                 {
                     int nbr = PathHelper.GetDistanceBetween(searcher.CellId, f.CellId);
-                    if (f is MonsterFighter)
-                    {
-                        MonsterFighter mob = f as MonsterFighter;
-                        if (!mob.isSummon)
-                            result.Add(f);
-                    }
-                    else
-                        result.Add(f);
+                    result.Add(f);
                 }
                 if (result.Count > 0)
                     return result.Count() > 0 ? result.Last() : null;

@@ -106,6 +106,7 @@ namespace Symbioz.World.Models.Alliances
 
         public static IEnumerable<GuildInsiderFactSheetInformations> GetGuildsInsiderFactSheetInformations(int allianceId)
         {
+            return null;
             List<GuildInsiderFactSheetInformations> guilds = new List<GuildInsiderFactSheetInformations>();
 
             GuildInsiderFactSheetInformations leaderGuildInformations = null;
@@ -120,13 +121,17 @@ namespace Symbioz.World.Models.Alliances
                     CharacterRecord.GetCharacterRecordById(guild.GetLeader().CharacterId).Name, (ushort)GuildProvider.Instance.ConnectedMembersCount(guild.Id),
                     0, 0, true);
 
-                if (allianceGuildLeader.Id == guild.Id)
+                if (guildInsiderFactSheetInformations != null)
                 {
-                    leaderGuildInformations = guildInsiderFactSheetInformations;
-                }
-                else
-                {
-                    guilds.Add(guildInsiderFactSheetInformations);
+                    if (allianceGuildLeader.Id == guild.Id)
+                    {
+                        leaderGuildInformations = guildInsiderFactSheetInformations;
+                    }
+                    else
+                    {
+                        guilds.Add(guildInsiderFactSheetInformations);
+
+                    }
                 }
             }
 
@@ -183,7 +188,7 @@ namespace Symbioz.World.Models.Alliances
 
         public static AllianceInsiderInfoMessage GetAllianceInsiderInfoMessage(AllianceRecord alliance)
         {
-            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), AllianceProvider.GetGuildsInsiderFactSheetInformations(alliance.Id), new List<PrismSubareaEmptyInfo>());
+            return new AllianceInsiderInfoMessage(new DofusProtocol.Types.AllianceFactSheetInformations((uint)alliance.Id, alliance.Tag, alliance.Name, new DofusProtocol.Types.GuildEmblem(alliance.SymbolShape, alliance.SymbolColor, alliance.BackgroundShape, alliance.BackgroundColor), DateTimeUtils.GetEpochFromDateTime(alliance.CreationDate)), new List<GuildInsiderFactSheetInformations>(), new List<PrismSubareaEmptyInfo>());
         }
 
         public static AllianceFactsMessage GetAllianceFactsMessage(AllianceRecord alliance)

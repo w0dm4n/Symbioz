@@ -194,7 +194,7 @@ namespace Symbioz.World.Handlers
                 }
                 else
                 {
-                    throw new Exception("Unable to find 'allianceId' when accessing SendPrismListUpdateMessage()");
+                    //throw new Exception("Unable to find 'allianceId' when accessing SendPrismListUpdateMessage()");
                 }
             }
             

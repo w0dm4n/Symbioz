@@ -53,8 +53,26 @@ namespace Symbioz.World.Models.Fights.FightsTypes
             positions.Add((ushort)FightCellId);
             return new FightCommonInformations(Id, (sbyte)8, teams, positions, new List<FightOptionsInformations>() { BlueTeam.TeamOptions, RedTeam.TeamOptions });
         }
+
+        public void StartFight(System.Timers.Timer Timer, FightAgression fight)
+        {
+            fight.StartFight();
+            Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
+        }
+
+        public void StartPhaseReady()
+        {
+            var Timer = new System.Timers.Timer();
+            Timer.Interval = 60000;
+            Timer.Elapsed += (sender, e) => { StartFight(Timer, this); };
+            Timer.Enabled = true;
+        }
+
         public override void StartPlacement()
         {
+            this.StartPhaseReady();
             base.StartPlacement();
         }
         public override void TryJoin(WorldClient client, int mainfighterid)
@@ -64,7 +82,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
 
             if (CanJoin(client, mainFighter.Team, mainFighter))
             {
-                var newFighter = client.Character.CreateFighter(mainFighter.Team);
+                var newFighter = client.Character.CreateFighter(mainFighter.Team, this);
                 mainFighter.Team.AddFighter(newFighter);
                 GetAllFighters().ForEach(x => x.ShowFighter(client));
                 Map.Instance.OnFighterAdded(Id, mainFighter.Team.Id, newFighter.GetFightMemberInformations());

@@ -31,8 +31,31 @@ namespace Symbioz.Network.Servers
         }
         void Server_OnSocketAccepted(Socket socket)
         {
-            Logger.Auth("New client connected!");
-            new AuthClient(socket);
+            byte[] bytes = new byte[1024];
+            socket.ReceiveTimeout = 1000;
+            
+            try
+            {
+                int bytesRec = socket.Receive(bytes);
+                if (Encoding.ASCII.GetString(bytes, 0, bytesRec).Contains("AutoRestart"))
+                {
+                    Logger.Auth("Received online check start from auto restart program and answered sucessfully !");
+                    byte[] msg = Encoding.ASCII.GetBytes("Online");
+                    socket.Send(msg);
+                    socket.Disconnect(false);
+                }
+                else
+                {
+                    Logger.Auth("New client connected!");
+                    new AuthClient(socket);
+                }
+
+            }
+            catch
+            {
+                Logger.Auth("New client connected!");
+                new AuthClient(socket);
+            }
         }
 
         void Server_OnServerFailedToStart(Exception ex)
@@ -53,6 +76,7 @@ namespace Symbioz.Network.Servers
         }
         public void RemoveClient(AuthClient client)
         {
+            
             AuthClients.Remove(client);
             Logger.Auth("Client Disconnected!");
         }

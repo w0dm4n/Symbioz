@@ -181,23 +181,41 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public virtual void StartTurn()
         {
-
-            if (CheckFighterDie())
+            try
             {
-                Fight.CheckFightEnd();
-                return;
+                if (CheckFighterDie())
+                {
+                    Fight.CheckFightEnd();
+                }
+                else
+                {
+                    if (this.Fight.TimeLine.m_round > 35 && this.Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM)
+                    {
+                        var Against = this.GetOposedTeam();
+                        var Fighters = Against.GetFighters();
+
+                        foreach (var fighter in Fighters)
+                            fighter.Die();
+                        this.Fight.CheckFightEnd();
+                    }
+                    else
+                    {
+                        IncrementBombs();
+                        LastTurnPosition = CellId;
+                        UpdateBuffs();
+                        DecrementGlyphsDuration();
+                        ApplyFighterEvent(FighterEventType.ON_TURN_STARTED, null);
+                        Fight.Send(new GameFightTurnStartMessage(ContextualId, FightTurnEngine.TURN_TIMEMOUT / 100));
+                        IsPlaying = true;
+                        RefreshStats();
+                        m_turnEngine.StartTurn();
+                    }
+                }
             }
-            IncrementBombs();
-            LastTurnPosition = CellId;
-            UpdateBuffs();
-            DecrementGlyphsDuration();
-            ApplyFighterEvent(FighterEventType.ON_TURN_STARTED, null);
-            Fight.Send(new GameFightTurnStartMessage(ContextualId, FightTurnEngine.TURN_TIMEMOUT / 100));
-            IsPlaying = true;
-            RefreshStats();
-            m_turnEngine.StartTurn();
-
-
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void DecrementGlyphsDuration()
@@ -225,17 +243,24 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public virtual void EndTurn()
         {
-            if (Fight.Ended)
-                return;
-            ApplyFighterEvent(FighterEventType.ON_TURN_ENDED, null);
-          
-            Fight.Send(new GameFightTurnEndMessage(ContextualId));
-            IsPlaying = false;
-            m_turnEngine.EndTurn();
-            FighterStats.OnTurnEnded();
-            SpellHistory.OnTurnEnded();
-            RefreshStats();
-            Fight.Synchronizer.Start(Fight.NewTurn);
+            try
+            {
+                if (!Fight.CheckFightEnd())
+                {
+                    ApplyFighterEvent(FighterEventType.ON_TURN_ENDED, null);
+                    Fight.Send(new GameFightTurnEndMessage(ContextualId));
+                    IsPlaying = false;
+                    m_turnEngine.EndTurn();
+                    FighterStats.OnTurnEnded();
+                    SpellHistory.OnTurnEnded();
+                    RefreshStats();
+                    Fight.Synchronizer.Start(Fight.NewTurn);
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void Teleport(short cellid,bool save = true)
@@ -252,86 +277,125 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public List<short> CheckMarks(List<short> path)
         {
-            List<short> finalPath = new List<short>();
-            finalPath.Add(CellId);
-            foreach (var cell in path)
+            try
             {
-                if (cell != CellId)
+                List<short> finalPath = new List<short>();
+                finalPath.Add(CellId);
+                foreach (var cell in path)
                 {
-                    var marks = Fight.MarkInteractions.FindAll(x => x.EventType == FighterEventType.AFTER_MOVE && x.Mark.Cells.Contains(cell));
-                    finalPath.Add(cell);
-                    foreach (var mark in marks)
+                    if (cell != CellId)
                     {
-                        return finalPath;
+                        var marks = Fight.MarkInteractions.FindAll(x => x.EventType == FighterEventType.AFTER_MOVE && x.Mark.Cells.Contains(cell));
+                        finalPath.Add(cell);
+                        foreach (var mark in marks)
+                        {
+                            return finalPath;
+                        }
                     }
                 }
+                return finalPath;
             }
-            return finalPath;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return null;
+            }
         }
 
         public void Slide(int sourceid, List<short> cells, int push, List<Fighter> next)
         {
-            if (cells.Count > 0)
+            try
             {
-                ApplyFighterEvent(FighterEventType.BEFORE_MOVE, cells);
-                LastPosition.Add(CellId);
-                cells = CheckMarks(cells);
-                Fight.TryStartSequence(ContextualId, 5);
-                Fight.Send(new GameActionFightSlideMessage(0, sourceid, ContextualId, CellId, cells.Last()));
-                CellId = cells.Last();
-                Fight.TryEndSequence(5, 0);
-                ApplyFighterEvent(FighterEventType.AFTER_MOVE, 0, cells); // 0 => mp cost
+                if (cells.Count > 0)
+                {
+                    ApplyFighterEvent(FighterEventType.BEFORE_MOVE, cells);
+                    LastPosition.Add(CellId);
+                    cells = CheckMarks(cells);
+                    Fight.TryStartSequence(ContextualId, 5);
+                    Fight.Send(new GameActionFightSlideMessage(0, sourceid, ContextualId, CellId, cells.Last()));
+                    CellId = cells.Last();
+                    Fight.TryEndSequence(5, 0);
+                    ApplyFighterEvent(FighterEventType.AFTER_MOVE, 0, cells); // 0 => mp cost
+                }
+                if (push > 0)
+                    PushLocked(sourceid, push, next);
             }
-            if (push > 0)
-                PushLocked(sourceid, push, next);
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void PushLocked(int SourceId, int push, List<Fighter> next)
         {
-            Fighter source = Fight.GetFighter(SourceId);
-            var jet = CalculateJetPush(push, source.FighterStats.Stats.PushDamageBonus);
-            TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
-
-            if (next != null)
+            try
             {
-                short div = 2;
-                foreach (var n in next)
+                Fighter source = Fight.GetFighter(SourceId);
+                var jet = CalculateJetPush(push, source.FighterStats.Stats.PushDamageBonus);
+                TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
+
+                if (next != null)
                 {
-                    if (jet < 0)
-                        break;
-                    jet /= div;
-                    if (jet < 0)
-                        break;
-                    n.TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
-                    div++;
+                    short div = 2;
+                    foreach (var n in next)
+                    {
+                        if (jet < 0)
+                            break;
+                        jet /= div;
+                        if (jet < 0)
+                            break;
+                        n.TakeDamages(new TakenDamages(jet, ElementType.Push), source.ContextualId);
+                        div++;
+                    }
                 }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
             }
         }
 
         public virtual void Move(List<short> keys, short cellid, sbyte direction)
         {
-            if (Fight.Ended)
-                return;
+            try
+            {
+                if (Fight.Ended)
+                    return;
 
-            List<short> path = Pathfinding.FightMove(PathParser.ReturnDispatchedCells(keys)).Keys.ToList();
-            path.Insert(0, CellId);
-            path = CheckMarks(path);
-            ApplyFighterEvent(FighterEventType.BEFORE_MOVE, path);
-            this.Fight.TryStartSequence(ContextualId, 5);
-            if (this.visible == false)//Invisible
-                this.Team.Send(new GameMapMovementMessage(path, ContextualId));
-            else
-                this.Fight.Send(new GameMapMovementMessage(path, ContextualId));
-            this.AddToLastPosition(path);
-            short mpcost = (short)PathHelper.GetDistanceBetween(CellId, path.Last());
-            FighterStats.Stats.MovementPoints -= mpcost;
-            this.CellId = path.Last();
-            this.Direction = direction;
-            RefreshStats();
-            GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, (short)-mpcost);
-            this.Fight.TryEndSequence(5, 5);
-            ApplyFighterEvent(FighterEventType.AFTER_MOVE, mpcost, path);
 
+                List<short> path = Pathfinding.FightMove(PathParser.ReturnDispatchedCells(keys)).Keys.ToList();
+                path.Insert(0, CellId);
+                if ((this.GetTackledMP() > 0 || this.GetTackledAP() > 0))
+                {
+                    this.OnTackled(this);
+                    for (var i = 0; i < path.Count - this.FighterStats.Stats.MovementPoints; i++)
+                    {
+                        path.Remove(path.Last());
+                    }
+
+                }
+                path = CheckMarks(path);
+                ApplyFighterEvent(FighterEventType.BEFORE_MOVE, path);
+                this.Fight.TryStartSequence(ContextualId, 5);
+                if (this.visible == false)//Invisible
+                    this.Team.Send(new GameMapMovementMessage(path, ContextualId));
+                else
+                    this.Fight.Send(new GameMapMovementMessage(path, ContextualId));
+                this.AddToLastPosition(path);
+                short mpcost = (short)PathHelper.GetDistanceBetween(CellId, path.Last());
+
+                FighterStats.Stats.MovementPoints -= mpcost;
+                this.CellId = path.Last();
+                this.Direction = direction;
+                RefreshStats();
+                GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, (short)-mpcost);
+                this.Fight.TryEndSequence(5, 5);
+                ApplyFighterEvent(FighterEventType.AFTER_MOVE, mpcost, path);
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void GameActionFightPointsVariation(ActionsEnum action, short delta)
@@ -340,7 +404,29 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.Fight.Send(new GameActionFightPointsVariationMessage((ushort)action, ContextualId, ContextualId, delta));
             this.Fight.TryEndSequence(1, 100);
         }
-
+        private  void OnTackled(Fighter actor)
+        {
+            Fighter[] tacklers = this.GetTacklers();
+            int tackledMP = actor.GetTackledMP();
+            int tackledAP = actor.GetTackledAP();
+            if (actor.FighterStats.Stats.MovementPoints - tackledMP < 0)
+            {
+               // Console.WriteLine("OnTackled");
+            }
+            else
+            {
+                
+                FighterStats.Stats.ActionPoints -= (short)tackledAP;
+                GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)(-tackledAP));
+                FighterStats.Stats.MovementPoints -= (short)tackledMP;
+                GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, (short)(-tackledMP));
+                this.Fight.Send(new GameActionFightTackledMessage(104, this.ContextualId,
+                from entry in tacklers
+                select entry.ContextualId));
+                RefreshStats();
+               
+            }
+        }
         public FightTeam GetOposedTeam()
         {
             if (Team == Fight.BlueTeam)
@@ -366,6 +452,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             Fight.Send(new GameActionFightDeathMessage(103, ContextualId, ContextualId));
             Fight.TryEndSequence(6, 103);
             Fight.TimeLine.RemoveFighter(this);
+            Fight.CheckFightEnd();
             Dead = true;
             ApplyFighterEvent(FighterEventType.AFTER_DIED, null);
         }
@@ -432,7 +519,7 @@ namespace Symbioz.World.Models.Fights.Fighters
             foreach (var effect in handledEffects)
             {
                 short[] cells = ShapesProvider.Handle(effect.ZoneShape, cellid, CellId, effect.ZoneSize).ToArray();
-                var actors = GetAffectedActors(cells, effect.Targets);       
+                var actors = GetAffectedActors(cells, effect.Targets);
                 CharacterStates.CharacterSpellStatesChecker(this, actors, spell, effect);
                 MonsterStates.MonsterSpellStatesChecker(this, actors, spell, effect);
                 validatedEffectsDatas.Add(effect, actors);
@@ -477,6 +564,8 @@ namespace Symbioz.World.Models.Fights.Fighters
                     case EffectsEnum.Eff_Summon:
                         if (this.FighterStats.Stats.SummonableCreaturesBoost == this.SummonCount)
                             return (false);
+                        //else//envoi du packet pour décrémenté
+                          ///TODO: SEND PACKEt DECREMENT SUMMONS  
                         break;
                     case EffectsEnum.Eff_SpawnBomb:
                         if (3 == this.GetBombs().Count)
@@ -487,85 +576,108 @@ namespace Symbioz.World.Models.Fights.Fighters
             return true;
         }
 
-        public virtual bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
+        public virtual bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0, bool checkRange = true)
         {
-            SpellLevelRecord spellLevl = GetSpellLevel(spellid);
+            try
+            {
+                SpellLevelRecord spellLevl = GetSpellLevel(spellid);
+                if (checkRange)
+                {
+                    var tmp = Fight.GetFighter(targetId);
+                    if (!CanCast(cellid, spellLevl, tmp))
+                    {
+                        return false;
+                    }
+                }
+                if (!IsPlaying)
+                {
+                    OnSpellCastFailed(CastFailedReason.NOT_PLAYING, spellLevl);
+                    return false;
+                }
+                if (Fight.Ended)
+                {
+                    OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spellLevl);
+                    return false;
+                }
+                if (!ValidState(spellLevl))
+                {
+                    OnSpellCastFailed(CastFailedReason.FORBIDDEN_STATE, spellLevl);
+                    return false;
+                }
+                if (spellLevl.ApCost > FighterStats.Stats.ActionPoints)
+                {
+                    OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
+                    return false;
+                }
+                if (!HaveConditionToLunchSpell(spellLevl))
+                {
+                    OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
+                    return false;
+                }
+                if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
+                {
+                    short[] portal = new short[0];
+                    UsingWeapon = true;
+                    bool result = UseWeapon(cellid);
+                    UsingWeapon = false;
+                    return result;
+                }
+                if (targetId == 0)
+                {
+                    var target = Fight.GetFighter(cellid);
+                    if (target != null)
+                        targetId = target.ContextualId;
+                }
+                if (!SpellHistory.CanCast(spellLevl, targetId))
+                {
+                    OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
+                    return false;
+                }
 
-            if (!IsPlaying)
-            {
-                OnSpellCastFailed(CastFailedReason.NOT_PLAYING, spellLevl);
-                return false;
-            }
-            if (Fight.Ended)
-            {
-                OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spellLevl);
-                return false;
-            }
-            if (!ValidState(spellLevl))
-            {
-                OnSpellCastFailed(CastFailedReason.FORBIDDEN_STATE, spellLevl);
-                return false;
-            }
-            if (spellLevl.ApCost > FighterStats.Stats.ActionPoints)
-            {
-                OnSpellCastFailed(CastFailedReason.AP_COST, spellLevl);
-                return false;
-            }
-            if (!HaveConditionToLunchSpell(spellLevl))
-            {
-                OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
-                return false;
-            }
-            if ((SpellIdEnum)spellid == SpellIdEnum.Punch)
-            {
-                short[] portal = new short[0];
-                UsingWeapon = true;
-                bool result = UseWeapon(cellid);
-                UsingWeapon = false;
-                return result;
-            }
-            if (targetId == 0)
-            {
-                var target = Fight.GetFighter(cellid);
-                if (target != null)
-                    targetId = target.ContextualId;
-            }
-            if (!SpellHistory.CanCast(spellLevl, targetId))
-            {
-                OnSpellCastFailed(CastFailedReason.CAST_LIMIT, spellLevl);
-                return false;
-            }
+                this.Fight.TryStartSequence(this.ContextualId, 1);
+                FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
 
-            this.Fight.TryStartSequence(this.ContextualId, 1);
-            FightSpellCastCriticalEnum critical = RollCriticalDice(spellLevl);
+                short[] portals = new short[0];
 
-            short[] portals = new short[0];
+                switch (spellid)
+                {
+                    case 65://affichage des piege car c'est un plugin client
+                    case 69:
+                    case 71:
+                    case 73:
+                    case 77:
+                    case 79:
+                    case 80:
+                        this.Team.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                        if (this.Team.TeamColor == TeamColorEnum.RED_TEAM)
+                            this.Fight.BlueTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                        else
+                            this.Fight.RedTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                        break;
+                    default:
+                        this.Fight.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
+                        break;
+                }
+                this.SpellHistory.Add(spellLevl, targetId);
 
-            switch (spellid)
-            {
-                case 65://affichage des piege car c'est un plugin client
-                case 69:
-                case 71:
-                case 73:
-                case 77:
-                case 79:
-                case 80:
-                    this.Team.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
-                    if (this.Team.TeamColor == TeamColorEnum.RED_TEAM)
-                        this.Fight.BlueTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
-                    else
-                        this.Fight.RedTeam.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, -1, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
-                    break;
-                default:
-                this.Fight.Send(new GameActionFightSpellCastMessage(0, ContextualId, targetId, cellid, (sbyte)critical, false, spellid, spellLevl.Grade, portals));
-                    break;
-            }
-            this.SpellHistory.Add(spellLevl, targetId);
-
-            #region EffectHandler
-            if (WorldServer.Instance.GetOnlineClient(targetId) != null)
-            {
-                if (!WorldServer.Instance.GetOnlineClient(targetId).Character.isGod)
+                #region EffectHandler
+                if (WorldServer.Instance.GetOnlineClient(targetId) != null)
+                {
+                    if (!WorldServer.Instance.GetOnlineClient(targetId).Character.isGod)
+                    {
+                        if (CustomSpellEffectsProvider.Exist(spellid))
+                        {
+                            Fight.TryStartSequence(ContextualId, 1);
+                            CustomSpellEffectsProvider.Handle(spellid, spellLevl.Effects, this);
+                            Fight.TryEndSequence(1, 0);
+                        }
+                        else
+                        {
+                            HandleSpellEffects(spellLevl, cellid, critical);
+                        }
+                    }
+                }
+                else
                 {
                     if (CustomSpellEffectsProvider.Exist(spellid))
                     {
@@ -578,59 +690,59 @@ namespace Symbioz.World.Models.Fights.Fighters
                         HandleSpellEffects(spellLevl, cellid, critical);
                     }
                 }
-            }
-            else
-            {
-                if (CustomSpellEffectsProvider.Exist(spellid))
-                {
-                    Fight.TryStartSequence(ContextualId, 1);
-                    CustomSpellEffectsProvider.Handle(spellid, spellLevl.Effects, this);
-                    Fight.TryEndSequence(1, 0);
-                }
-                else
-                {
-                    HandleSpellEffects(spellLevl, cellid, critical);
-                }
-            }
-            #endregion
+                #endregion
 
-            FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
-           GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spellLevl.ApCost);
-           Fight.CheckFightEnd();
-            if (Fight.Ended)
+                FighterStats.Stats.ActionPoints -= spellLevl.ApCost;
+                GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spellLevl.ApCost);
+                Fight.CheckFightEnd();
+                if (Fight.Ended)
+                    return true;
+                RefreshStats();
+                OnSpellCasted(spellLevl);
+                this.Fight.TryEndSequence(1, 100);
+                ApplyFighterEvent(FighterEventType.AFTER_USED_AP, spellLevl.ApCost);
                 return true;
-            RefreshStats();
-            OnSpellCasted(spellLevl);
-            this.Fight.TryEndSequence(1, 100);
-            ApplyFighterEvent(FighterEventType.AFTER_USED_AP, spellLevl.ApCost);
-            return true;
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return false;
+            }
         }
 
         public List<Fighter> GetAffectedActors(short[] shape, List<string> targets)
         {
-            List<Fighter> results = new List<Fighter>();
-            List<Fighter> authorized = new List<Fighter>();
-
-            foreach (var target in targets)
+            try
             {
-                authorized.AddRange(TargetMaskProvider.Handle(this, target));
-            }
+                List<Fighter> results = new List<Fighter>();
+                List<Fighter> authorized = new List<Fighter>();
 
-            foreach (var target in targets)
-            {
-                authorized = TargetMaskValidator.Valid(this, target, authorized);
-            }
+                foreach (var target in targets)
+                {
+                    authorized.AddRange(TargetMaskProvider.Handle(this, target));
+                }
 
-            foreach (var cell in shape)
-            {
-                var fighter = Fight.GetFighter(cell);
-                if (fighter != null && authorized.Contains(fighter))
-                    results.Add(fighter);
+                foreach (var target in targets)
+                {
+                    authorized = TargetMaskValidator.Valid(this, target, authorized);
+                }
+
+                foreach (var cell in shape)
+                {
+                    var fighter = Fight.GetFighter(cell);
+                    if (fighter != null && authorized.Contains(fighter))
+                        results.Add(fighter);
+                }
+                if (targets.Contains("C") && !results.Contains(this))
+                    results.Add(this);
+                var t = results.Distinct().ToList();
+                return t;
             }
-            if (targets.Contains("C") && !results.Contains(this))
-                results.Add(this);
-            var t = results.Distinct().ToList();
-            return t;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return null;
+            }
         }
 
         public virtual void OnSpellCastFailed(CastFailedReason reason, SpellLevelRecord spelllevel) { }
@@ -639,63 +751,98 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public bool CanCast(short targetedcell, SpellLevelRecord level, Fighter targetedFighter)
         {
-            if (level.CastInLine)
+            try
             {
-                if (targetedcell == this.CellId && level.MinRange == 0)
-                    return true;
-                var direction = ShapesProvider.GetDirectionFromTwoCells(this.CellId, targetedcell);
-                if (direction == DirectionsEnum.DIRECTION_EAST || direction == DirectionsEnum.DIRECTION_NORTH
-                    || direction == DirectionsEnum.DIRECTION_SOUTH || direction == DirectionsEnum.DIRECTION_WEST)
+                if (level.CastInLine)
                 {
-                    OnSpellCastFailed(CastFailedReason.RANGE, level);
-                    return false;
-                }
-                var line = ShapesProvider.GetLineFromDirection(CellId, level.MaxRange, direction);
+                    if (targetedcell == this.CellId && level.MinRange == 0)
+                        return true;
+                    var direction = ShapesProvider.GetDirectionFromTwoCells(this.CellId, targetedcell);
+                    if (direction == DirectionsEnum.DIRECTION_EAST || direction == DirectionsEnum.DIRECTION_NORTH
+                        || direction == DirectionsEnum.DIRECTION_SOUTH || direction == DirectionsEnum.DIRECTION_WEST)
+                    {
+                        OnSpellCastFailed(CastFailedReason.RANGE, level);
+                        return false;
+                    }
+                    var line = ShapesProvider.GetLineFromDirection(CellId, level.MaxRange, direction);
 
-                if (line.Contains(targetedFighter.CellId))
-                    return true;
-                else
+                    /*bool losOK = true;
+                    foreach (short c in line)
+                    {
+                        if (!this.Fight.Map.WalkableCells.Contains(c))
+                        {
+                            losOK = false;
+                        }
+                    }
+
+                    if (!losOK)
+                    {
+                        OnSpellCastFailed(CastFailedReason.RANGE, level);
+                        return false;
+                    }*/
+
+                    if (targetedFighter != null)
+                    {
+                        if (line.Contains(targetedFighter.CellId))
+                            return true;
+                        else
+                        {
+                            OnSpellCastFailed(CastFailedReason.RANGE, level);
+                            return false;
+                        }
+                    }
+                }
+                int Distance = PathHelper.GetDistanceBetween(targetedcell, this.CellId);
+                if (Distance > level.MaxRange + FighterStats.Stats._Range || Distance < level.MinRange)
                 {
                     OnSpellCastFailed(CastFailedReason.RANGE, level);
                     return false;
                 }
+                return true;
             }
-            int Distance = PathHelper.GetDistanceBetween(targetedcell, this.CellId);
-            if (Distance > level.MaxRange + FighterStats.Stats._Range || Distance < level.MinRange)
+            catch (Exception error)
             {
-                OnSpellCastFailed(CastFailedReason.RANGE, level);
+                Logger.Error(error);
                 return false;
             }
-            if (level.CastTestLos)
-            {
-                OnSpellCastFailed(CastFailedReason.RANGE, level);
-                return false;
-            }
-            return true;
         }
 
         public virtual bool UseWeapon(short cellid) { return false; }
 
-        public virtual bool CastSpellOnTarget(ushort spellid, int targetid)
+        public virtual bool CastSpellOnTarget(ushort spellid, int targetid, bool checkRange = true)
         {
-            var target = Fight.GetFighter(targetid);
-            var spell = GetSpellLevel(spellid);
-            if (Fight.Ended)
+            try
             {
-                OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spell);
+                var target = Fight.GetFighter(targetid);
+                var spell = GetSpellLevel(spellid);
+                if (Fight.Ended)
+                {
+                    OnSpellCastFailed(CastFailedReason.FIGHT_ENDED, spell);
+                    return false;
+                }
+                if (target == null)
+                    return false;
+                if (checkRange == true)
+                {
+                    if (!CanCast(target.CellId, spell, target))
+                    {
+                        return false;
+                    }
+                    return CastSpellOnCell(spellid, target.CellId, targetid, true);
+                }
+                else
+                    return CastSpellOnCell(spellid, target.CellId, targetid, false);
+
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
                 return false;
             }
-            if (target == null)
-                return false;
-            if (!CanCast(target.CellId, spell, target))
-            {
-                return false;
-            }
-            return CastSpellOnCell(spellid, target.CellId, targetid);
 
         }
 
-        bool CheckFighterDie()
+        public bool CheckFighterDie()
         {
             if (FighterStats.Stats.LifePoints <= 0)
             {
@@ -718,119 +865,133 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public void LoseLife(TakenDamages damages, int sourceid)
         {
-            damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
-
-            if (damages.Delta <= 0)
-                return;
-
-            Fight.TryStartSequence(sourceid, 1);
-            if (FighterStats.ShieldPoints > 0)
+            try
             {
-                if (FighterStats.ShieldPoints - damages.Delta <= 0)
+                damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
+
+                if (damages.Delta <= 0)
+                    return;
+
+                Fight.TryStartSequence(sourceid, 1);
+                if (FighterStats.ShieldPoints > 0)
                 {
-                    ushort rest = (ushort)(damages.Delta - FighterStats.ShieldPoints);
-                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage((ushort)ActionsEnum.ACTION_CHARACTER_BOOST_SHIELD, sourceid, ContextualId, rest, 0, (ushort)FighterStats.ShieldPoints));
-                    FighterStats.ShieldPoints = 0;
-                    if (FighterStats.Stats.LifePoints - rest <= 0)
+                    if (FighterStats.ShieldPoints - damages.Delta <= 0)
                     {
-                        FighterStats.Stats.LifePoints = 0;
-                        RefreshStats();
-                        Die();
+                        ushort rest = (ushort)(damages.Delta - FighterStats.ShieldPoints);
+                        Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage((ushort)ActionsEnum.ACTION_CHARACTER_BOOST_SHIELD, sourceid, ContextualId, rest, 0, (ushort)FighterStats.ShieldPoints));
+                        FighterStats.ShieldPoints = 0;
+                        if (FighterStats.Stats.LifePoints - rest <= 0)
+                        {
+                            FighterStats.Stats.LifePoints = 0;
+                            RefreshStats();
+                            Die();
+                        }
+                        else
+                        {
+                            ShowFighter();
+                            FighterStats.Stats.LifePoints -= (short)rest;
+                        }
+                        return;
                     }
                     else
                     {
+                        Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage(0, sourceid, ContextualId, 0, 0, (ushort)damages.Delta));
+                        FighterStats.ShieldPoints -= (int)damages.Delta;
                         ShowFighter();
-                        FighterStats.Stats.LifePoints -= (short)rest;
+                        return;
                     }
+                }
+                if (FighterStats.Stats.LifePoints - damages.Delta <= 0)
+                {
+                    Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)FighterStats.Stats.LifePoints, 0));
+                    FighterStats.Stats.LifePoints = 0;
+                    Die();
                     return;
                 }
                 else
                 {
-                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage(0, sourceid, ContextualId, 0, 0, (ushort)damages.Delta));
-                    FighterStats.ShieldPoints -= (int)damages.Delta;
-                    ShowFighter();
-                    return;
+                    ushort erosionDelta = (ushort)CalculateErosionDamage(damages.Delta);
+                    FighterStats.RealStats.LifePoints -= (short)erosionDelta;
+                    FighterStats.ErodedLife += erosionDelta;
+                    FighterStats.Stats.LifePoints -= damages.Delta;
+
+                    Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)damages.Delta, erosionDelta));
+
+                    RefreshStats();
+                    ApplyFighterEvent(FighterEventType.AFTER_ATTACKED, sourceid, damages);
                 }
+                Fight.TryEndSequence(1, 103);
             }
-            if (FighterStats.Stats.LifePoints - damages.Delta <= 0)
+            catch (Exception error)
             {
-                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)FighterStats.Stats.LifePoints, 0));
-                FighterStats.Stats.LifePoints = 0;
-                Die();
-                return;
+                Logger.Error(error);
             }
-            else
-            {
-                ushort erosionDelta = (ushort)CalculateErosionDamage(damages.Delta);
-                FighterStats.RealStats.LifePoints -= (short)erosionDelta;
-                FighterStats.ErodedLife += erosionDelta;
-                FighterStats.Stats.LifePoints -= damages.Delta;
-
-                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)damages.Delta, erosionDelta));
-
-                RefreshStats();
-                ApplyFighterEvent(FighterEventType.AFTER_ATTACKED, sourceid, damages);
-            }
-            Fight.TryEndSequence(1, 103);
         }
 
         public void LoseLifeNoEvent(TakenDamages damages, int sourceid)
         {
-            damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
-
-            if (damages.Delta <= 0)
-                return;
-
-            Fight.TryStartSequence(sourceid, 1);
-            if (FighterStats.ShieldPoints > 0)
+            try
             {
-                if (FighterStats.ShieldPoints - damages.Delta <= 0)
+                damages.EvaluateWithResistances(Fight.GetFighter(sourceid), this, Fight.PvP);
+
+                if (damages.Delta <= 0)
+                    return;
+
+                Fight.TryStartSequence(sourceid, 1);
+                if (FighterStats.ShieldPoints > 0)
                 {
-                    ushort rest = (ushort)(damages.Delta - FighterStats.ShieldPoints);
-                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage((ushort)ActionsEnum.ACTION_CHARACTER_BOOST_SHIELD, sourceid, ContextualId, rest, 0, (ushort)FighterStats.ShieldPoints));
-                    FighterStats.ShieldPoints = 0;
-                    if (FighterStats.Stats.LifePoints - rest <= 0)
+                    if (FighterStats.ShieldPoints - damages.Delta <= 0)
                     {
-                        FighterStats.Stats.LifePoints = 0;
-                        RefreshStats();
-                        Die();
+                        ushort rest = (ushort)(damages.Delta - FighterStats.ShieldPoints);
+                        Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage((ushort)ActionsEnum.ACTION_CHARACTER_BOOST_SHIELD, sourceid, ContextualId, rest, 0, (ushort)FighterStats.ShieldPoints));
+                        FighterStats.ShieldPoints = 0;
+                        if (FighterStats.Stats.LifePoints - rest <= 0)
+                        {
+                            FighterStats.Stats.LifePoints = 0;
+                            RefreshStats();
+                            Die();
 
 
+                        }
+                        else
+                        {
+                            ShowFighter();
+                            FighterStats.Stats.LifePoints -= (short)rest;
+                        }
+                        return;
                     }
                     else
                     {
+                        Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage(0, sourceid, ContextualId, 0, 0, (ushort)damages.Delta));
+                        FighterStats.ShieldPoints -= (int)damages.Delta;
                         ShowFighter();
-                        FighterStats.Stats.LifePoints -= (short)rest;
+                        return;
                     }
+                }
+                if (FighterStats.Stats.LifePoints - damages.Delta <= 0)
+                {
+                    Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)FighterStats.Stats.LifePoints, 0));
+                    FighterStats.Stats.LifePoints = 0;
+                    Die();
                     return;
                 }
                 else
                 {
-                    Fight.Send(new GameActionFightLifeAndShieldPointsLostMessage(0, sourceid, ContextualId, 0, 0, (ushort)damages.Delta));
-                    FighterStats.ShieldPoints -= (int)damages.Delta;
-                    ShowFighter();
-                    return;
+                    ushort erosionDelta = (ushort)CalculateErosionDamage(damages.Delta);
+                    FighterStats.RealStats.LifePoints -= (short)erosionDelta;
+                    FighterStats.ErodedLife += erosionDelta;
+                    FighterStats.Stats.LifePoints -= damages.Delta;
+
+                    Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)damages.Delta, erosionDelta));
+
+                    RefreshStats();
                 }
+                Fight.TryEndSequence(1, 103);
             }
-            if (FighterStats.Stats.LifePoints - damages.Delta <= 0)
+            catch (Exception error)
             {
-                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)FighterStats.Stats.LifePoints, 0));
-                FighterStats.Stats.LifePoints = 0;
-                Die();
-                return;
+                Logger.Error(error);
             }
-            else
-            {
-                ushort erosionDelta = (ushort)CalculateErosionDamage(damages.Delta);
-                FighterStats.RealStats.LifePoints -= (short)erosionDelta;
-                FighterStats.ErodedLife += erosionDelta;
-                FighterStats.Stats.LifePoints -= damages.Delta;
-
-                Fight.Send(new GameActionFightLifePointsLostMessage(0, sourceid, ContextualId, (ushort)damages.Delta, erosionDelta));
-
-                RefreshStats();
-            }
-            Fight.TryEndSequence(1, 103);
         }
 
         public void AddBuff(Buff buff)
@@ -860,6 +1021,21 @@ namespace Symbioz.World.Models.Fights.Fighters
         public List<T> GetAllBuffs<T>() where T : Buff
         {
             return Buffs.OfType<T>().ToList();
+        }
+
+        public List<Buff> GetAllBuffs()
+        {
+            return (Buffs);
+        }
+
+        public Buff GetBuffByDelta(short delta)
+        {
+            foreach (var b in GetAllBuffs())
+            {
+                if (b.Delta == delta)
+                    return (b);
+            }
+            return (null);
         }
 
         public void UpdateBuffs()
@@ -925,7 +1101,7 @@ namespace Symbioz.World.Models.Fights.Fighters
         }
 
         /// <summary>
-        /// Dégâts subis =dégâts totaux - résistance fixe - (dégâts totaux / 100/pourcentage de résistance) 
+        /// Dégâts subis = dégâts totaux - résistance fixe - (dégâts totaux / 100/pourcentage de résistance) 
         /// </summary>
         /// <param name="delta"></param>
         /// <param name="sourceid"></param>
@@ -946,35 +1122,51 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         }
 
+        /// <summary>
+        /// Fighter Events
+        /// </summary>
+        /// <param name="eventtype"></param>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="arg3"></param>
+        /// <returns></returns>
         public bool ApplyFighterEvent(FighterEventType eventtype, object arg1, object arg2 = null, object arg3 = null)
         {
-            if (eventtype == FighterEventType.BEFORE_MOVE)
+            try
             {
-                BeforeMove(arg2 as List<short>);
+                if (eventtype == FighterEventType.BEFORE_MOVE)
+                {
+                    BeforeMove(arg2 as List<short>);
+                }
+                if (eventtype == FighterEventType.AFTER_MOVE)
+                {
+                    OnMoved(arg2 as List<short>);
+                }
+                if (eventtype == FighterEventType.AFTER_DIED)
+                {
+
+                }
+                bool result = false;
+                var buffs = Buffs.FindAll(x => x.EventType == eventtype && x.Delay == 0);
+                foreach (var buff in buffs)
+                {
+                    if (buff.OnEventCalled(arg1, arg2, arg3))
+                        result = true;
+                }
+                var interactions = Fight.MarkInteractions.FindAll(x => x.EventType == eventtype);
+                short fighterCellid = this.CellId; // a remplacer par simplement FighterCellId si problemes Réseaux
+                foreach (var interaction in interactions)
+                {
+                    if (interaction.Mark.Cells.Contains(fighterCellid))
+                        interaction.Method.Invoke(interaction.Mark, new object[] { this, arg1, arg2, arg3 });
+                }
+                return result;
             }
-            if (eventtype == FighterEventType.AFTER_MOVE)
+            catch (Exception error)
             {
-                OnMoved(arg2 as List<short>);
+                Logger.Error(error);
+                return false;
             }
-            if (eventtype == FighterEventType.AFTER_DIED)
-            {
-                
-            }
-            bool result = false;
-            var buffs = Buffs.FindAll(x => x.EventType == eventtype && x.Delay == 0);
-            foreach (var buff in buffs)
-            {
-                if (buff.OnEventCalled(arg1, arg2, arg3))
-                    result = true;
-            }
-            var interactions = Fight.MarkInteractions.FindAll(x => x.EventType == eventtype);
-            short fighterCellid = this.CellId; // a remplacer par simplement FighterCellId si problemes Réseaux
-            foreach (var interaction in interactions)
-            {
-                if (interaction.Mark.Cells.Contains(fighterCellid))
-                    interaction.Method.Invoke(interaction.Mark, new object[] { this, arg1, arg2, arg3 });
-            }
-            return result;
         }
 
         public void AddShieldPoints(uint buffid, short amount, short duration, int sourceid, ushort spellid)
@@ -994,13 +1186,131 @@ namespace Symbioz.World.Models.Fights.Fighters
         public abstract int GetInitiative();
         public abstract void RefreshStats();
         public abstract string GetName();
+        public Fighter[] GetTacklers()
+        {
+            
+            var cellArround  = this.Fight.GetFighterBreakAtFirstObstacles(this.CellId, ShapesProvider.GetCross1RadiusCells(this.CellId), (DirectionsEnum)this.Direction).ToArray();
+            return cellArround.Where(x => x.Dead == false && x.Team.Id != this.Team.Id ).ToArray();
+            //return this.GetOposedTeam().GetAllFighters((Fighter entry) => entry.Dead == false ).ToArray<Fighter>();
+        }
+        public virtual int GetTackledMP()
+        {
+            int result;
+            
+                Fighter[] tacklers = this.GetTacklers();
+                
+                if (tacklers.Length <= 0)
+                {
+                    result = 0;
+                }
+                else
+                {
+                    double num = 0.0;
+                    for (int i = 0; i < tacklers.Length; i++)
+                    {
 
+                        Fighter tackler = tacklers[i];
+
+                    if (i == 0)
+                        {
+                            num = this.GetTacklePercent(tackler);
+                        }
+                        else
+                        {
+                            num *= this.GetTacklePercent(tackler);
+                        }
+                    }
+                    num = 1.0 - num;
+                    if (num < 0.0)
+                    {
+                        num = 0.0;
+                    }
+                    else
+                    {
+                        if (num > 1.0)
+                        {
+                            num = 1.0;
+                        }
+                    }
+
+                result = (int)System.Math.Ceiling((double)this.FighterStats.Stats.MovementPoints  * num);
+
+            }
+
+            return result;
+        }
+        private double GetTacklePercent(Fighter tackler)
+        {
+            double result;
+            if (tackler.FighterStats.Stats.TackleBlock == -2)
+            {
+                result = 0.0;
+            }
+            else
+            {
+
+                result = (double)(this.FighterStats.Stats.TackleEvade+ 2) / (2.0 * (double)(tackler.FighterStats.Stats.TackleBlock + 2));
+
+            }
+            return result;
+        }
+
+        public virtual int GetTackledAP()
+        {
+            int result;
+          
+                Fighter[] tacklers = this.GetTacklers();
+                if (tacklers.Length <= 0)
+                {
+                    result = 0;
+                }
+                else
+                {
+                    double num = 0.0;
+                    for (int i = 0; i < tacklers.Length; i++)
+                    {
+                        Fighter tackler = tacklers[i];
+                        if (i == 0)
+                        {
+                            num = this.GetTacklePercent(tackler);
+                        }
+                        else
+                        {
+                            num *= this.GetTacklePercent(tackler);
+                        }
+                    }
+                    num = 1.0 - num;
+
+                if (num < 0.0)
+                    {
+                        num = 0.0;
+                    }
+                    else
+                    {
+                        if (num > 1.0)
+                        {
+                            num = 1.0;
+                        }
+                    }
+                    result = (int)System.Math.Ceiling((double)this.FighterStats.Stats.ActionPoints * num);
+     
+                }
+            
+            return result;
+        }
+        
         public short GetSpellBoost(ushort spellid)
         {
             var valuePair = m_buffedSpells.FirstOrDefault(x => x.SpellId == spellid);
             return (short)(valuePair != null ? valuePair.Delta : 0);
         }
 
+        /// <summary>
+        /// Calcul Jet by Spell bas effect and FighterStats %dammages
+        /// </summary>
+        /// <param name="record"></param>
+        /// <param name="statdata"></param>
+        /// <returns></returns>
         public short CalculateJet(ExtendedSpellEffect record, short statdata)
         {
             short jet = (short)(SpellEffectsHandler.GetRandom(record));

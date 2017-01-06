@@ -13,42 +13,48 @@ namespace Symbioz.Providers.ActorIA.Actions
     {
         public override void Execute(World.Models.Fights.Fighters.MonsterFighter fighter)
         {
-            var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
+            try
+            {
+                var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
 
-            if (fighter.GetOposedTeam().LowerProchFighter(fighter, 20).FighterStats.LifePercentage <= 20 && spells.FindAll(x=>x.Category == SpellCategoryEnum.Damages).Count > 0)
-                return;
-            Logger.Log("BUFF TEAM pourcent" + fighter.GetOposedTeam().LowerProchFighter(fighter, 20).FighterStats.LifePercentage + " nbrspelldmg " + spells.FindAll(x => x.Category == SpellCategoryEnum.Damages).Count);
-            int po = 2;
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Heal))
-            {
-                foreach (int s in spell.SpellLevels)
+                if (fighter.GetOposedTeam().LowerProchFighter(fighter, 20).FighterStats.LifePercentage <= 20 && spells.FindAll(x => x.Category == SpellCategoryEnum.Damages).Count > 0)
+                    return;
+                int po = 2;
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Heal))
                 {
-                    SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
-                    if (record == null)
-                        continue;
-                    if (po < record.MaxRange)
-                        po = record.MaxRange;
+                    foreach (int s in spell.SpellLevels)
+                    {
+                        SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
+                        if (record == null)
+                            continue;
+                        if (po < record.MaxRange)
+                            po = record.MaxRange;
+                    }
+                }
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Buff))
+                {
+                    foreach (int s in spell.SpellLevels)
+                    {
+                        SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
+                        if (record == null)
+                            continue;
+                        if (po < record.MaxRange)
+                            po = record.MaxRange;
+                    }
+                }
+                var target = fighter.Team.LowerProchFighter(fighter, po);
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Heal))
+                {
+                    CastAction.TryCast(fighter, spell.Id, target);
+                }
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Buff))
+                {
+                    CastAction.TryCast(fighter, spell.Id, target);
                 }
             }
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Buff))
+            catch (Exception error)
             {
-                foreach (int s in spell.SpellLevels)
-                {
-                    SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
-                    if (record == null)
-                        continue;
-                    if (po < record.MaxRange)
-                        po = record.MaxRange;
-                }
-            }
-            var target = fighter.Team.LowerProchFighter(fighter, po);
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Heal))
-            {
-                CastAction.TryCast(fighter, spell.Id, target);
-            }
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Buff))
-            {
-                CastAction.TryCast(fighter, spell.Id,target);
+                Logger.Error(error);
             }
         }
     }

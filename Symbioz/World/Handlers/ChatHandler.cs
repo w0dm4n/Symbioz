@@ -7,6 +7,7 @@ using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.Network.Servers;
 using Symbioz.World.Handlers;
+using Symbioz.World.Models;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Alliances;
@@ -48,11 +49,52 @@ namespace Symbioz.World.Handlers
         {
             client.Character.DisplaySmiley(message.smileyId);
         }
+
         [MessageHandler]
         public static void HandleChatClientMultiWithObject(ChatClientMultiWithObjectMessage message, WorldClient client)
         {
-           
+            string useless = "";
+            if (client.Character.Restrictions.cantChat == true)
+                client.Character.Reply("Impossible d'écrire dans ce canal !");
+            else if (client.Character.Restrictions.isMuted == true)
+                client.Character.Reply("Vous avez été muté, impossible d'envoyer votre message.");
+            
+            switch (message.channel)
+            {
+                case (sbyte)ChatActivableChannelsEnum.CHANNEL_PARTY:
+                    if (client.Character.Party != null)
+                    {
+                        foreach (Character c in client.Character.Party.Members)
+                        {
+                            c.Client.Send(new ChatServerWithObjectMessage(message.channel, message.content, 0, useless, client.Character.Record.Id, client.Character.Record.Name, client.Account.Id, message.objects));
+                        }
+                    }
+                    break;
+
+                case (sbyte)ChatActivableChannelsEnum.CHANNEL_GLOBAL:
+                    ChatServerWithObjectMessage chatMessage = new ChatServerWithObjectMessage(message.channel, message.content, 0, useless, client.Character.Record.Id, client.Character.Record.Name, client.Account.Id, message.objects);
+                    if (client.Character.IsFighting)
+                        client.Character.FighterInstance.Fight.Send(chatMessage);
+                    else
+                    {
+                        if (client.Character.Map.Instance.Muted && client.Account.Role == 0)
+                            client.Character.Reply("Impossible d'envoyer le message, la map a été mute.");
+                        else
+                            client.Character.SendMap(chatMessage);
+                    }
+                    break;
+
+                case (sbyte)ChatActivableChannelsEnum.CHANNEL_SALES:
+                    if (client.Character.CanSendSalesMessage())
+                    {
+                        //WorldServer.Instance.SendOnSubarea(new ChatServerWithObjectMessage(message.channel, message.content, 0, useless, client.Character.Record.Id, client.Character.Record.Name, client.Account.Id, message.objects), client.Character.SubAreaId);
+                        WorldServer.Instance.Send(new ChatServerWithObjectMessage(message.channel, message.content, 0, useless, client.Character.Record.Id, client.Character.Record.Name, client.Account.Id, message.objects));
+                        client.Character.UpdateLastSalesMessage();
+                    }
+                    break;
+            }     
         }
+
         [MessageHandler]
         public static void HandleChatMultiClient(ChatClientMultiMessage message, WorldClient client)
         {
@@ -138,7 +180,8 @@ namespace Symbioz.World.Handlers
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_SALES;
             if (client.Character.CanSendSalesMessage())
             {
-                WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
+                //WorldServer.Instance.SendOnSubarea(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id), client.Character.SubAreaId);
+                WorldServer.Instance.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
                 client.Character.UpdateLastSalesMessage();
             }
         }
@@ -160,9 +203,16 @@ namespace Symbioz.World.Handlers
         public static void Admin(WorldClient client, string message)
         {
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_ADMIN;
-            if (client.Account.Role >= ServerRoleEnum.ADMINISTRATOR)
+            if (client.Account.Role >= ServerRoleEnum.ANIMATOR)
             {
-                WorldServer.Instance.SendToOnlineCharacters(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                var clients = WorldServer.Instance.GetAllClientsOnline();
+                foreach (var tmp in clients)
+                {
+                    if (tmp.Account.Role >= ServerRoleEnum.ANIMATOR)
+                    {
+                        tmp.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                    }
+                }
             }
             else
                 client.Character.Reply("Vous n'avez pas les droits pour utiliser ce chat");
@@ -170,11 +220,11 @@ namespace Symbioz.World.Handlers
         public static void Group(WorldClient client, string message)
         {
             sbyte channel = (sbyte)ChatActivableChannelsEnum.CHANNEL_PARTY;
-            if(client.Character.PartyMember != null && client.Character.PartyMember.Party != null)
+            if (client.Character.Party != null)
             {
-                foreach(WorldClient c in client.Character.PartyMember.Party.Members)
+                foreach(Character c in client.Character.Party.Members)
                 {
-                    c.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
+                    c.Client.Send(new ChatServerMessage(channel, message, 1, string.Empty, client.Character.Id, client.Character.Record.Name, client.Account.Id));
                 }
             }
         }

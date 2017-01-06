@@ -57,7 +57,7 @@ namespace Symbioz.World.Models.Fights
           
             if (CanJoin(client, mainFighter.Team))
             {
-                var newFighter = client.Character.CreateFighter(mainFighter.Team);
+                var newFighter = client.Character.CreateFighter(mainFighter.Team, this);
                 mainFighter.Team.AddFighter(newFighter);
                 GetAllFighters().ForEach(x => x.ShowFighter(client));
                 Map.Instance.OnFighterAdded(Id, mainFighter.Team.Id, newFighter.GetFightMemberInformations());

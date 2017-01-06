@@ -217,17 +217,38 @@ namespace Symbioz.PathProvider
             return (result);
         }
 
+        public static List<short> GetDiagonalcells(Fight fight, short cell)
+        {
+            List<short> result = new List<short>();
+
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_EAST), DirectionsEnum.DIRECTION_EAST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_EAST));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_WEST), DirectionsEnum.DIRECTION_WEST))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_WEST));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH), DirectionsEnum.DIRECTION_SOUTH))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_SOUTH));
+            if (!fight.IsOutMap(cell, GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH), DirectionsEnum.DIRECTION_NORTH))
+                result.Add(GetNearCellByDirection(cell, DirectionsEnum.DIRECTION_NORTH));
+            return (result);
+        }
+
         public static List<short> Getalldirectionlines(Fight fight, short Cell1)
         {
             List<short> result = new List<short>();
             short tmp = Cell1;
             short endcell = Cell1;
+            var infinite = 0;
+            var infinite1 = 0;
+            var infinite2 = 0;
             while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_NORTH_EAST)) > -1)
             {
                 if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_NORTH_EAST))
                     break;
                 result.Add(tmp);
                 Cell1 = tmp;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             tmp = Cell1;
             endcell = Cell1;
@@ -237,6 +258,9 @@ namespace Symbioz.PathProvider
                     break;
                 result.Add(tmp);
                 Cell1 = tmp;
+                infinite1++;
+                if (infinite1 > 100000)
+                    break;
             }
 
             tmp = Cell1;
@@ -247,16 +271,83 @@ namespace Symbioz.PathProvider
                     break;
                 result.Add(tmp);
                 Cell1 = tmp;
+                infinite2++;
+                if (infinite2 > 100000)
+                    break;
             }
 
             tmp = Cell1;
             endcell = Cell1;
+            var infinite3 = 0;
             while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_SOUTH_WEST)) > -1)
             {
                 if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_SOUTH_WEST))
                     break;
                 result.Add(tmp);
                 Cell1 = tmp;
+                infinite3++;
+                if (infinite3 > 100000)
+                    break;
+            }
+            return (result);
+        }
+
+        public static List<short> GetalldirectionDiagonal(Fight fight, short Cell1)
+        {
+            List<short> result = new List<short>();
+            short tmp = Cell1;
+            short endcell = Cell1;
+            var infinite = 0;
+            var infinite1 = 0;
+            var infinite2 = 0;
+            var infinite3 = 0;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_NORTH)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_NORTH))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+                infinite++;
+                if (infinite > 100000)
+                    break;
+            }
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_WEST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_WEST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+                infinite1++;
+                if (infinite1 > 100000)
+                    break;
+            }
+
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_EAST)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_EAST))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+                infinite2++;
+                if (infinite2 > 100000)
+                    break;
+            }
+
+            tmp = Cell1;
+            endcell = Cell1;
+            while ((tmp = GetNearCellByDirection(tmp, DirectionsEnum.DIRECTION_SOUTH)) > -1)
+            {
+                if (fight.IsOutMap(endcell, tmp, DirectionsEnum.DIRECTION_SOUTH))
+                    break;
+                result.Add(tmp);
+                Cell1 = tmp;
+                infinite3++;
+                if (infinite3 > 100000)
+                    break;
             }
             return (result);
         }
@@ -344,6 +435,7 @@ namespace Symbioz.PathProvider
                 _loc_20 = 3;
             }
             _loc_10 = 0;
+            var infinite = 0;
             while (_loc_10 < _loc_16)
             {
                 if (_loc_20 == 2)
@@ -467,6 +559,7 @@ namespace Symbioz.PathProvider
 
                 if (_loc_19.Count > 0)
                 {
+                    var infinite1 = 0;
                     _loc_22 = 0;
                     while (_loc_22 < _loc_19.Count)
                     {
@@ -474,10 +567,14 @@ namespace Symbioz.PathProvider
                         _loc_21 = new Point3d(Math.Floor(_loc_11.X + _loc_13), (double)_loc_19[(int)_loc_22]);
                         _loc_7.Add(_loc_21);
                         _loc_22 = _loc_22 + 1;
+                        infinite1++;
+                        if (infinite1 > 100000)
+                            break;
                     }
                 }
                 else if (_loc_18.Count > 0)
                 {
+                    var infinite2 = 0;
                     _loc_23 = 0;
                     while (_loc_23 < _loc_18.Count)
                     {
@@ -485,6 +582,9 @@ namespace Symbioz.PathProvider
                         _loc_21 = new Point3d((double)_loc_18[(int)_loc_23], Math.Floor(_loc_11.Y + _loc_14));
                         _loc_7.Add(_loc_21);
                         _loc_23 = _loc_23 + 1;
+                        infinite2++;
+                        if (infinite2 > 100000)
+                            break;
                     }
                 }
                 else
@@ -495,6 +595,9 @@ namespace Symbioz.PathProvider
                 _loc_11.X = _loc_11.X + _loc_13;
                 _loc_11.Y = _loc_11.Y + _loc_14;
                 _loc_10++;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             return _loc_7.Select(n => n.GetPoint()).ToArray();
         }
@@ -545,18 +648,35 @@ namespace Symbioz.PathProvider
         #region GetDistance
         public static int GetDistanceBetween(short originCellId, short destinationCellId)
         {//distance (en pm) (manhatann)
-            LineOfSightUtil();
-            int diffX = Math.Abs(GetPoint(originCellId).X - GetPoint(destinationCellId).X);
-            int diffY = Math.Abs(GetPoint(originCellId).Y - GetPoint(destinationCellId).Y);
-            return (diffX + diffY);
+            try
+            {
+                LineOfSightUtil();
+                int diffX = Math.Abs(GetPoint(originCellId).X - GetPoint(destinationCellId).X);
+                int diffY = Math.Abs(GetPoint(originCellId).Y - GetPoint(destinationCellId).Y);
+                return (diffX + diffY);
+            } catch (Exception e)
+            {
+                //TODO
+                //error donc ont dit qu'il et loin
+                return (1000);
+            }
         }
 
         public static int GetDistance(short originCellId, short destinationCellId)
         {//distance entre une celle et une autre (euclidienne)
-            LineOfSightUtil();
-            Point p1 = GetPoint(originCellId);
-            Point p2 = GetPoint(destinationCellId);
-            return Math.Abs(p1.X - p2.X) + Math.Abs(p1.Y - p2.Y);
+            try
+            {
+                LineOfSightUtil();
+                Point p1 = GetPoint(originCellId);
+                Point p2 = GetPoint(destinationCellId);
+                return Math.Abs(p1.X - p2.X) + Math.Abs(p1.Y - p2.Y);
+            }
+            catch (Exception e)
+            {
+                //TODO
+                //error donc ont dit qu'il et loin
+                return (1000);
+            }
         }
 
         public static int GetDistanceForPath(short originCellId, short destinationCellId)
@@ -583,7 +703,9 @@ namespace Symbioz.PathProvider
 
             int _loc_4, _loc_1, _loc_2, _loc_3, _loc_5;
             _loc_1 = _loc_2 = _loc_3 = _loc_4 = _loc_5 = 0;
-
+            var infinite = 0;
+            var infinite1 = 0;
+            var infinite2 = 0;
             while (_loc_5 < MAP_HEIGHT)
             {
                 _loc_4 = 0;
@@ -592,6 +714,9 @@ namespace Symbioz.PathProvider
                     _cellsPositions[_loc_3] = new Point(_loc_1 + _loc_4, _loc_2 + _loc_4);
                     _loc_3++;
                     _loc_4++;
+                    infinite1++;
+                    if (infinite1 > 100000)
+                        break;
                 }
 
                 _loc_1++;
@@ -601,9 +726,15 @@ namespace Symbioz.PathProvider
                     _cellsPositions[_loc_3] = new Point(_loc_1 + _loc_4, _loc_2 + _loc_4);
                     _loc_3++;
                     _loc_4++;
+                    infinite2++;
+                    if (infinite2 > 100000)
+                        break;
                 }
                 _loc_2--;
                 _loc_5++;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
         }
 

@@ -18,6 +18,8 @@ using Symbioz.World.PathProvider;
 using Symbioz.World.Records.SubAreas;
 using Shader.Helper;
 using Symbioz.Core;
+using System.Threading;
+using Symbioz.World.Models.Monsters;
 
 namespace Symbioz.World.Models
 {
@@ -46,18 +48,33 @@ namespace Symbioz.World.Models
         public void AddClient(WorldClient client)
         {
             this.Send(new GameRolePlayShowActorMessage(client.Character.GetRolePlayActorInformations()));
-
-            if (!Clients.Contains(client))
-                Clients.Add(client);
+            Monitor.Enter(this.Clients);
+            try
+            {
+                if (!Clients.Contains(client))
+                    Clients.Add(client);
+            }finally
+            {
+                Monitor.Exit(this.Clients);
+            }
         }
 
         public void RemoveClient(WorldClient client) // OnLeavingMap
         {
-            client.Character.Map = null;
-            Clients.Remove(client);
-            RemoveEntity(client.Character.Id);
-        }
+            Monitor.Enter(this.Clients);
+            try
+            {
+                client.Character.Map = null;
+                Clients.Remove(client);
+                RemoveEntity(client.Character.Id);
 
+            }finally
+            {
+                Monitor.Exit(this.Clients);
+            }
+
+
+        }
         public void RemoveEntity(int id)
         {
             this.Send(new GameContextRemoveElementMessage(id));
@@ -66,6 +83,7 @@ namespace Symbioz.World.Models
         public void RemoveMonsterGroup(int groupid)
         {
             MonstersGroups.Remove(MonstersGroups.Find(x => x.MonsterGroupId == groupid));
+            MonsterSpawnManager.RemoveMonsterSpawnGroup(MonstersGroups.Find(x => x.MonsterGroupId == groupid));
             RemoveEntity(groupid);
         }
 
@@ -95,25 +113,54 @@ namespace Symbioz.World.Models
             List<GameRolePlayCharacterInformations> ListPlayers = new List<GameRolePlayCharacterInformations>();
             foreach (var client in Clients)
             {
-                if (client.Character.Record.MerchantMode == 0)
-                    ListPlayers.Add(client.Character.GetRolePlayActorInformations());
+                if (client != null && client.Character != null)
+                {
+                    if (client.Character.Record.MerchantMode == 0)
+                        ListPlayers.Add(client.Character.GetRolePlayActorInformations());
+                }
             }
-            //return Clients.ConvertAll<GameRolePlayCharacterInformations>(x => x.Character.GetRolePlayActorInformations());
             return ListPlayers;
         }
 
         List<GameRolePlayMerchantInformations> GetPlayersMerchant()
         {
             List<GameRolePlayMerchantInformations> ListPlayersMerchant = new List<GameRolePlayMerchantInformations>();
-            foreach (var client in Clients)
+
+            Parallel.ForEach(Clients, client =>
             {
-                if (client.Character.Record.MerchantMode == 1)
+                if (client != null && client.Character != null && client.Character.Record.MerchantMode == 1)
                 {
                     if (CharactersMerchantsRecord.GetItemsFromCharacterId((uint)client.Character.Id) != null)
                         ListPlayersMerchant.Add(client.Character.GetRolePlayMerchantInformations());
-               }
-            }
+                }
+            });
             return ListPlayersMerchant;
+        }
+
+        static void RefreshActors(System.Timers.Timer Timer, MapInstance instance)
+        {
+            foreach (var client in instance.Clients)
+            {
+                client.Character.Map.Instance.SyncMonsters(false);
+                var actors = client.Character.Map.Instance.GetActors(client);
+                foreach (var actor in actors)
+                {
+                    client.Send(new GameRolePlayShowActorMessage(actor));
+                }
+                client.Character.Map.Instance.GetMonsters();
+                client.Character.RefreshOnMapInstance();
+            }
+            Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
+        }
+
+        public void RefreshActorsOnMap()
+        {
+            var Timer = new System.Timers.Timer();
+            Timer.Interval = 1000;
+            Timer.Elapsed += (sender, e) => { RefreshActors(Timer, this); };
+            Timer.Enabled = true;
         }
 
         public List<InteractiveElement> GetInteractiveElements()
@@ -129,7 +176,8 @@ namespace Symbioz.World.Models
         public List<GameRolePlayActorInformations> GetActors(WorldClient client)
         {
             List<GameRolePlayActorInformations> actors = new List<GameRolePlayActorInformations>();
-            actors.AddRange(GetMonsters());
+            if (this.Record.Id != 115609089) // SHOP MAP
+                actors.AddRange(GetMonsters());
             actors.AddRange(GetNpcsInformations());
             if(this.Prism != null)
             {
@@ -140,25 +188,28 @@ namespace Symbioz.World.Models
             return actors;
         }
 
-        public void SyncMonsters()
+        public void SyncMonsters(bool resetMonsters = false)
         {
             lock (this)
             {
-                if (MonstersGroups.Count > 0 || Record.HaveZaap || !MapNoSpawnRecord.CanSpawn(Record.Id))
-                    return;
+                if (!resetMonsters)
+                {
+                    if (MonstersGroups.Count > 0 || Record.HaveZaap || !MapNoSpawnRecord.CanSpawn(Record.Id))
+                        return;
+                }
                 AsyncRandom random = new AsyncRandom();
                 if (this.Record.DugeonMap)
                 {
-                    if (this.MonstersGroups.Count == 0)
+                    if (this.MonstersGroups.Count == 0 || resetMonsters)
                     {
                         List<MonsterSpawnMapRecord> monsters = DungeonRecord.GetDungeonMapMonsters(this.Record.Id).ConvertAll<MonsterSpawnMapRecord>(x => new MonsterSpawnMapRecord(-1, x, this.Record.Id, 100));
                         monsters.ForEach(x => x.ActualGrade = (sbyte)random.Next(1, 6));
-                        MonstersGroups.Add(new MonsterGroup(MonsterGroup.START_ID, monsters, (ushort)Record.RandomWalkableCell()));
+                        MonstersGroups.Add(new MonsterGroup(MonsterGroup.START_ID, monsters, (ushort)Record.RandomWalkableCell(), this.Record.SubAreaId));
                     }
                     return;
                 }
                 var spawns = MonsterSpawnSubRecord.GetSpawns(Record.Id);
-                if (spawns.Count() == 0)
+                if (spawns.Count() == 0 && !resetMonsters)
                     return;
                 for (sbyte groupId = 0; groupId < random.Next(1, MAX_MONSTER_PER_GROUP + 1); groupId++)
                 {
@@ -193,14 +244,22 @@ namespace Symbioz.World.Models
                                 }
                                 else
                                 {
-                                    monster.ActualGrade = (sbyte)random.Next(1, 6);
-                                    monsters.Add(monster);
+                                    if (currentMonsterRecord != null)
+                                    {
+                                        monster.ActualGrade = (sbyte)random.Next(1, 6);
+                                        monsters.Add(monster);
+                                    }
                                     break;
                                 }
                             }
                         }
                     }
-                    MonstersGroups.Add(new MonsterGroup(groupId + MonsterGroup.START_ID, monsters, (ushort)Record.RandomWalkableCell()));
+                    if (monsters.Count >= 1)
+                    {
+                        var group = new MonsterGroup(groupId + MonsterGroup.START_ID, monsters, (ushort)Record.RandomWalkableCell(), this.Record.SubAreaId);
+                        MonstersGroups.Add(group);
+                        MonsterSpawnManager.AddMonsterSpawnGroup(group);
+                    }
                 }
             }
         }
@@ -250,7 +309,7 @@ namespace Symbioz.World.Models
             return MonstersGroups.Find(x => x.MonsterGroupId == id);
         }
 
-        List<GameRolePlayGroupMonsterInformations> GetMonsters()
+        public List<GameRolePlayGroupMonsterInformations> GetMonsters()
         {
             return MonsterGroup.GetActorsInformations(Record, MonstersGroups);
         }
@@ -266,8 +325,16 @@ namespace Symbioz.World.Models
             }
             else
             {
-                throw new Exception("Un prisme est déjà présent sur cette carte !");
+                //throw new Exception("Un prisme est déjà présent sur cette carte !");
             }
+        }
+
+        public void DeletePrism(PrismRecord prism)
+        {
+            PrismRecord.RemovePrismFromMapid(this.Record.Id);
+            this.Send(new GameContextRemoveElementMessage(-10000));
+            //todo: find how to free the subArea from the alliance
+            this.Prism = null;
         }
 
         private void RandomizePrismPosition(PrismRecord prismRecord, short playerSenderCellId = -1, short moveCellsCount = 2)

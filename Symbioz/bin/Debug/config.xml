@@ -1,10 +1,10 @@
 <!-- Symbioz Configuration -->
 <Configuration>
-  <CyclicSaveInterval>250</CyclicSaveInterval>
+  <CyclicSaveInterval>60</CyclicSaveInterval>
   <DatabaseHost>127.0.0.1</DatabaseHost>
   <DatabaseUser>root</DatabaseUser>
   <DatabasePassword></DatabasePassword>
-  <DatabaseName>Symbioz</DatabaseName>
+  <DatabaseName>symbioz</DatabaseName>
   <ServerId>22</ServerId>
   <AuthPort>443</AuthPort>
   <WorldPort>5556</WorldPort>
@@ -30,8 +30,10 @@
   <TimeBetweenSeekMessage>20</TimeBetweenSeekMessage>
   <TurnBeforeFightDisconnection>15</TurnBeforeFightDisconnection>
   <TimeBetweenCharacterSave>60</TimeBetweenCharacterSave>
+  <TimeBetweenStart>300</TimeBetweenStart>
   <TimeForUseKeyring>14400</TimeForUseKeyring>
   <ArchMonsterBySubArea>1</ArchMonsterBySubArea>
   <TimeBetweenSpawnArchMonster>1800</TimeBetweenSpawnArchMonster>
   <WelcomeSystemMessage>QmllbnZlbnVlIHN1ciBLcnlvbmUgMi4wIGjDqXJvaXF1ZSAhPGJyLz5Wb3VzIGNvbW1lbmNleiBhdmVjIHVuZSBwYW5vcGxpZSBhdmVudHVyaWVyIGV0IHVuIHRyb3Vzc2VhdSBkZSBjbGVmcyBwb3VyIGZhaXJlIGxlcyBkb25qb25zIGRpc3BvbmlibGVzLjxici8+DQpMZSBkcm9wIGQnaXRlbSBjZSBmYWl0IHN1ciBsZXMgbW9uc3RyZXMsIGxlIHRhdXggZGUgZHJvcCBlc3QgcHJvcG9ydGlvbm5lbCBhdSBuaXZlYXUgZGUgbCdvYmpldDxici8+DQpQb3VyIGF2b2lyIGxhIGxpc3RlIGRlcyBjb21tYW5kZXMgZGlzcG9uaWJsZSB0YXBlciAuaGVscA0KPC9icj5MZXMgYWxsaWFuY2VzIGV0IHByaXNtZSBkZSBjb25xdcOqdGUgc29udCBkaXNwb25pYmxlIGV0IGNvbmbDqHJlbnQgdW4gdGF1eCBkZSBkcm9wIGV0IGQneHAgcGx1cyDDqWxldsOpIGxvcnNxdWUgdm91cyDDqnRlcyBkYW5zIHZvdHJlIHpvbmUNClNpIHZvdXMgYXBlcmNldmV6IGxlIG1vaW5kcmUgc291Y2lzLCB0YXBleiBsYSBjb21tYW5kZSAuYnVnIHBvdXIgcmVwb3J0ZXIgdW4gYnVnDQpMZXMgaMO0dGVscyBkZSB2ZW50ZSBzb250IGRpc3BvbmlibGUgYSBCb250YSBldCBCcmFrbWFyIHBvdXIgZMOpdmVsb3BwZXIgdm90cmUgY29tbWVyY2UgYWluc2kgcXVlIGxlIG1vZGUgbWFyY2hhbmQgbWFpcyBpbCB5IGF1c3NpIGRlcyBQTkpTIGF1IHphYXAgYXN0cnViIHBvdXIgdmVuZHJlIGRlcyBvYmpldHMgdXRpbGVzIGVuIHRvdXQgZ2VucmUgY29udHJlIGRlcyBrYW1hcyBvdSBkZXMgcMOpcGl0ZXM8YnIvPg0KQm9uIGpldSBzdXIgbm9zIHNlcnZldXJzICE=</WelcomeSystemMessage>
 </Configuration>
+

@@ -29,37 +29,45 @@ namespace Symbioz.Providers.ActorIA.Actions
         }
         public override void Execute(MonsterFighter fighter)
         {
-            var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
-            int po = 2;
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))
+            try
             {
-                foreach (int s in spell.SpellLevels)
+                var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
+                int po = 2;
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))
                 {
-                    SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
-                    if (record == null)
-                        continue;
-                    if (po < record.MaxRange)
-                        po = record.MaxRange;
+                    foreach (int s in spell.SpellLevels)
+                    {
+                        SpellLevelRecord record = SpellLevelRecord.GetLevel(s);
+                        if (record == null)
+                            continue;
+                        if (po < record.MaxRange)
+                            po = record.MaxRange;
+                    }
+                }
+                Fighter lower = fighter.GetOposedTeam().LowerProchFighter(fighter, po);
+                if (lower == null)
+                    return;
+
+
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))
+                {
+                    TryCast(fighter, spell.Id, lower);
+                }
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Agress))
+                {
+                    TryCast(fighter, spell.Id, lower);
+                }
+                foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Undefined))
+                {
+                    TryCast(fighter, spell.Id, lower);
                 }
             }
-            Fighter lower = fighter.GetOposedTeam().LowerProchFighter(fighter, po);
-            if (lower == null)
-                return;
-
-            
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Damages))
+            catch (Exception error)
             {
-                TryCast(fighter, spell.Id,lower);
-            }
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Agress))
-            {
-                TryCast(fighter, spell.Id,lower);
-            }
-            foreach (var spell in spells.FindAll(x => x.Category == SpellCategoryEnum.Undefined))
-            {
-                TryCast(fighter, spell.Id,lower);
+                Logger.Error(error);
             }
 
         }
+
     }
 }

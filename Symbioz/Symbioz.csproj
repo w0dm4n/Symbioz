@@ -102,8 +102,11 @@
     <Compile Include="Providers\ActorIA\Actions\AnimatedBagAction.cs" />
     <Compile Include="Providers\ActorIA\Actions\BuffTeamAction.cs" />
     <Compile Include="Providers\ActorIA\Actions\CastAction.cs" />
+    <Compile Include="Providers\ActorIA\Actions\CastDiagonalAction.cs" />
+    <Compile Include="Providers\ActorIA\Actions\CastOnLineAction.cs" />
     <Compile Include="Providers\ActorIA\Actions\FleeAction.cs" />
-    <Compile Include="Providers\ActorIA\Actions\MoveToLowerAllyAction.cs" />
+    <Compile Include="Providers\ActorIA\Actions\MoveToDiagonalLowerEnemy.cs" />
+    <Compile Include="Providers\ActorIA\Actions\MoveToLowerAllignedEnemy.cs" />
     <Compile Include="Providers\ActorIA\Actions\TrySummonAction.cs" />
     <Compile Include="Providers\ActorIA\EnvironementAnalyser.cs" />
     <Compile Include="Providers\ActorIA\IAActionsEnum.cs" />
@@ -138,6 +141,7 @@
     <Compile Include="RawData\RawMessages\MerchantMessage.cs" />
     <Compile Include="RawData\RawMessages\MotdAllianceMessage.cs" />
     <Compile Include="RawData\RawMessages\RawMessage.cs" />
+    <Compile Include="RawData\RawMessages\ReviveMessage.cs" />
     <Compile Include="World\CyclicMerchantAdsTask.cs" />
     <Compile Include="World\Handlers\ActorLook.cs" />
     <Compile Include="World\Handlers\AlllianceHandler.cs" />
@@ -152,6 +156,10 @@
     <Compile Include="Network\CharactersDisconnected.cs" />
     <Compile Include="World\Models\Alliances\Prisms\PrismsManager.cs" />
     <Compile Include="World\Models\Challenges\ChallengesInstance.cs" />
+    <Compile Include="World\Models\Exchanges\NpcShopExchange.cs" />
+    <Compile Include="World\Models\Exchanges\NpcTradeExchange.cs" />
+    <Compile Include="World\Models\Exchanges\PlayerTrader.cs" />
+    <Compile Include="World\Models\Exchanges\PlayerTradeRequest.cs" />
     <Compile Include="World\Models\Exchanges\PrismExchange.cs" />
     <Compile Include="World\Models\Exchanges\ShopStockExchange.cs" />
     <Compile Include="World\Models\Fights\CastSpellCheck\CharacterStates.cs" />
@@ -165,7 +173,6 @@
     <Compile Include="World\Models\Fights\StartTurn\StartTurnSadida.cs" />
     <Compile Include="World\Models\Items\CharacterKeyring.cs" />
     <Compile Include="World\Models\Maps\AvAState.cs" />
-    <Compile Include="World\Models\Parties\Dungeon\DungeonPartyProvider.cs" />
     <Compile Include="Providers\FightResults\Exp\ExperienceFormulas.cs" />
     <Compile Include="Providers\FightResults\Exp\GroupMemberData.cs" />
     <Compile Include="Providers\FightResults\Exp\MonsterData.cs" />
@@ -197,7 +204,6 @@
     <Compile Include="World\Handlers\GuildHandler.cs" />
     <Compile Include="World\Handlers\PartyHandler.cs" />
     <Compile Include="World\Handlers\PvPHandler.cs" />
-    <Compile Include="World\Models\Parties\Dungeon\DungeonPartyCharacter.cs" />
     <Compile Include="World\Models\Exchanges\Craft\Replay\CraftReplayEngine.cs" />
     <Compile Include="World\Models\Exchanges\Craft\Replay\ReplayEngine.cs" />
     <Compile Include="World\Models\Exchanges\Craft\Replay\SmithMagicReplayEngine.cs" />
@@ -311,9 +317,10 @@
     <Compile Include="World\Models\Maps\MapScrollType.cs" />
     <Compile Include="World\Models\Monsters\DroppedItem.cs" />
     <Compile Include="World\Models\Monsters\MonsterGroup.cs" />
+    <Compile Include="World\Models\Monsters\MonsterSpawnManager.cs" />
     <Compile Include="World\Models\Parties\Party.cs" />
-    <Compile Include="World\Models\Parties\PartyGuest.cs" />
-    <Compile Include="World\Models\Parties\PartyMember.cs" />
+    <Compile Include="World\Models\Parties\PartyInvitation.cs" />
+    <Compile Include="World\Models\Parties\PartyProvider.cs" />
     <Compile Include="World\Models\Succes\SuccesRewards.cs" />
     <Compile Include="World\PathProvider\CoordCells.cs" />
     <Compile Include="World\PathProvider\Node.cs" />
@@ -329,6 +336,7 @@
     <Compile Include="World\Records\Alliances\Prisms\PrismRecord.cs" />
     <Compile Include="World\Records\Challenges\ChallengesRecord.cs" />
     <Compile Include="World\Records\Character\CharacteristicRecord.cs" />
+    <Compile Include="World\Records\Character\CharactersInvisibleRecord.cs" />
     <Compile Include="World\Records\Character\CharactersMerchantsRecord.cs" />
     <Compile Include="World\Records\Character\EmoteRecord.cs" />
     <Compile Include="World\Records\Character\GeneralShortcutRecord.cs" />
@@ -338,6 +346,7 @@
     <Compile Include="World\Records\Companions\CompanionsCharacteristics.cs" />
     <Compile Include="World\Records\Companions\CompanionSpellRecord.cs" />
     <Compile Include="World\Records\DungeonsIdRecord.cs" />
+    <Compile Include="World\Records\DungeonsRewardRecord.cs" />
     <Compile Include="World\Records\Emblems\EmblemSymbol.cs" />
     <Compile Include="World\Records\Friends\FriendsRecord.cs" />
     <Compile Include="World\Records\Guilds\CharacterGuildRecord.cs" />
@@ -356,6 +365,7 @@
     <Compile Include="World\Records\Maps\MapScrollActionRecord.cs" />
     <Compile Include="World\Records\Maps\MapTriggerRecord.cs" />
     <Compile Include="World\Records\Monsters\DungeonRecord.cs" />
+    <Compile Include="World\Records\ShopLogsRecord.cs" />
     <Compile Include="World\Records\Spells\BombWallRecord.cs" />
     <Compile Include="World\Records\Spells\CharacterSpellRecord.cs" />
     <Compile Include="World\Records\Character\ExperienceRecord.cs" />

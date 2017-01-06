@@ -33,9 +33,17 @@ namespace Symbioz.World.Models.Fights.Damages
         {
             if (source == null)
                 return;
-            short elementBonus = 0;
-            short elementReduction = 0;
-            double elementResistPercent = 0;
+            short elementBonus = 0;//statsC
+            short elementReduction = 0;//resfT
+            double elementResistPercent = 0;//respT
+            double mulT = 1;
+            double a = 1;//calcul
+            double i = 0;//bonus maitrise
+            double j = 100;//bonus classe
+            double domC = 0, perdomC = 0;
+            int multiplier = 0;
+                domC = source.FighterStats.Stats.AllDamagesBonus;
+                perdomC = source.FighterStats.Stats.AllDamagesBonusPercent;
             switch (ElementType)
             {
                 case ElementType.Earth:
@@ -71,9 +79,18 @@ namespace Symbioz.World.Models.Fights.Damages
                 default:
                     break;
             }
-            Delta += elementBonus;
+            //Delta += elementBonus;
             if (source.UsingWeapon)
-                Delta += (short)((source.FighterStats.Stats.WeaponDamagesBonusPercent / 100) * Delta);
+            {
+                i = source.FighterStats.Stats.WeaponDamagesBonusPercent;
+                a = (((100 + (i / 5)) / 100) * (100 / 100));//lavant dernier 100 c'est bonus classe sur un cac mais pas fait pour le moment
+            }
+            //Delta += (short)((source.FighterStats.Stats.WeaponDamagesBonusPercent / 100) * Delta);
+
+            float lok = ((100 + elementBonus) / 100);
+            if (lok < 1)
+                lok = 1;
+            Delta = (short)(mulT * a * (Delta * lok) + domC);//dégats bruts
             if (elementResistPercent != 0)
                 Delta = (short)(Delta - elementReduction - (elementResistPercent/ 100 * Delta));
             else

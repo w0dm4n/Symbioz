@@ -13,8 +13,7 @@ namespace Symbioz.World.Models.Fights.CastSpellCheck
         public static bool MonsterSpellStatesChecker(Fighter Caster, List<Fighter> affecteds, SpellLevelRecord Record, ExtendedSpellEffect Effect)
         {
             List<MonsterFighter> mobs = new List<MonsterFighter>();
-
-            Logger.Log("LUNCH SPELL CHECK");
+            
             foreach (var affected in affecteds)
             {
                 if (affected is MonsterFighter)

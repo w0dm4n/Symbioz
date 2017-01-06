@@ -14,10 +14,10 @@ using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.World.Records;
 using Symbioz.World.Models;
-using Symbioz.World.Models.Parties;
 using Shader.Helper;
 using Symbioz.ORM;
 using Symbioz.Auth.Records;
+using System.Threading;
 
 namespace Symbioz.Network.Servers
 {
@@ -26,8 +26,9 @@ namespace Symbioz.Network.Servers
         public int InstanceMaxConnected = 0;
         public ServerStatusEnum ServerState = ServerStatusEnum.ONLINE;
         public List<WorldClient> WorldClients = new List<WorldClient>();
-        public List<Party> Parties = new List<Party>();
         public SSyncServer Server { get; set; }
+        public DateTime StartTime { get; set; }
+
         public WorldServer()
         {
             this.Server = new SSyncServer(ConfigurationManager.Instance.Host, ConfigurationManager.Instance.WorldPort);
@@ -39,9 +40,19 @@ namespace Symbioz.Network.Servers
         void Server_OnSocketAccepted(Socket socket)
         {
             Logger.World("New client connected!");
-            WorldClients.Add(new WorldClient(socket));
-            if (WorldClients.Count > InstanceMaxConnected)
-                InstanceMaxConnected = WorldClients.Count;
+
+            Monitor.Enter(this.WorldClients);
+            try
+            {
+                WorldClients.Add(new WorldClient(socket));
+                if (WorldClients.Count > InstanceMaxConnected)
+                    InstanceMaxConnected = WorldClients.Count;
+            }
+            finally
+            {
+                Monitor.Exit(this.WorldClients);
+            }
+            
         }
 
         void Server_OnServerFailedToStart(Exception ex)
@@ -52,6 +63,9 @@ namespace Symbioz.Network.Servers
         void Server_OnServerStarted()
         {
             Logger.World("Server started (" + Server.EndPoint.AsIpString() + ")");
+            this.StartTime = new DateTime();
+            this.StartTime = DateTime.Now;
+
         }
         public void Start()
         {
@@ -68,6 +82,14 @@ namespace Symbioz.Network.Servers
                 client.Send(new ServersListMessage(servers, 0, true));
             }
         }
+        
+        public string GetUptime()
+        {
+            DateTime now = DateTime.Now;
+            TimeSpan span = now.Subtract(this.StartTime);
+            return span.Hours + ":" + span.Minutes + ":" + span.Seconds;
+        }
+
         public void Send(Message message)
         {
             WorldClients.ForEach(x => x.Send(message));
@@ -82,30 +104,65 @@ namespace Symbioz.Network.Servers
         }
         public void RemoveClient(WorldClient client)
         {
-            bool remove = true;
-            if (client != null && client.Character != null)
+            try
             {
-                if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+                bool remove = true;
+                if (client != null && client.Character != null)
                 {
-                    CharactersDisconnected.add(client.Character);
-                    client.Character.FighterInstance.Fight.FighterDisconnect(client.Character.FighterInstance);
-                    remove = false;
+                   /* if (client.Character.FighterInstance != null && client.Character.FighterInstance.Fight != null)
+                    {
+                        CharactersDisconnected.add(client.Character);
+                        client.Character.FighterInstance.Fight.FighterDisconnect(client.Character.FighterInstance);
+                        remove = false;
+                    }*/
+                    if (client.Character != null && client.Character.CurrentStats != null)
+                    {
+                        client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
+                        if (client.Character.IsRegeneratingLife)
+                            client.Character.StopRegenLife();
+                    }
+                    AccountsProvider.UpdateAccountsOnlineState(client.Account.Id, false);
+                    client.Character.Record.LastConnection = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                    if (client.Character != null)
+                    {
+                        client.Character.Dispose();
+                        client.Character = null;
+                    }
                 }
-                client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
-                if (client.Character.IsRegeneratingLife)
-                    client.Character.StopRegenLife();
-                AccountsProvider.UpdateAccountsOnlineState(client.Account.Id, false);
-                client.Character.Record.LastConnection = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                if (client.Character != null)
-                    client.Character.Dispose();
+
+                if (remove == true)
+                {
+                    Monitor.Enter(this.WorldClients);
+                    try
+                    {
+                        WorldClients.Remove(client);
+
+                    }
+                    finally
+                    {
+                        Monitor.Exit(this.WorldClients);
+                    }
+                }
+                Logger.World("Client disconnected!");
             }
-            if (remove == true)
-                WorldClients.Remove(client);
-            Logger.World("Client disconnected!");
+            catch(Exception error)
+            {
+                Logger.Log(error);
+            }
         }
         public List<WorldClient> GetAllClientsOnline()
         {
-            return WorldClients.FindAll(x => x.Character != null);
+            List<WorldClient> clients = null;
+            Monitor.Enter(this.WorldClients);
+            try
+            {
+                clients = WorldClients.FindAll(x => x.Character != null);
+            }
+            finally
+            {
+                Monitor.Exit(this.WorldClients);       
+            }
+            return clients;
         }
         public WorldClient GetOnlineClient(int characterid)
         {
@@ -119,6 +176,17 @@ namespace Symbioz.Network.Servers
         {
             return GetAllClientsOnline().Find(x => x.Account.Id == accountId);
         }
+
+        public List<WorldClient> GetAllOnlineClientByAccountId(int accountId)
+        {
+            List<WorldClient> accounts = new List<WorldClient>();
+            foreach (var client in this.GetAllClientsOnline())
+            {
+                if (client.Account.Id == accountId)
+                    accounts.Add(client);
+            }
+            return accounts;
+        }
         public List<WorldClient> GetOnlineClientOnMap(int mapId)
         {
            var onlineClients =  WorldClients.FindAll(x => x.Character != null);
@@ -130,25 +198,7 @@ namespace Symbioz.Network.Servers
             }
             return onTheMap;
         }
-
-        public Party GetPartyById(int partyId)
-        {
-            return this.Parties.Find(x => x.Id == partyId);
-        }
-        public Party GetPartyByCharacterId(int characterId)
-        {
-            foreach(WorldClient c in this.WorldClients)
-            {
-                if(c.Character.Id == characterId)
-                {
-                    if(c.Character.PartyMember != null)
-                    {
-                        return c.Character.PartyMember.Party;
-                    }
-                }
-            }
-            return null;
-        }
+ 
         public bool IsConnected(string characterName)
         {
             return GetOnlineClient(characterName) != null;

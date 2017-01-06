@@ -19,16 +19,20 @@ namespace Symbioz.World.Models
         public static short STARS_BONUS_LIMIT = 100;
         public const int START_ID = 100000000;
 
-        public MonsterGroup(int monstergroupid,List<MonsterSpawnMapRecord> monsters,ushort cellid)
+        public MonsterGroup(int monstergroupid,List<MonsterSpawnMapRecord> monsters,ushort cellid, int subArea)
         {
             this.MonsterGroupId = monstergroupid;
             this.Monsters = monsters;
             this.CellId = cellid;
             this.CreationDate = DateTime.Now;
+            SubAreaId = subArea;
+            ItemsToDrop = new List<CharacterItemRecord>();
         }
         public ushort CellId { get; set; }
         public int MonsterGroupId { get; set; }
         public DateTime CreationDate { get; set; }
+        public int SubAreaId { get; set; }
+        public List<CharacterItemRecord> ItemsToDrop { get; set; }
         public short AgeBonus
         {
             get
@@ -61,19 +65,23 @@ namespace Symbioz.World.Models
             var random = new AsyncRandom();
             var firstMonster = group.Monsters[0];
             var firstMonsterTemplate = MonsterRecord.GetMonster(firstMonster.MonsterId);
+            if (firstMonsterTemplate == null)
+                return null;
             var light = new MonsterInGroupLightInformations(firstMonsterTemplate.Id, (sbyte)random.Next(1, 6));
             List<MonsterInGroupInformations> monstersinGroup = new List<MonsterInGroupInformations>();
             for (int i = 1; i < group.Monsters.Count; i++)
             {
                 var mob = group.Monsters[i];
                 var template = MonsterRecord.GetMonster(mob.MonsterId);
-                monstersinGroup.Add(new MonsterInGroupInformations(mob.MonsterId, mob.ActualGrade, template.RealLook.ToEntityLook()));
+                if (template != null && template.RealLook != null)
+                    monstersinGroup.Add(new MonsterInGroupInformations(mob.MonsterId, mob.ActualGrade, template.RealLook.ToEntityLook()));
             }
             var staticInfos = new GroupMonsterStaticInformations(light, monstersinGroup);
 
             return new GameRolePlayGroupMonsterInformations(group.MonsterGroupId, firstMonsterTemplate.RealLook.ToEntityLook(),
                 new EntityDispositionInformations((short)group.CellId, 3), false, false, false, staticInfos,group.AgeBonus, 0, 0);
         }
+
         public static List<GameRolePlayGroupMonsterInformations> GetActorsInformations(MapRecord map,List<MonsterGroup> groups)
         {
            

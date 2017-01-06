@@ -15,6 +15,7 @@ namespace Symbioz.Providers.ActorIA
         MonsterFighter m_fighter { get; set; }
 
         int m_action_Index = 0;
+  
         public MonsterBrain(MonsterFighter fighter, List<int> actions)
         {
             this.m_fighter = fighter;
@@ -23,41 +24,55 @@ namespace Symbioz.Providers.ActorIA
 
         protected void NextAction()
         {
-        //    try
+            try
             {
                 Actions[m_action_Index].Execute(m_fighter);
             }
-       //     catch (Exception ex)
+            catch (Exception ex)
             {
-              //  m_fighter.Fight.GetAllCharacterFighters().ForEach(x => x.Client.Character.NotificationError("(" + m_fighter.GetName() + ")" + ex));
-
+                Logger.Error("Actor AI error " + ex);
             }
-      //      finally
+            finally
             {
+                //pass a l'action suivante dans tout les cas
                 OnActionEnded();
             }
         }
         protected void OnActionEnded()
         {
-            
-            m_action_Index++;
-            if (Actions.Count() == m_action_Index)
+            try
             {
-                m_action_Index = 0;
-                return;
+                m_action_Index++;
+                //Si index action >= Count() return
+                if (Actions.Count() <= m_action_Index)
+                {
+                    m_action_Index = 0;
+                    return;
+                }
+                if (!m_fighter.Dead && !m_fighter.Fight.Ended)
+                {
+                    NextAction();
+                }
             }
-            if (!m_fighter.Dead && !m_fighter.Fight.Ended)
+            catch (Exception error)
             {
-                NextAction();
+                Logger.Error(error);
             }
         }
         public void StartPlay()
         {
-            int boucle = 4;
-            while (boucle > 0)
+            try
             {
-                NextAction();
-                boucle--;
+                int action = 0;
+                while (action <= 4)
+                {
+                    NextAction();
+                    action++;
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
             }
         }
     }

@@ -82,18 +82,41 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
             var target = fighter.Fight.GetFighter(castcellid);
             var direction = ShapesProvider.GetDirectionFromTwoCells(target.CellId, fighter.CellId);
             short destinationCell = (short)((target.CellId * 2) - fighter.CellId);
-            if (ShapesProvider.IsDiagonalDirection(direction))
+
+            bool isonleft = Pathfinding.isOnLeftLine(target.CellId);
+            
+            int line = Pathfinding.getSeparatedNumberOfLines(target.CellId, fighter.CellId);
+
+            int l = 15;
+            if (isonleft)
+                l = 14;
+            //line *= 2;
+            var infinite = 0;
+            short addlines = 0;
+            while (line > 0)
             {
-                if (PathHelper.GetDistanceBetween(fighter.CellId, target.CellId) % 2 != 0) {
-                    destinationCell = (short)((target.CellId * 2) - fighter.CellId - 1);
-                }
+                if (l == 14)
+                    l = 15;
                 else
-                    destinationCell = (short)((target.CellId * 2) - fighter.CellId);
+                {
+                    addlines += 1;
+                    l = 14;
+                }
+                line--;
+                if (infinite > 100000)
+                    break;
+                infinite++;
             }
-            else if (PathHelper.GetDistanceBetween(fighter.CellId, castcellid) % 2 != 0)
+
+            short add = (short)(((target.CellId) - fighter.CellId) * 2);
+            if (!PathHelper.GetDiagonalcells(target.Fight, target.CellId).Contains(fighter.CellId))//si c'est une diagonal juste ont ajoute rien
             {
-                destinationCell = (short)((target.CellId * 2) - fighter.CellId -1);
+                if (fighter.CellId < target.CellId)
+                    add += addlines;
+                else
+                    add -= addlines;
             }
+            destinationCell = (short)(fighter.CellId + add);
             if (fighter.Fight.IsObstacle(destinationCell) && fighter.Fight.GetFighter(destinationCell) == null)
                 return;
             if (fighter.Fight.GetFighter(destinationCell) != null)

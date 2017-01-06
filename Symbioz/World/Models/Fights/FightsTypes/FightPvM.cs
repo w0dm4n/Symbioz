@@ -25,6 +25,14 @@ namespace Symbioz.World.Models.Fights
             }
         }
 
+        public double AttackersPlacementPhaseTime
+        {
+            get
+            {
+                return 60000;
+            }
+        }
+
         public override bool SpawnJoin { get { return true; } }
 
         public override bool PvP { get { return false; } }
@@ -33,17 +41,36 @@ namespace Symbioz.World.Models.Fights
         {
             get { return true; ; }
         }
+
         public MonsterGroup MonsterGroup { get; set; }
+
         public FightPvM(int id, MapRecord map, FightTeam blueteam, FightTeam redteam, short fightcellid, MonsterGroup group)
             : base(id, map, blueteam, redteam, fightcellid)
         {
             this.MonsterGroup = group;
         }
+
         public override void StartPlacement()
         {
             Map.Instance.RemoveMonsterGroup(MonsterGroup.MonsterGroupId);
+            this.StartPhaseReady();
             base.StartPlacement();
         }
+
+        public void StartFight(System.Timers.Timer Timer, FightPvM fight)
+        {
+            fight.StartFight();
+            Timer.Enabled = false;
+        }
+
+        public void StartPhaseReady()
+        {
+            var Timer = new System.Timers.Timer();
+            Timer.Interval = 60000;
+            Timer.Elapsed += (sender, e) => { StartFight(Timer, this); };
+            Timer.Enabled = true;
+        }
+
         public override FightCommonInformations GetFightCommonInformations()
         {
             List<FightTeamInformations> teams = new List<FightTeamInformations>();
@@ -54,6 +81,7 @@ namespace Symbioz.World.Models.Fights
             positions.Add((ushort)Map.CloseCell(FightCellId));
             return new FightCommonInformations(Id, (sbyte)FightType, teams, positions, new List<FightOptionsInformations>() { BlueTeam.TeamOptions, RedTeam.TeamOptions });
         }
+
         public override void TryJoin(WorldClient client, int mainfighterid)
         {
             var mainFighter = GetAllFighters().Find(x => x.ContextualId == mainfighterid);
@@ -64,12 +92,13 @@ namespace Symbioz.World.Models.Fights
             }
             if (CanJoin(client, BlueTeam, mainFighter))
             {
-                var newFighter = client.Character.CreateFighter(BlueTeam);
+                var newFighter = client.Character.CreateFighter(BlueTeam, this);
                 BlueTeam.AddFighter(newFighter);
                 GetAllFighters().ForEach(x => x.ShowFighter(client));
                 Map.Instance.OnFighterAdded(Id, BlueTeam.Id, newFighter.GetFightMemberInformations());
             }
         }
+
         public override void ShowFightResults(List<FightResultListEntry> results, WorldClient client)
         {
             //todo: print chall failed if fight lose

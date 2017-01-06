@@ -20,6 +20,8 @@ using Symbioz.Network;
 using Shader.Helper;
 using Symbioz.DofusProtocol.Messages;
 using System.Drawing;
+using Symbioz.World.Records.Items;
+using Symbioz.World.Records.Alliances.Prisms;
 
 namespace Symbioz.Providers.FightResults
 {
@@ -31,7 +33,7 @@ namespace Symbioz.Providers.FightResults
         public List<FightResultAdditionalData> AdditionalDatas = new List<FightResultAdditionalData>();
         public byte PlayerLevel { get; set; }
         public FightLoot FightLoot = new FightLoot(new List<ushort>(), 0);
-        public FightResultPlayer(CharacterFighter fighter, TeamColorEnum winner, bool forLeaver = false)
+        public FightResultPlayer(CharacterFighter fighter, TeamColorEnum winner, ulong xpwinnable, bool forLeaver = false)
             : base(fighter, winner)
         {
             this.PlayerLevel = fighter.Client.Character.Record.Level;
@@ -46,6 +48,13 @@ namespace Symbioz.Providers.FightResults
                             fighter.Fight.LoadDeadItems((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.RedTeam.GetCharacterFighters(true) : fighter.Fight.BlueTeam.GetCharacterFighters(true));
                         GeneratePlayerLoot((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.BlueTeam.GetCharacterFighters(true) : fighter.Fight.RedTeam.GetCharacterFighters(true), fighter);
                         fighter.AlreadyDropped = true;
+
+                        //gain de 25% des gagnants
+                        var expWon = xpwinnable;
+                        client.Character.AddXp((ulong)expWon);
+                        PlayerLevel = client.Character.Record.Level;
+                        var expdatas = new FightResultExperienceData(true, true, true, true, false, false, false, client.Character.Record.Exp, ExperienceRecord.GetExperienceForLevel(client.Character.Record.Level), ExperienceRecord.GetExperienceForLevel((uint)client.Character.Record.Level + 1), (int)expWon, 0, 0, 0);
+                        AdditionalDatas.Add(expdatas);
                     }
                     else if (fighter.Fight is FightPvM)
                         GeneratePVMLoot();
@@ -70,6 +79,24 @@ namespace Symbioz.Providers.FightResults
                             Data[0] = client.Character.Record.Name;
                             client.Send(new TextInformationMessage(1, 190, Data));
                         }
+                    }
+                    var groupSubArea = MonsterSpawnManager.GetMonsterSpawnBySubArea(fighter.Fight.Map.SubAreaId);
+                    if(groupSubArea != null)
+                    {
+                        for (int i = 0; i < (fighter as CharacterFighter).Client.Character.Inventory.GetAllItems().Count; i++)
+                        {
+                            Random rdm = new Random();
+                            var group = groupSubArea.Find(x => x.MonsterGroupId == rdm.Next(MonsterGroup.START_ID, groupSubArea.Last().MonsterGroupId));
+                            while (group == null)
+                            {
+                                group = groupSubArea.Find(x => x.MonsterGroupId == rdm.Next(MonsterGroup.START_ID, groupSubArea.Last().MonsterGroupId));
+                            }
+                            if (group != null)
+                            {
+                                var item = (fighter as CharacterFighter).Client.Character.Inventory.GetAllItems()[i];
+                                group.ItemsToDrop.Add(item);
+                            }
+                        }  
                     }
                 }
                 if (fighter.Fight is FightAvAPrism)
@@ -96,14 +123,6 @@ namespace Symbioz.Providers.FightResults
                             fighter.Fight.LoadDeadItems((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.RedTeam.GetCharacterFighters(true) : fighter.Fight.BlueTeam.GetCharacterFighters(true));
                         GeneratePlayerLoot((fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM) ? fighter.Fight.BlueTeam.GetCharacterFighters(true) : fighter.Fight.RedTeam.GetCharacterFighters(true), fighter);
                         fighter.AlreadyDropped = true;
-
-                        if (fighter.Team.IsDefenders)
-                        {
-                            //client.Character.Reply("Votre prisme a survécu, félicitations !", Color.Orange);
-                        }
-                        else
-                        {
-                        }
                     }
                 }
                 if (fighter.Fight is FightArena && winner == fighter.Team.TeamColor)
@@ -180,11 +199,18 @@ namespace Symbioz.Providers.FightResults
         {
             WorldClient client = (Fighter as CharacterFighter).Client;
             var WinnerNumber = Winners.Count;
+            int killedPlayers = 0;
             var willDrop = fighter.Fight.ListDeadsItemsStartSize / Winners.Count;
             int[] dropped = new int[willDrop];
             int index = 0;
             int infinite = 0;
             Random rand = new Random();
+
+            if (fighter.Team.TeamColor == TeamColorEnum.BLUE_TEAM)
+                killedPlayers = fighter.Fight.RedTeam.GetCharacterFighters(true).Count;
+            else if (fighter.Team.TeamColor == TeamColorEnum.RED_TEAM)
+                killedPlayers = fighter.Fight.BlueTeam.GetCharacterFighters(true).Count;
+            client.Character.increasePlayersKilled(killedPlayers);
             while (willDrop != 0)
             {
                 if (Winners.Count != 1)
@@ -230,7 +256,7 @@ namespace Symbioz.Providers.FightResults
                         FightLoot.objects.Add(1);
                         if (fighter.AlreadyDropped == false)
                         {
-                            client.Character.Inventory.Add((ushort)item.Id, 1, false, false);
+                            client.Character.Inventory.AddWeapon((ushort)item.Id, 1, false, false);
                             fighter.Fight.DeleteFromDeadItems(item.Id);
                         }
                     }
@@ -238,6 +264,76 @@ namespace Symbioz.Providers.FightResults
              }
             client.Character.Inventory.Refresh();
             client.Character.RefreshShortcuts();
+        }
+
+
+        static void SendNotif(System.Timers.Timer Timer, WorldClient client)
+        {
+            client.Character.ShowNotification("Vous avez obtenu un bonus d'expérience (<b>X2</b>) et de drop (<b>X2</b>) car votre alliance possède ce territoire !");
+            Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
+        }
+        public double CheckDropBonusPrism(double dropChance, Fight fight, WorldClient client)
+        {
+            bool OwnTerritory = false;
+            if (PrismRecord.PrismOnSubArea(fight.Map.SubAreaId))
+            {
+                if (client.Character.HasAlliance)
+                {
+                    var alliance = client.Character.GetAlliance();
+                    if (alliance != null)
+                    {
+                        var prisms = PrismRecord.GetAlliancePrisms(alliance.Id);
+                        foreach (var prism in prisms)
+                        {
+                            if (prism.SubAreaId == fight.Map.SubAreaId)
+                            {
+                                OwnTerritory = true;
+                                break;
+                            }
+                        }
+                        if (OwnTerritory == true)
+                        {
+                            var Timer = new System.Timers.Timer();
+                            Timer.Interval = 1500;
+                            Timer.Elapsed += (sender, e) => { SendNotif(Timer, client); };
+                            Timer.Enabled = true;
+                            return dropChance * 1.5;
+                        }
+                    }
+                }
+            }
+            return dropChance;
+        }
+
+        public double CheckExpBonusPrism(double exp, Fight fight, WorldClient client)
+        {
+            bool OwnTerritory = false;
+            if (PrismRecord.PrismOnSubArea(fight.Map.SubAreaId))
+            {
+                if (client.Character.HasAlliance)
+                {
+                    var alliance = client.Character.GetAlliance();
+                    if (alliance != null)
+                    {
+                        var prisms = PrismRecord.GetAlliancePrisms(alliance.Id);
+                        foreach (var prism in prisms)
+                        {
+                            if (prism.SubAreaId == fight.Map.SubAreaId)
+                            {
+                                OwnTerritory = true;
+                                break;
+                            }
+                        }
+                        if (OwnTerritory == true)
+                        {
+                            return exp * 1.5;
+                        }
+                    }
+                }
+            }
+            return exp;
         }
 
         public void GeneratePVMLoot()
@@ -253,6 +349,20 @@ namespace Symbioz.Providers.FightResults
 
             #region Kamas & Items Generation
             List<DroppedItem> m_drops = new List<DroppedItem>();
+            List<CharacterItemRecord> m_remove = new List<CharacterItemRecord>();
+            foreach(var items in pvmfight.MonsterGroup.ItemsToDrop)
+            {
+                if(items != null)
+                {
+                    items.CharacterId = client.CharacterId;
+                    client.Character.Inventory.AddItemRecordWithQuantity(items, items.Quantity, true);
+                    m_remove.Add(items);
+                }
+            }
+            for (int i = 0; i < m_remove.Count; i++)
+            {
+                pvmfight.MonsterGroup.ItemsToDrop.Remove(m_remove[i]);
+            }
             foreach (var monster in pvmfight.MonsterGroup.Monsters)
             {
                 var template = MonsterRecord.GetMonster(monster.MonsterId);
@@ -273,6 +383,7 @@ namespace Symbioz.Providers.FightResults
                     double dropchancePercent = (((item.GetDropRate(monster.ActualGrade) + pvmfight.MonsterGroup.AgeBonus / 5 + client.Character.CharacterStatsRecord.Prospecting / 100) / 4.5) * ConfigurationManager.Instance.ItemsDropRatio);
                     if (pvmfight.ChallengesInstance != null)
                         dropchancePercent = pvmfight.ChallengesInstance.GetDropBonus(dropchancePercent);
+                    dropchancePercent = this.CheckDropBonusPrism(dropchancePercent, this.Fighter.Fight, client);
                     if ((int)dropchancePercent == 0)
                         dropchancePercent = 2;
                     if (D <= dropchancePercent)
@@ -288,14 +399,23 @@ namespace Symbioz.Providers.FightResults
                             ItemRecord templateItem = ItemRecord.GetItem(item.ObjectId);
                             if (templateItem != null)
                             {
-                                if (client.Character.Record.Level >= templateItem.Level)
-                                    m_drops.Add(new DroppedItem(item.ObjectId, Q));
-                                else
+                                m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                            }
+                            else
+                            {
+                                WeaponRecord templateWeapon = WeaponRecord.GetWeapon(item.ObjectId);
+                                if (templateWeapon != null)
                                 {
-                                    if ((templateItem.Level - client.Character.Record.Level) <= 10)
-                                    {
+                                    if (client.Character.Record.Level >= templateWeapon.Level)
                                         m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                                    else
+                                    {
+                                        if ((templateWeapon.Level - client.Character.Record.Level) <= 10)
+                                        {
+                                            m_drops.Add(new DroppedItem(item.ObjectId, Q));
+                                        }
                                     }
+
                                 }
                             }
                         }
@@ -321,10 +441,23 @@ namespace Symbioz.Providers.FightResults
                     {
                         if (item_dropped < 2)
                         {
-                            FightLoot.objects.Add(item.GID);
-                            FightLoot.objects.Add(1);
-                            client.Character.Inventory.Add(item.GID, 1, false, false);
-                            item_dropped++;
+                            if (client.Character.Record.Level >= template.Level)
+                            {
+                                FightLoot.objects.Add(item.GID);
+                                FightLoot.objects.Add(1);
+                                client.Character.Inventory.Add(item.GID, 1, false, false);
+                                item_dropped++;
+                            }
+                            else
+                            {
+                                if ((template.Level - client.Character.Record.Level) <= 2)
+                                {
+                                    FightLoot.objects.Add(item.GID);
+                                    FightLoot.objects.Add(1);
+                                    client.Character.Inventory.Add(item.GID, 1, false, false);
+                                    item_dropped++;
+                                }
+                            }
                         }
                     }
                     else
@@ -353,9 +486,8 @@ namespace Symbioz.Providers.FightResults
             var team = Fighter.Team.GetFighters().FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x); ;
             ExperienceFormulas formulas = new ExperienceFormulas();
             formulas.InitXpFormula(new PlayerData(client.Character.Record.Level, client.Character.CharacterStatsRecord.Wisdom, client.Character.Record.DeathMaxLevel), monsters, team.ConvertAll<GroupMemberData>(x => new GroupMemberData(x.Client.Character.Record.Level, false)), this.Fighter.Fight, pvmfight.MonsterGroup.AgeBonus);
-            if (client.Character.Record.Level >= 200)
-                formulas._xpSolo = 0;
-            client.Character.AddXp((ulong)formulas._xpSolo);
+            var expWon = this.CheckExpBonusPrism(formulas._xpSolo, Fighter.Fight, client);
+            client.Character.AddXp((ulong)expWon);
             PlayerLevel = client.Character.Record.Level;
             var expdatas = new FightResultExperienceData(true, true, true, true, false, false, false, client.Character.Record.Exp, ExperienceRecord.GetExperienceForLevel(client.Character.Record.Level), ExperienceRecord.GetExperienceForLevel((uint)client.Character.Record.Level + 1), (int)formulas._xpSolo, 0, 0, 0);
             AdditionalDatas.Add(expdatas);

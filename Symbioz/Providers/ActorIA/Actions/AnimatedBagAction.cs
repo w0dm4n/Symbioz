@@ -12,7 +12,6 @@ namespace Symbioz.Providers.ActorIA.Actions
     {
         public override void Execute(MonsterFighter fighter)
         {
-            Logger.Log("ANIMATED_BAG");
             var martyrSpell = fighter.Template.Spells[0];
             Fighter lower = fighter.Team.LowerFighter();
             fighter.CastSpellOnTarget(martyrSpell, lower.ContextualId);

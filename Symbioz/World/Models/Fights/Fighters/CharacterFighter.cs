@@ -81,60 +81,110 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public override void Move(List<short> keys, short cellid, sbyte direction)
         {
-            CompanionFighter companion = GetCompanion();
-            if (companion != null && companion.IsPlaying)
-                companion.Move(keys, cellid, direction);
-            else
-                base.Move(keys, cellid, direction);
+            try
+            {
+                CompanionFighter companion = GetCompanion();
+                if (companion != null && companion.IsPlaying)
+                    companion.Move(keys, cellid, direction);
+                else
+                    base.Move(keys, cellid, direction);
+            } catch (Exception e)
+            {
+                Logger.Error(e);
+            }
         }
 
         public override void EndTurn()
         {
-            CompanionFighter companion = GetCompanion();
-            if (companion != null && companion.IsPlaying)
+            try
             {
-                companion.EndTurn();
-            }
-            else if (IsPlaying)
+                CompanionFighter companion = GetCompanion();
+                if (companion != null && companion.IsPlaying)
+                {
+                    companion.EndTurn();
+                }
+                else if (IsPlaying)
+                {
+                    if (this.Fight.ChallengesInstance != null)
+                        this.Fight.ChallengesInstance.HandleEndTurn(this);
+                    base.EndTurn();
+                    if (companion != null && !companion.Dead)
+                        companion.SwitchContext();
+                }
+            } catch (Exception e)
             {
-                if (this.Fight.ChallengesInstance != null)
-                    this.Fight.ChallengesInstance.HandleEndTurn(this);
-                base.EndTurn();
-                if (companion != null && !companion.Dead)
-                    companion.SwitchContext();
-            }
-        }
-
-        public override bool CastSpellOnTarget(ushort spellid, int targetid)
-        {
-            CompanionFighter companion = GetCompanion();
-            if (companion != null && companion.IsPlaying)
-            {
-                return companion.CastSpellOnTarget(spellid, targetid);
-            }
-            else
-            {
-                return base.CastSpellOnTarget(spellid, targetid);
+                Logger.Error(e);
             }
         }
 
-        public override bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0)
+        public override bool CastSpellOnTarget(ushort spellid, int targetid, bool checkRange = true)
         {
-            CompanionFighter companion = GetCompanion();
-            if (companion != null && companion.IsPlaying)
+            try
             {
-                return companion.CastSpellOnCell(spellid, cellid);
-            }
-            else
-            {
-                return base.CastSpellOnCell(spellid, cellid);
-            }
+                CompanionFighter companion = GetCompanion();
+                Fighter target = this.GetOposedTeam().getFighterById(targetid);
 
+                if (companion != null && companion.IsPlaying)
+                {
+                    if (target == null)
+                        return companion.CastSpellOnTarget(spellid, targetid);
+                    else
+                        return companion.CastSpellOnCell(spellid, target.CellId);
+                }
+                else
+                {
+                    if (checkRange == false)
+                    {
+                        if (target == null)
+                            return base.CastSpellOnTarget(spellid, targetid);
+                        else
+                            return base.CastSpellOnCell(spellid, target.CellId, 0, false);
+                    }
+                    if (target == null)
+                        return base.CastSpellOnTarget(spellid, targetid);
+                    else
+                        return base.CastSpellOnCell(spellid, target.CellId);
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return false;
+            }
+        }
+
+        public override bool CastSpellOnCell(ushort spellid, short cellid, int targetId = 0, bool checkRange = true)
+        {
+            try
+            {
+                CompanionFighter companion = GetCompanion();
+                if (companion != null && companion.IsPlaying)
+                {
+                    return companion.CastSpellOnCell(spellid, cellid, 0, checkRange);
+                }
+                else
+                {
+                    return base.CastSpellOnCell(spellid, cellid, 0, checkRange);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return false;
+            }
         }
 
         public CompanionFighter GetCompanion()
         {
-            return Fight.GetFighter<CompanionFighter>(x => x.Master == this);
+            if (Fight != null)
+            {
+                if (Fight is FightPvM || Fight is FightDual)
+                    return Fight.GetFighter<CompanionFighter>(x => x.Master == this);
+                else
+                    return null;
+            }
+            else
+                return null;
         }
 
         public void RemoveCompanion()
@@ -161,31 +211,50 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public void Leave()
         {
-            if (this.Disconnected)
-                return;
-            if (!Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PvM && Fight.FightType != FightTypeEnum.FIGHT_TYPE_AGRESSION)
+            try
             {
-                RemoveCompanion();
-                Fight.Send(new GameFightRemoveTeamMemberMessage((short)Fight.Id, Team.Id, ContextualId));
-                if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
-                    Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, ContextualId);
-                Team.RemoveFighter(this);
-                Fight.CheckFightEnd();
-                Client.Character.RejoinMap(Fight.SpawnJoin, false);
-            }
-            else
-            {
-                Client.Character.CurrentStats.LifePoints = 0;
-                if (HasLeft)
-                {
-                    Client.Character.NotificationError("Vous avez déjà quitter le combat !");
+                if (!Team.GetCharacterFighters(true).Contains(this))
                     return;
+                if (!Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PvM && Fight.FightType != FightTypeEnum.FIGHT_TYPE_AGRESSION)
+                {
+                    RemoveCompanion();
+                    Fight.Send(new GameFightRemoveTeamMemberMessage((short)Fight.Id, Team.Id, ContextualId));
+                    if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
+                        Fight.Map.Instance.OnFighterRemoved(Fight.Id, Team.Id, ContextualId);
+                    Team.RemoveFighter(this);
+                    Fight.CheckFightEnd();
+                    Client.Character.RejoinMap(Fight.SpawnJoin, false);
                 }
-                RemoveCompanion();
-                if (!Dead)
-                    Die();
-                HasLeft = true;
-                Fight.Synchronizer.Start(AknowlegeAndLeave);
+                else
+                {
+                    if (Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM && Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)
+                    {
+                        Client.Character.Record.DeathCount++;
+                        if (Client.Character.Record.DeathMaxLevel < Client.Character.Record.Level)
+                            Client.Character.Record.DeathMaxLevel = Client.Character.Record.Level;
+                        Client.Character.Record.Energy = 0;
+                        Client.Character.Look = ContextActorLook.Parse("{24}");
+                        Client.Character.Restrictions.cantMove = true;
+                        Client.Character.Restrictions.cantSpeakToNPC = true;
+                        Client.Character.Restrictions.cantExchange = true;
+                        Client.Character.Restrictions.cantAttackMonster = true;
+                        Client.Character.Restrictions.isDead = true;
+                        String[] Data = new string[1];
+                        Data[0] = Client.Character.Record.Name;
+                        Client.Send(new TextInformationMessage(1, 190, Data));
+                        Client.Character.CurrentStats.LifePoints = 0;
+                    }
+                    Team.RemoveFighter(this);
+                    RemoveCompanion();
+                    if (!Dead)
+                        Die();
+                    Fight.CheckFightEnd();
+                    HasLeft = true;
+                    this.AknowlegeAndLeave();
+                }
+            } catch(Exception e)
+            {
+                Logger.Error(e);
             }
         }
 
@@ -207,6 +276,14 @@ namespace Symbioz.World.Models.Fights.Fighters
                             Client.Character.Record.DeathMaxLevel = Client.Character.Record.Level;
                         Client.Character.Record.Energy = 0;
                         Client.Character.Look = ContextActorLook.Parse("{24}");
+                        Client.Character.Restrictions.cantMove = true;
+                        Client.Character.Restrictions.cantSpeakToNPC = true;
+                        Client.Character.Restrictions.cantExchange = true;
+                        Client.Character.Restrictions.cantAttackMonster = true;
+                        Client.Character.Restrictions.isDead = true;
+                        String[] Data = new string[1];
+                        Data[0] = Client.Character.Record.Name;
+                        Client.Send(new TextInformationMessage(1, 190, Data));
                     }
                 }
                 if (Fight.Started && Fight.FightType != FightTypeEnum.FIGHT_TYPE_PVP_ARENA)
@@ -217,21 +294,30 @@ namespace Symbioz.World.Models.Fights.Fighters
                 }
                 Client.Character.RejoinMap(Fight.SpawnJoin, false);
             }
-            catch { }
+            catch (Exception error)
+            {
+                Logger.Error(error);   
+            }
 
         }
 
         public override void Die()
         {
-            CompanionFighter companion = GetCompanion();
-            if (companion != null && !companion.Dead)
-                companion.SwitchContext();
-            base.Die();
+            try
+            {
+                CompanionFighter companion = GetCompanion();
+                if (companion != null && !companion.Dead)
+                    companion.SwitchContext();
+                base.Die();
+            } catch (Exception e)
+            {
+                Logger.Error(e);
+            }
         }
 
         public void OnDisconnect()
         {
-            if (Fight == null)
+            /*if (Fight == null)
                 return;
             if (this.TurnDisconnect > 0)
             {
@@ -249,13 +335,19 @@ namespace Symbioz.World.Models.Fights.Fighters
             if (!Fight.Started)
                 Leave();
             else
+            {*/
+            try
             {
-                HasLeft = true;
                 Die();
                 Leave();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
                 //AknowlegeAndLeave();
                 //Fight.OnCharacterFighters(x => x.Character.NotificationError(GetName() + " s'est déconnecté !"));
-            }
+            //}
         }
 
         public override void RefreshStats()
@@ -293,15 +385,22 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public override void StartTurn()
         {
-            if (this.Disconnected)
-                OnDisconnect();
-            base.StartTurn();
-            if (this.Client.Character.Record.Breed == 10)
-                StartTurnSadida.EffectAllTreeSadida(this);
-            RefreshStats();
-            Client.Send(new GameFightTurnStartPlayingMessage());
-            if (this.Disconnected)
-                base.EndTurn();
+            try
+            {
+                if (this.Disconnected)
+                    OnDisconnect();
+                base.StartTurn();
+                if (this.Client.Character.Record.Breed == 10)
+                    StartTurnSadida.EffectAllTreeSadida(this);
+                RefreshStats();
+                Client.Send(new GameFightTurnStartPlayingMessage());
+                if (this.Disconnected)
+                    base.EndTurn();
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void ShowPlacementCells()
@@ -315,22 +414,21 @@ namespace Symbioz.World.Models.Fights.Fighters
             {
                 case CastFailedReason.RANGE:
                     Client.Character.ReplyError("Vous n'avez pas la portée pour lancer ce sort.");
-
                     break;
                 case CastFailedReason.FIGHT_ENDED:
                     Client.Character.ReplyError("Le combat est terminé.");
                     break;
                 case CastFailedReason.FORBIDDEN_STATE:
-                    Client.Character.ReplyError("L'état dans lequel vous êtes ne convient pas.");
+                    Client.Character.ReplyError("Impossible dans votre état actuel.");
                     break;
                 case CastFailedReason.AP_COST:
                     Client.Character.ReplyError("Vous n'avez pas assez de PA pour lancer ce sort.");
                     break;
                 case CastFailedReason.CAST_LIMIT:
-                    Client.Character.ReplyError("Lancé par tour limité.");
+                    RefreshStats();
                     break;
                 case CastFailedReason.NOT_PLAYING:
-                    Client.Character.ReplyError("Vous n'etes pas entrain de jouer...");
+                    Client.Character.ReplyError("Vous n'etes pas entrain de jouer.");
                     break;
             }
             Fight.Send(new GameActionFightNoSpellCastMessage((uint)spelllevel.Grade));
@@ -348,61 +446,77 @@ namespace Symbioz.World.Models.Fights.Fighters
 
         public void UsePunch(short cellid)
         {
-            Fight.TryStartSequence(this.ContextualId, 2);
-            Fighter target = Fight.GetFighter(cellid);
-            SpellLevelRecord spell = GetSpellLevel((ushort)PUNCH_SPELL);
-            if (target != null)
+            try
             {
-                Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, target.ContextualId, cellid, 0, false, 0));
-                var jet = CalculateJet(spell.Effects[0], FighterStats.Stats.Strength);
-                target.TakeDamages(new TakenDamages(jet, ElementType.Earth), this.ContextualId);
+                Fight.TryStartSequence(this.ContextualId, 2);
+                Fighter target = Fight.GetFighter(cellid);
+                SpellLevelRecord spell = GetSpellLevel((ushort)PUNCH_SPELL);
+                if (target != null)
+                {
+                    Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, target.ContextualId, cellid, 0, false, 0));
+                    var jet = CalculateJet(spell.Effects[0], FighterStats.Stats.Strength);
+                    target.TakeDamages(new TakenDamages(jet, ElementType.Earth), this.ContextualId);
+                }
+                else
+                {
+                    Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, 0, cellid, 0, false, 0));
+                }
+                GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spell.ApCost);
+                FighterStats.Stats.ActionPoints -= spell.ApCost;
+                RefreshStats();
+                Fight.TryEndSequence(2, 0);
+                Fight.CheckFightEnd();
             }
-            else
+            catch (Exception error)
             {
-                Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, 0, cellid, 0, false, 0));
+                Logger.Error(error);
             }
-            GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)-spell.ApCost);
-            FighterStats.Stats.ActionPoints -= spell.ApCost;
-            RefreshStats();
-            Fight.TryEndSequence(2, 0);
-            Fight.CheckFightEnd();
         }
 
         public override bool UseWeapon(short cellid)
         {
-            var target = Fight.GetFighter(cellid);
-            if (this.Fight.ChallengesInstance != null)
-                this.Fight.ChallengesInstance.HandleWeaponUse(this);
-            if (Client.Character.isGod == true)
+            try
             {
-                if (target != null)
+                var target = Fight.GetFighter(cellid);
+                if (this.Fight.ChallengesInstance != null)
+                    this.Fight.ChallengesInstance.HandleWeaponUse(this);
+
+                if (Client.Character.isGod == true)
                 {
-                    target.TakeDamages(new TakenDamages(25000, ElementType.Earth), this.ContextualId);
-                    Fight.CheckFightEnd();
+                    if (target != null)
+                    {
+                        target.TakeDamages(new TakenDamages(25000, ElementType.Earth), this.ContextualId);
+                        Fight.CheckFightEnd();
+                        return true;
+                    }
+                }
+                CharacterItemRecord weapon = Client.Character.Inventory.GetEquipedWeapon();
+                if (weapon == null)
+                {
+                    UsePunch(cellid);
                     return true;
                 }
-            }
-            CharacterItemRecord weapon = Client.Character.Inventory.GetEquipedWeapon();
-            if (weapon == null)
-            {
-                UsePunch(cellid);
+                WeaponRecord template = WeaponRecord.GetWeapon(weapon.GID);
+
+                FightSpellCastCriticalEnum critical = RollCriticalDice(template);
+                Fight.TryStartSequence(this.ContextualId, 2);
+                int targetId = target != null ? target.ContextualId : 0;
+                Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, targetId, cellid, (sbyte)critical, false, weapon.GID));
+                var effects = template.GetWeaponEffects(critical);
+                this.HandleWeaponEffect(cellid, effects, critical, template, Fight.Map, this.CellId);
+                this.FighterStats.Stats.ActionPoints -= template.ApCost;
+                this.GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)(-template.ApCost));
+                Fight.TryEndSequence(2, 0);
                 return true;
             }
-            WeaponRecord template = WeaponRecord.GetWeapon(weapon.GID);
-
-            FightSpellCastCriticalEnum critical = RollCriticalDice(template);
-            Fight.TryStartSequence(this.ContextualId, 2);
-            int targetId = target != null ? target.ContextualId : 0;
-            Fight.Send(new GameActionFightCloseCombatMessage(0, this.ContextualId, targetId, cellid, (sbyte)critical, false, weapon.GID));
-            var effects = template.GetWeaponEffects(critical);
-            this.HandleWeaponEffect(cellid, effects, critical, template, Fight.Map, this.CellId);
-            this.FighterStats.Stats.ActionPoints -= template.ApCost;
-            this.GameActionFightPointsVariation(ActionsEnum.ACTION_CHARACTER_ACTION_POINTS_USE, (short)(-template.ApCost));
-            Fight.TryEndSequence(2, 0);
-            return true;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return false;
+            }
         }
 
-        private void CheckFightEnd(object source, ElapsedEventArgs e)
+        private void CheckFightEnd()
         {
             Fight.CheckFightEnd();
         }
@@ -412,18 +526,22 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             foreach (var effect in handledEffects)
             {
-                Fight.TryStartSequence(ContextualId, 1);
-                short[] cells = Pathfinding.getCiblesByZoneByWeapon(CurrentMap, template, cellid, CasterCellId);
-                var actors = GetAffectedActors(cells, effect.Targets);
-                CharacterStates.CharacterSpellStatesChecker(this, actors, null, effect);
-                MonsterStates.MonsterSpellStatesChecker(this, actors, null, effect);
-                SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
-                Fight.TryEndSequence(1, 0);
+                try
+                {
+                    Fight.TryStartSequence(ContextualId, 1);
+                    short[] cells = Pathfinding.getCiblesByZoneByWeapon(CurrentMap, template, cellid, CasterCellId);
+                    var actors = GetAffectedActors(cells, effect.Targets);
+                    CharacterStates.CharacterSpellStatesChecker(this, actors, null, effect);
+                    MonsterStates.MonsterSpellStatesChecker(this, actors, null, effect);
+                    SpellEffectsHandler.Handle(this, null, effect, actors, cellid);
+                    Fight.TryEndSequence(1, 0);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error(error);
+                }
             }
-            System.Timers.Timer Timer = new System.Timers.Timer();
-            Timer.Elapsed += new ElapsedEventHandler(CheckFightEnd);
-            Timer.Interval = 2000;
-            Timer.Enabled = true;
+            this.CheckFightEnd();
         }
     }
 }

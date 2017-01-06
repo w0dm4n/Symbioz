@@ -25,11 +25,33 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
             }
 
         }
-        [EffectHandler(EffectsEnum.Eff_SpawnGlyphOnDied)]
-        public static void SpawnGlyphOnDied(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
+        /// <summary>
+        /// Ajoute l'etat telefrag
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="effect"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
+        [EffectHandler(EffectsEnum.Eff_AddStateTelefrag)]
+        public static void AddStateTelefrag(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
-
+            foreach (var target in affecteds)
+            {
+                if (!target.HaveState((short)251))
+                {
+                    StateBuff buff = new StateBuff((uint)target.BuffIdProvider.Pop(), (short)251, 1, fighter.ContextualId, (short)level.SpellId, 0);
+                    target.AddBuff(buff);
+                }
+                else
+                {
+                    Buff b = target.GetBuffByDelta((short)251);
+                    if (b != null)
+                        b.RemoveBuff();
+                }
+            }
         }
+
         [EffectHandler(EffectsEnum.Eff_MultiplyTakenDamages)] // dommages subis *X%
         public static void MultiplyTakenDamages(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {

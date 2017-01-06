@@ -132,6 +132,8 @@ namespace Symbioz.Core
 
         public int TimeBetweenCharacterSave { get; set; }
 
+        public int TimeBetweenStart { get; set; }
+
         public int TimeForUseKeyring { get; set; }
 
         public int ArchMonsterBySubArea { get; set; }
@@ -175,6 +177,7 @@ namespace Symbioz.Core
             config.ArchMonsterBySubArea = 1;
             config.TimeBetweenSpawnArchMonster = 1800;
             config.WelcomeSystemMessage = "Bienvenue sur notre serveur !";
+            config.TimeBetweenStart = 300;
             return config;
         }
     }

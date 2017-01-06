@@ -83,21 +83,79 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
            
             IncreaseDamage(fighter, level, effect, affected, castcellid);
         }
+        /// <summary>
+        /// Ajout de dommages exemple + 2 dommages
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="effect"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_AddDamageBonus)]
         public static void AddDamageBonus(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
+            
             foreach (var target in affecteds)
             {
+                if (!damagesBonusCumulConditions(level, target))
+                    continue ;
                 var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("AllDamagesBonus"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
+
+        /// <summary>
+        /// Buff effect vérif cumul
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        private static bool damagesBonusCumulConditions(SpellLevelRecord level, Fighter target)
+        {
+            if (level.SpellId == 145)//epee divine max 2buff
+            {
+                int nbrbuff = 0;
+                foreach (var buff in target.Buffs)
+                {
+                    if (buff is StatBuff)
+                    {
+                        if (buff.SourceSpellId == 145)
+                            nbrbuff++;
+                    }
+                }
+                if (nbrbuff >= 2)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         [EffectHandler(EffectsEnum.Eff_1048)]
         public static void RemoveLifePercent(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
             // transe, zobal actions enum dans le displayable ^^
-
         }
+
+        [EffectHandler(EffectsEnum.Eff_Double)]
+        public static void AddDouble(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
+        {
+            Console.WriteLine("myaw");
+           
+             DoubleFighter doubles = new DoubleFighter(fighter.Team, fighter, castcellid);
+            fighter.Team.AddFighter(doubles);
+            fighter.Fight.Send(new GameActionFightSummonMessage(181, doubles.ContextualId, doubles.FighterInformations));
+            fighter.Fight.Send(new GameFightTurnListMessage(fighter.Fight.TimeLine.GenerateTimeLine(false), new int[0]));
+            // MonsterFighter summoned = fighter.Fight.AddSummon(fighter, 4147, fighter.GetSpellLevel(level.SpellId).Grade, castcellid, fighter.Team,fighter);
+
+            /*SummonedClone summonedClone = new SummonedClone((int)base.Fight.GetNextContextualId(), base.Caster, base.TargetedCell);
+            ActionsHandler.SendGameActionFightSummonMessage(base.Fight.Clients, summonedClone);
+            base.Caster.AddSummon(summonedClone);
+            base.Caster.Team.AddFighter(summonedClone);
+            return true;*/
+        }
+
+
         [EffectHandler(EffectsEnum.Eff_AddShieldPercent)]
         public static void AddShieldPercent(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {

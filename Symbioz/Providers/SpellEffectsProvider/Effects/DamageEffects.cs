@@ -25,8 +25,13 @@ namespace Symbioz.Providers.SpellEffectsProvider
             }
             else
                 fighter.Heal(healJet, fighter.ContextualId);
-
         }
+
+        static void StealDammages(Fighter fighter, Fighter target, short jet, ElementType element, SpellLevelRecord level)
+        {
+            target.TakeDamages(new TakenDamages(jet, element), fighter.ContextualId);
+        }
+
 
         public static MonsterFighter ConvertMonster(MonsterFighter f)
         {
@@ -89,24 +94,50 @@ namespace Symbioz.Providers.SpellEffectsProvider
             affecteds.ForEach(x => Steal(fighter, x, jet, ElementType.Air, level));
 
         }
+        /// <summary>
+        /// Dommages Earth
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_DamageEarth)]
         public static void DamageEarth(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
+            
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Strength);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Earth), fighter.ContextualId));
-
+            affecteds.ForEach(x => StealDammages(fighter, x, jet, ElementType.Earth, level));
         }
+
+        /// <summary>
+        /// Dommages Fire
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_DamageFire)]
         public static void DamageFire(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Intelligence);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Fire), fighter.ContextualId));
+            affecteds.ForEach(x => StealDammages(fighter, x, jet, ElementType.Fire, level));
 
         }
+
+        /// <summary>
+        /// Dommages Water
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_DamageWater)]
         public static void DamageWater(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
-            if (level.SpellId == 195)//larme sadida
+            if (level != null && level.SpellId == 195) //larme sadida
             {
                 bool arbre = false;
                 foreach (var target in affecteds)
@@ -121,30 +152,58 @@ namespace Symbioz.Providers.SpellEffectsProvider
                     return;
             }
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Chance);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Water), fighter.ContextualId));
+            affecteds.ForEach(x => StealDammages(fighter, x, jet, ElementType.Water, level));
 
         }
+
+        /// <summary>
+        /// Dommages Air
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_DamageAir)]
         public static void DamageAir(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Agility);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Air), fighter.ContextualId));
+            affecteds.ForEach(x => StealDammages(fighter, x, jet, ElementType.Air, level));
 
         }
+
+        /// <summary>
+        /// Dommages Neutral
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_DamageNeutral)]
         public static void DamageNeutral(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
             var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.Strength);
-            affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Earth), fighter.ContextualId));
+            affecteds.ForEach(x => StealDammages(fighter, x, jet, ElementType.Earth, level));
 
             /*var jet = fighter.CalculateJet(record, fighter.FighterStats.Stats.NeutralDamageBonus);
             affecteds.ForEach(x => x.TakeDamages(new TakenDamages(jet, ElementType.Neutral), fighter.ContextualId));*/
         }
+
+        /// <summary>
+        /// Dommages Kill all Affecteds
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="record"></param>
+        /// <param name="affecteds"></param>
+        /// <param name="castcellid"></param>
         [EffectHandler(EffectsEnum.Eff_Kill)]
         public static void Kill(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castcellid)
         {
             affecteds.ForEach(x => x.Die());
         }
+
         /// <summary>
         /// Fury sacrieur
         /// </summary>
@@ -156,7 +215,6 @@ namespace Symbioz.Providers.SpellEffectsProvider
             //    short num = (short)((double)fighter.FighterStats.RealStats.LifePoints * ((double)effect.BaseEffect.DiceNum / 100.0));
             //    target.TakeDamages(new TakenDamages(num, ElementType.Neutral), fighter.ContextualId);
             //}
-
         }
 
         /// <summary>
@@ -172,6 +230,7 @@ namespace Symbioz.Providers.SpellEffectsProvider
                 target.TakeDamages(new TakenDamages((short)num, ElementType.Fire), fighter.ContextualId);
             }
         }
+
         /// <summary>
         /// Duel Iop
         /// </summary>
@@ -184,6 +243,7 @@ namespace Symbioz.Providers.SpellEffectsProvider
                 target.TakeDamages(new TakenDamages((short)num, ElementType.Air), fighter.ContextualId);
             }
         }
+
         /// <summary>
         /// Pulsar Roublard
         /// </summary>

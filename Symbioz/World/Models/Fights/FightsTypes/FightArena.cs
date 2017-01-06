@@ -34,7 +34,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
 
         public override void TryJoin(WorldClient client, int mainfighterid)
         {
-            throw new Exception("A client try to join an Arena Fight!");
+            //throw new Exception("A client try to join an Arena Fight!");
         }
 
 

@@ -30,13 +30,11 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
             this.Fighter.Fight.Send(new GameActionFightDispellableEffectMessage((ushort)DisplayableId, SourceId,
                 new FightTemporaryBoostEffect(UID, Fighter.ContextualId, Duration, 1, (ushort)SourceSpellId,DisplayableId, 0, Delta)));
             this.StatDefiniton.AddValue(RealDelta);
-
         }
 
         public override void RemoveBuff()
         {
             this.StatDefiniton.AddValue((short)-RealDelta);
-
         }
 
     }

@@ -30,7 +30,11 @@ namespace Symbioz.World.Models.Alliances.Prisms
         [StartupInvoke("SpawnPrisms", StartupInvokeType.Others)]
         public static void SpawnPrisms()
         {
-            PrismRecord.Prisms.ForEach(x => x.Map.AddPrism(x));
+            foreach (var prism in PrismRecord.Prisms)
+            {
+                if (prism.Map != null)
+                    prism.Map.AddPrism(prism);
+            }
         }
 
         #endregion
@@ -145,7 +149,7 @@ namespace Symbioz.World.Models.Alliances.Prisms
                     tmp.Character.Reply("Un prisme de votre alliance est attaqué en (<b>" + map.WorldX + "," + map.WorldY + "</b>, " + SubAreaRecord.GetSubAreaName(map.SubAreaId) + "), rendez vous à cette position et battez vous pour conserver votre territoire !", Color.Orange);
                 FightAvAPrism fight = FightProvider.Instance.CreateAvAPrismFight(prism, client.Character.Map, (short)prism.CellId, client.Character.Record.CellId);
                 fight.AllianceId = alliance.Id;
-                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
+                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam, fight));
                 fight.RedTeam.AddFighter(prism.CreateFighter(fight.RedTeam));
                 fight.StartPlacement();
 

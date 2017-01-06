@@ -1,7 +1,9 @@
 ﻿using Symbioz.Auth.Records;
+using Symbioz.Core.Startup;
 using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
+using Symbioz.Helper;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Messages;
 using Symbioz.Network.Servers;
@@ -46,8 +48,10 @@ namespace Symbioz.World.Handlers
         {
             if(client.Character.IsFriendWith(message.accountId))
             {
-                client.Send(new FriendDeleteResultMessage(client.Character.RemoveFriend(message.accountId), client.Character.GetFriendName(message.accountId)));
+                Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                    client.Send(new FriendDeleteResultMessage(client.Character.RemoveFriend(message.accountId), client.Character.GetFriendName(message.accountId)));
                 SendFriendsList(client);
+                }));
             }
         }
 
@@ -72,7 +76,8 @@ namespace Symbioz.World.Handlers
 
         public static void SendFriendsList(WorldClient client)
         {
-            List<FriendInformations> friends = new List<FriendInformations>();
+            Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                List<FriendInformations> friends = new List<FriendInformations>();
             foreach (var friend in client.Character.Friends)
             {
                 var characters = CharacterRecord.GetAccountCharacters(friend.FriendAccountId);
@@ -119,6 +124,7 @@ namespace Symbioz.World.Handlers
                 }
             }
             client.Send(new FriendsListMessage(friends));
+            }));
         }
 
         #endregion

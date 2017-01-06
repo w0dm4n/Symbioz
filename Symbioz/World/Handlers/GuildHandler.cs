@@ -14,6 +14,7 @@ using Symbioz.World.Records;
 using Symbioz.Network.Servers;
 using Shader.Helper;
 using Symbioz.Helper;
+using Symbioz.World.Models;
 
 namespace Symbioz.World.Handlers
 {
@@ -29,8 +30,15 @@ namespace Symbioz.World.Handlers
             }
             if (GuildRecord.CanCreateGuild(message.guildName))
             {
-                GuildProvider.Instance.CreateGuild(client.Character, message);
-                client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_OK));
+                CharacterItemRecord item = null;
+                if ((item = client.Character.haveGuildalogemme()) != null)
+                {
+                    client.Character.Inventory.RemoveItem(item.UID, 1);
+                    GuildProvider.Instance.CreateGuild(client.Character, message);
+                    client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_OK));
+                }
+                else
+                    client.Character.ReplyImportant("Vous devez avoir une Guildalogemme pour créer une guilde. (Il faut les dropper ou les acheter a d'autre joueurs)");
             }
             else
             {

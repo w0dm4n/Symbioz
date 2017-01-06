@@ -41,7 +41,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
         {
             get
             {
-                return 15000;
+                return 240000;
             }
         }
 
@@ -129,7 +129,6 @@ namespace Symbioz.World.Models.Fights.FightsTypes
 
         private void OnDefendersPlacementEnded()
         {
-            Console.WriteLine("OnDefendersPlacementEnded");
             this.IsDefendersPlacementPhase = false;
             this.DefendersPlacementTimer.Dispose();
 
@@ -207,7 +206,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
                             {
                                 if (this.RedTeam.GetFighters().Count() < 5)
                                 {
-                                    var newFighter = client.Character.CreateFighter(this.RedTeam);
+                                    var newFighter = client.Character.CreateFighter(this.RedTeam, this);
                                     this.RedTeam.AddFighter(newFighter);
                                     this.GetAllFighters().ForEach(x => x.ShowFighter(client));
                                     this.Map.Instance.OnFighterAdded(Id, this.RedTeam.Id, newFighter.GetFightMemberInformations());
@@ -228,7 +227,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
                         {
                             if (this.BlueTeam.GetFighters().Count() < 5)
                             {
-                                var newFighter = client.Character.CreateFighter(this.BlueTeam);
+                                var newFighter = client.Character.CreateFighter(this.BlueTeam, this);
                                 this.BlueTeam.AddFighter(newFighter);
                                 this.GetAllFighters().ForEach(x => x.ShowFighter(client));
                                 this.Map.Instance.OnFighterAdded(Id, this.BlueTeam.Id, newFighter.GetFightMemberInformations());
@@ -374,7 +373,7 @@ namespace Symbioz.World.Models.Fights.FightsTypes
                     {
                         if (defender.Client != null)
                         {
-                            this.RedTeam.AddFighter(defender.CreateFighter(this.RedTeam));
+                            this.RedTeam.AddFighter(defender.CreateFighter(this.RedTeam, this));
                         }
                     }
                 }

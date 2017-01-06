@@ -5,6 +5,7 @@ using Symbioz.Network.Servers;
 using Symbioz.ORM;
 using Symbioz.Providers;
 using Symbioz.World.Models;
+using Symbioz.World.Records.Guilds;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +110,8 @@ namespace Symbioz.World.Records
         public int MoodSmileyId;
         [Update]
         public int MerchantMode;
+        [Update]
+        public int PlayersKilled;
         [Ignore]
         public bool IsMerchantMode
         {
@@ -127,7 +130,7 @@ namespace Symbioz.World.Records
             ushort activeornament, List<byte> knownemotes, int spawnpointmapid, short equipedskitterid, List<int> knowntips,
             ushort actualRank,ushort bestDailyRank,ushort maxRank,ushort arenaVictoryCount,ushort arenaFightsCount, bool pvpEnable,
             short energy, ushort deathCount, byte deathMaxLevel, string succes, uint currentLifePoint, int lastConnection,
-            int moodSmileyId, int merchantMode)
+            int moodSmileyId, int merchantMode, int playersKilled)
         {
             this.Id = id;
             this.Name = name;
@@ -173,6 +176,7 @@ namespace Symbioz.World.Records
             this.LastConnection = lastConnection;
             this.MoodSmileyId = moodSmileyId;
             this.MerchantMode = merchantMode;
+            this.PlayersKilled = playersKilled;
         }
         [BeforeSave]
         public static void BeforeSave()
@@ -180,10 +184,17 @@ namespace Symbioz.World.Records
             var online = WorldServer.Instance.GetAllClientsOnline();
             foreach (var client in online)
             {
-                client.Character.Look.UnsetAura();
-                client.Character.Record.Look = client.Character.Look.ConvertToString();
-                SaveTask.UpdateElement(client.Character.Record);
-                SaveTask.UpdateElement(client.Character.CharacterStatsRecord);
+                try
+                {
+                    client.Character.Look.UnsetAura();
+                    client.Character.Record.Look = client.Character.Look.ConvertToString();
+                    SaveTask.UpdateElement(client.Character.Record);
+                    SaveTask.UpdateElement(client.Character.CharacterStatsRecord);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error(error);
+                }
             }
         }
 
@@ -201,11 +212,21 @@ namespace Symbioz.World.Records
         }
         public static CharacterRecord Default(string name, int accountid, string look, sbyte breed, bool sex)
         {
+            var newId = CharacterRecord.FindFreeId();
+            CharacterItemRecord.RemoveAll(newId);
+            GeneralShortcutRecord.RemoveAll(newId);
+            SpellShortcutRecord.RemoveAll(newId);
+            CharacterSpellRecord.RemoveAll(newId);
+            CharacterJobRecord.RemoveAll(newId);
+            BidShopGainRecord.RemoveAll(newId);
+            CharacterGuildRecord.RemoveAll(newId);
+            BidShopItemRecord.RemoveAll(newId);
+
             return new CharacterRecord(CharacterRecord.FindFreeId(), name, accountid, look, look, 1, breed, sex,
             ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId, 3, ConfigurationManager.Instance.StartKamas,
             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             new List<ushort>(), new List<ushort>(), 0, 0, new List<byte>() { 1 }, -1, 0, new List<int>(),ArenaProvider.DEFAULT_RANK,ArenaProvider.DEFAULT_RANK,
-            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, 0, 0);
+            ArenaProvider.DEFAULT_RANK,0,0,false, 10000, 0, 1, null, 0, 0, 0, 0, 0);
         }
         public static bool CheckCharacterNameExist(string name)
         {
@@ -218,6 +239,11 @@ namespace Symbioz.World.Records
         public static CharacterRecord GetCharacterRecordById(int id)
         {
             return Characters.Find(x => x.Id == id);
+        }
+
+        public static CharacterRecord GetCharacterRecordByName(string name)
+        {
+            return Characters.Find(x => x.Name == name);
         }
         public static int FindFreeId()
         {

@@ -20,8 +20,8 @@ namespace Symbioz.Auth.Records
 
         public static void CreateAccountInformation(int accountid,int startbankkamas)
         {
-           
-            Locker.EnterReadLock();
+
+            Monitor.Enter(AuthDatabaseProvider.AuthConnection);
             try
             {
                 AuthDatabaseProvider.Insert("AccountsInformations", new List<string>() { "Id", "BankKamas" }, new List<string>() { accountid.ToString(), startbankkamas.ToString() });
@@ -29,7 +29,7 @@ namespace Symbioz.Auth.Records
             }
             finally
             {
-                Locker.ExitReadLock();
+                Monitor.Exit(AuthDatabaseProvider.AuthConnection);
             }
         } 
 
@@ -62,12 +62,12 @@ namespace Symbioz.Auth.Records
 
         public static Account GetAccountFromDb(string username)
         {
-            Locker.EnterReadLock();
+            Monitor.Enter(AuthDatabaseProvider.AuthConnection);
             try
             {
                 Account account = null;
                 string query = "SELECT * FROM Accounts WHERE Username = '" + username + "'";
-                MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.Connection).ExecuteReader();
+                MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.AuthConnection).ExecuteReader();
                 while (dataReader.Read())
                 {
                     account = new Account();
@@ -85,18 +85,18 @@ namespace Symbioz.Auth.Records
             }
             finally
             {
-                Locker.ExitReadLock(); 
+                Monitor.Exit(AuthDatabaseProvider.AuthConnection);
             }
         }
 
         public static Account GetAccountFromDb(int accountId)
         {
-            Locker.EnterReadLock();
+            Monitor.Enter(AuthDatabaseProvider.AuthConnection);
             try
             {
                 Account account = null;
                 string query = "SELECT * FROM Accounts WHERE Id = '" + accountId + "'";
-                MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.Connection).ExecuteReader();
+                MySqlDataReader dataReader = new MySqlCommand(query, AuthDatabaseProvider.AuthConnection).ExecuteReader();
                 while (dataReader.Read())
                 {
                     account = new Account();
@@ -115,14 +115,13 @@ namespace Symbioz.Auth.Records
             }
             finally
             {
-                Locker.ExitReadLock();
+                Monitor.Exit(AuthDatabaseProvider.AuthConnection);
             }
         }
 
         public static bool UpdateAccountsWarningEvent(Account account)
         {
             bool updated = false;
-            Locker.EnterReadLock();
             try
             {
                 AuthDatabaseProvider.Update("accounts", "WarnOnFriendConnection", account.WarnOnFriendConnection ? "1" : "0", "Id", account.Id.ToString());
@@ -133,16 +132,14 @@ namespace Symbioz.Auth.Records
             {
                 Logger.Error(ex.Message);
             }
-            finally
-            {
-                Locker.ExitReadLock();
-            }
+            
             return updated;
         }
 
         public static bool UpdateAccountsOnlineState(int accountId, bool isOnline)
         {
-            bool updated = false;
+            return true;
+            /*bool updated = false;
             Locker.EnterReadLock();
             try
             {
@@ -157,7 +154,7 @@ namespace Symbioz.Auth.Records
             {
                 Locker.ExitReadLock();
             }
-            return updated;
+            return updated;*/
         }
 
         public static bool RemovePoints(Account account)
@@ -232,7 +229,7 @@ namespace Symbioz.Auth.Records
 
         public static bool CheckAndApplyNickname(AuthClient client, string nickname)
         {
-            Locker.EnterReadLock();
+            Monitor.Enter(AuthDatabaseProvider.AuthConnection);
             try
             {
                 if (AuthDatabaseProvider.SelectData("Accounts", "Nickname", nickname, "Nickname") != string.Empty)
@@ -246,7 +243,7 @@ namespace Symbioz.Auth.Records
             }
             finally
             {
-                Locker.ExitReadLock();
+                Monitor.Exit(AuthDatabaseProvider.AuthConnection);
             }
         }
     }

@@ -17,6 +17,9 @@ using Symbioz.World.Models.Guilds;
 using Symbioz.World.Models.Alliances;
 using Symbioz.World.Records;
 using Symbioz.DofusProtocol.Types;
+using Symbioz.World.Models;
+using System.Drawing;
+using Symbioz.Core;
 
 namespace Symbioz.RawData
 {
@@ -107,6 +110,61 @@ namespace Symbioz.RawData
                 worldClient.Character.Record.MerchantMode = 1;
                 SaveTask.UpdateElement(worldClient.Character.Record, worldClient.Character.Record.Id);
                 worldClient.Disconnect();
+            }
+        }
+
+        public static void ReviveCharacterByName(string value)
+        {
+            if (value != null)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(value);
+                if (target != null)
+                {
+                    target.Character.Restrictions.cantMove = false;
+                    target.Character.Restrictions.cantSpeakToNPC = false;
+                    target.Character.Restrictions.cantExchange = false;
+                    target.Character.Restrictions.cantAttackMonster = false;
+                    target.Character.Restrictions.isDead = false;
+                    target.Character.Record.Energy = 10000;
+                    target.Character.Look = ContextActorLook.Parse(target.Character.Record.OldLook);
+                    target.Character.RefreshOnMapInstance();
+                }
+                else
+                {
+                    var character = CharacterRecord.GetCharacterRecordByName(value);
+                    if (character != null)
+                    {
+                        character.Energy = 10000;
+                        character.Look = character.OldLook;
+                    }
+                }
+            }
+        }
+
+        [RawHandlerAttribute(ReviveMessage.Id)]
+        public static void HandleReviveCharacter(DofusClient client, ReviveMessage message)
+        {
+            var worldClient = WorldServer.Instance.GetOnlineClientByAccountId(client.Account.Id);
+            if (worldClient != null)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(message.Message.ToString());
+                if (target != null || CharacterRecord.GetCharacterRecordByName(message.Message.ToString()) != null)
+                {
+                    int Points = AuthDatabaseProvider.GetPoints(worldClient.Account.Id);
+                    if (Points >= 1000)
+                    {
+                        Points = Points - 1000;
+                        AuthDatabaseProvider.UpdatePoints(Points, worldClient.Account.Id);
+                        worldClient.Character.Reply("Youhou ! Le personnage a été ressusciter, merci pour votre achat, <br/>Il vous reste <b>" + Points + "</b> points boutique", System.Drawing.Color.Orange);
+                        ReviveCharacterByName(message.Message.ToString());
+                    }
+                    else
+                        worldClient.Character.Reply("Impossible car vous n'avez pas assez de points boutique<br/>Vous avez " + Points + " points boutique", System.Drawing.Color.Orange);
+                }
+                else
+                {
+                    worldClient.Character.Reply("Ce personnage n'existe pas, merci de vérifier que le pseudo a bien été écrit !", System.Drawing.Color.Orange);
+                }
             }
         }
     }

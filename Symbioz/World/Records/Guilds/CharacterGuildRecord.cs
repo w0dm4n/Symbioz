@@ -53,15 +53,30 @@ namespace Symbioz.World.Records.Guilds
 
         public static GuildMember[] GetMembers(int guildId)
         {
-            return CharactersGuilds.FindAll(x => x.GuildId == guildId).ConvertAll<GuildMember>(x => x.GetGuildMember()).ToArray();
+            var characters = CharactersGuilds.FindAll(x => x.GuildId == guildId);
+            List<CharacterGuildRecord> Characters = new List<CharacterGuildRecord>();
+            CharacterRecord checkCharac = null;
+            foreach (var character in characters)
+            {
+                checkCharac = CharacterRecord.GetCharacterRecordById(character.CharacterId);
+                if (checkCharac != null)
+                    Characters.Add(character);
+            }
+            return Characters.ConvertAll<GuildMember>(x => x.GetGuildMember()).ToArray();
         }
+
         public GuildMember GetGuildMember()
         {
             sbyte connected = (sbyte)(WorldServer.Instance.IsConnected(CharacterId) ? 1 : 0);
             sbyte status = (sbyte)(WorldServer.Instance.IsConnected(CharacterId) ? WorldServer.Instance.GetOnlineClient(CharacterId).Character.PlayerStatus.statusId : 0);
             CharacterRecord cRecord = CharacterRecord.GetCharacterRecordById(CharacterId);
+            if (cRecord != null)
+            {
+                return new GuildMember((uint)CharacterId, cRecord.Level, cRecord.Name, cRecord.Breed, cRecord.Sex, Rank, GivenExperience, ExperienceGivenPercent,
+                    Rights, connected, cRecord.AlignmentSide, 0, 0, cRecord.AccountId, 0, new PlayerStatus(status));
+            }
             return new GuildMember((uint)CharacterId, cRecord.Level, cRecord.Name, cRecord.Breed, cRecord.Sex, Rank, GivenExperience, ExperienceGivenPercent,
-                Rights, connected, cRecord.AlignmentSide, 0, 0, cRecord.AccountId, 0, new PlayerStatus(status));
+                   Rights, connected, cRecord.AlignmentSide, 0, 0, cRecord.AccountId, 0, new PlayerStatus(status));
         }
         public void ChangeParameters(WorldClient changer, ushort rank, sbyte experienceGivenPercent, uint rights)
         {

@@ -383,8 +383,9 @@ namespace Symbioz.World.PathProvider
                     return DirectionsEnum.DIRECTION_SOUTH;
                 case DirectionsEnum.DIRECTION_NORTH_EAST:
                     return DirectionsEnum.DIRECTION_SOUTH_WEST;
-                default:
-                    throw new Exception("What is dat direction dude?");
+               default:
+                    Logger.Error("Wrong direction from client received");
+                    return 0;
             }
         }
         public static DirectionsEnum GetDirectionFromTwoCells(short firstcellid, short secondccellid) // first = caster

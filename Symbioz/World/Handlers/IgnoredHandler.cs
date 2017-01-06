@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using Symbioz.Auth.Records;
 using Symbioz.ORM;
 using Symbioz.Enums;
+using Symbioz.Core.Startup;
+using System;
 
 namespace Symbioz.World.Handlers
 {
@@ -62,7 +64,8 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleIgnoredDeleteRequestMessage(IgnoredDeleteRequestMessage message, WorldClient client)
         {
-            if(!message.session)
+            Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                if (!message.session)
             {
                 if(client.Character.AlreadyEnemy(message.accountId))
                 {
@@ -81,13 +84,15 @@ namespace Symbioz.World.Handlers
                     client.Send(new IgnoredDeleteResultMessage(success, true, name));
                 }
             }
+            }));
         }
 
         #region Send
 
         public static void SendIgnoredList(WorldClient client)
         {
-            List<IgnoredInformations> allIgnoreds = new List<IgnoredInformations>();
+            Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                List<IgnoredInformations> allIgnoreds = new List<IgnoredInformations>();
             foreach (var ignored in client.Character.Enemies)
             {
                 var characters = CharacterRecord.GetAccountCharacters(ignored.IgnoredAccountId);
@@ -107,6 +112,7 @@ namespace Symbioz.World.Handlers
                 }
             }
             client.Send(new IgnoredListMessage(allIgnoreds));
+            }));
         }
 
         #endregion

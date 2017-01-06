@@ -43,7 +43,7 @@ namespace Symbioz.World.PathProvider
         {
             this.m_end.Walkable = true;
             this.m_openList.Add(this.m_start);
-
+            var infinite = 0;
             while (this.m_openList.Count > 0)
             {
                 var bestCell = this.m_openList.RemoveFirst();
@@ -62,6 +62,9 @@ namespace Symbioz.World.PathProvider
                 }
                 this.m_closeList.Add(bestCell);
                 this.AddToOpen(bestCell, this.GetNeighbors(bestCell));
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             this.m_end.Walkable = false;
             return null;
@@ -72,7 +75,7 @@ namespace Symbioz.World.PathProvider
             this.m_end.Walkable = true;
 
             this.m_openList.Add(this.m_start);
-
+            var infinite = 0;
             while (this.m_openList.Count > 0)
             {
                 var bestCell = this.m_openList.RemoveFirst();
@@ -91,6 +94,9 @@ namespace Symbioz.World.PathProvider
                 }
                 this.m_closeList.Add(bestCell);
                 this.AddToOpen(bestCell, this.GetNeighbors(bestCell));
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             this.m_end.Walkable = false;
             return null;

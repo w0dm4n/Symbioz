@@ -25,9 +25,16 @@ namespace Symbioz.World
         [StartupInvoke("CyclicMobsMovementTask", StartupInvokeType.Cyclics)]
         public static void Start()
         {
-            CyclicMobsMovementTimer = new System.Timers.Timer(MoveInstanceInterval);
-            CyclicMobsMovementTimer.Elapsed += (sender, e) => CyclicMobsMovementTimer_Tick();
-            CyclicMobsMovementTimer.Start();
+            try
+            {
+                CyclicMobsMovementTimer = new System.Timers.Timer(MoveInstanceInterval);
+                CyclicMobsMovementTimer.Elapsed += (sender, e) => CyclicMobsMovementTimer_Tick();
+                CyclicMobsMovementTimer.Start();
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         private static void CyclicMobsMovementTimer_Tick()
@@ -46,48 +53,69 @@ namespace Symbioz.World
 
         private static async void GenerateMobMovements(MapRecord map, List<MonsterGroup> groups)
         {
-            await Task.Run(() =>
+            try
             {
-                for (int i = 0; i < groups.Count; i++)
+                await Task.Run(() =>
                 {
-                    MonsterGroup group = groups[i];
-                    MoveGroup(map, group);
-                }
-            });
+                    for (int i = 0; i < groups.Count; i++)
+                    {
+                        MonsterGroup group = groups[i];
+                        MoveGroup(map, group);
+                    }
+                });
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         private static void MoveGroup(MapRecord map, MonsterGroup group)
         {
-            var dispatchMobTimer = new System.Timers.Timer(new AsyncRandom().Next(0, 20000));
-            dispatchMobTimer.Elapsed += (sender, e) => DispatchMobTimer_Elapsed(sender, e, map, group);
-            dispatchMobTimer.Start();
+            try
+            {
+                var dispatchMobTimer = new System.Timers.Timer(new AsyncRandom().Next(0, 20000));
+                dispatchMobTimer.Elapsed += (sender, e) => DispatchMobTimer_Elapsed(sender, e, map, group);
+                dispatchMobTimer.Start();
+            }
+            catch (Exception error)
+            {
+                Logger.Log(error);
+            }
         }
 
         private static void DispatchMobTimer_Elapsed(object sender, ElapsedEventArgs e, MapRecord map, MonsterGroup group)
         {
-            if(sender is System.Timers.Timer && (System.Timers.Timer)sender != null)
+            try
             {
-                ((System.Timers.Timer)sender).Stop();
-                ((System.Timers.Timer)sender).Dispose();
+                if (sender is System.Timers.Timer && (System.Timers.Timer)sender != null)
+                {
+                    ((System.Timers.Timer)sender).Stop();
+                    ((System.Timers.Timer)sender).Dispose();
+                }
+
+                var info = MonsterGroup.GetActorInformations(map, group);
+
+                List<short> cells = Pathfinding.GetCircleCells(info.disposition.cellId, MoveCellsCount);
+                cells.Remove(info.disposition.cellId);
+                cells.RemoveAll(x => !map.WalkableCells.Contains(x));
+                if (cells.Count == 0)
+                    return;
+                var newCell = cells[new AsyncRandom().Next(0, cells.Count())];
+                var path = new Pathfinder(map, info.disposition.cellId, newCell).FindPath();
+                if (path != null)
+                {
+                    path.Insert(0, info.disposition.cellId);
+                    map.Instance.Send(new GameMapMovementMessage(path, info.contextualId));
+                    group.CellId = (ushort)newCell;
+                }
+                else
+                    Logger.Error("Impossible de déplacer le groupe de monstres '" + group.MonsterGroupId + "' (carte : " + map.Id + ").");
             }
-
-            var info = MonsterGroup.GetActorInformations(map, group);
-
-            List<short> cells = Pathfinding.GetCircleCells(info.disposition.cellId, MoveCellsCount);
-            cells.Remove(info.disposition.cellId);
-            cells.RemoveAll(x => !map.WalkableCells.Contains(x));
-            if (cells.Count == 0)
-                return;
-            var newCell = cells[new AsyncRandom().Next(0, cells.Count())];
-            var path = new Pathfinder(map, info.disposition.cellId, newCell).FindPath();
-            if (path != null)
+            catch(Exception error)
             {
-                path.Insert(0, info.disposition.cellId);
-                map.Instance.Send(new GameMapMovementMessage(path, info.contextualId));
-                group.CellId = (ushort)newCell;
+                Logger.Error(error);
             }
-            else
-                Logger.Error("Impossible de déplacer le groupe de monstres '" + group.MonsterGroupId + "' (carte : " + map.Id + ").");
-        }
+            }
     }
 }

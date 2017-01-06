@@ -187,10 +187,28 @@ namespace Symbioz.World.Records.Alliances
             }
         }
 
+
+        public static AllianceRecord GetAllianceForSave(int AllianceId)
+        {
+            foreach (var alliance in Alliances)
+            {
+                if (alliance.Id == AllianceId)
+                    return alliance;
+            }
+            return null;
+        }
+
         [BeforeSave]
         public static void BeforeSave()
         {
-            Alliances.ForEach(x => SaveTask.UpdateElement(x));
+            var AllianceCopy = new List<AllianceRecord>();
+            foreach (var alliance in Alliances)
+                AllianceCopy.Add(alliance);
+
+            foreach (var guild in AllianceCopy)
+            {
+                SaveTask.UpdateElement(GetAllianceForSave(guild.Id));
+            }
         }
 
         #region Extended

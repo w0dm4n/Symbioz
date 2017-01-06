@@ -27,27 +27,35 @@ namespace Symbioz.Auth
             _tickets.Remove(ticket);
             return result;
         }
-        public static void DisconnectAlreadyConnectedClient(DofusClient client,int accountid)
+
+        public static void DisconnectAlreadyConnectedClient(DofusClient client, int accountid)
         {
-            var authClient = AuthServer.Instance.AuthClients.Find(x => x.Account.Id == accountid && x != client);
-            var worldClient = WorldServer.Instance.WorldClients.Find(x => x.Account != null && x.Account.Id == accountid && x != client);
-            if (authClient != null)
+            var authClient = AuthServer.Instance.AuthClients.FindAll(x => x.Account.Id == accountid && x != client);
+            var worldClient = WorldServer.Instance.WorldClients.FindAll(x => x.Account != null && x.Account.Id == accountid && x != client);
+
+            foreach (var tmp in worldClient)
             {
-                authClient.Disconnect(0,"La connexion a été interompu par un nouveau client.");
+                if (tmp.Character != null)
+                    tmp.Character.Dispose();
+                tmp.Disconnect(0, "La connexion a été interrompu par un nouveau client.");
             }
-            if (worldClient != null)
+
+            foreach (var auth in authClient)
             {
-                worldClient.Disconnect(0,"La connexion a été interompu par un nouveau client.");
+                auth.Disconnect(0, "La connexion a été interrompu par un nouveau client.");
             }
         }
+
         public static int GetWorldConnectedCount()
         {
             return WorldServer.Instance.WorldClients.Count();
         }
+
         public static int GetAuthConnectedCount()
         {
             return AuthServer.Instance.AuthClients.Count();
         }
+
         public static int GetConnectedCounts()
         {
             return GetWorldConnectedCount() + GetAuthConnectedCount();

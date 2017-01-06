@@ -74,6 +74,12 @@ namespace Symbioz.World.Models
         {
             return new BankItemRecord(UID, GID, accountId, Quantity, EffectsLinkedToList);
         }
+
+        public BankItemRecord GetBankItem(int accountId, int quantity)
+        {
+            return new BankItemRecord(UID, GID, accountId, (uint)quantity, EffectsLinkedToList);
+        }
+
         public PrismModuleRecord GetPrismModule(int prismId)
         {
             return new PrismModuleRecord((int)UID, GID, prismId);

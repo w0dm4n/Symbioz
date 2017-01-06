@@ -26,16 +26,23 @@ namespace Symbioz
     {
         static void Main(string[] args)
         {
-            Logger.OnStartup();
-            Startup.Initialize();
+            try
+            {
+                Logger.OnStartup();
+                Startup.Initialize();
 
-            if (ConfigurationManager.Instance.SafeRun)
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-           
-            Startup.StartServers();
-            DataWriterProvider.Instance.Init();
+                if (ConfigurationManager.Instance.SafeRun)
+                    AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            new Thread(new ThreadStart(SymbiozCommands.HandleCommands)).Start();
+                Startup.StartServers();
+                DataWriterProvider.Instance.Init();
+
+                new Thread(new ThreadStart(SymbiozCommands.HandleCommands)).Start();
+            }
+            catch (Exception error)
+            {
+                Logger.Log(error);
+            }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

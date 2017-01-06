@@ -18,6 +18,7 @@ using Symbioz.World.Records.Maps;
 using Shader.Helper;
 using Symbioz.World.Records.Alliances.Prisms;
 using System.Drawing;
+using Symbioz.World.Models;
 
 namespace Symbioz.World.Handlers
 {
@@ -40,8 +41,12 @@ namespace Symbioz.World.Handlers
             client.Send(new MapComplementaryInformationsDataMessage(client.Character.SubAreaId, message.mapId, new List<HouseInformations>(),
                client.Character.Map.Instance.GetActors(client), client.Character.Map.Instance.GetInteractiveElements(), new List<StatedElement>(),
                 new List<MapObstacle>(), client.Character.Map.Instance.Fights));
-            AvAState.GetState(client, client.Character.Map.Instance.GetPlayers());
             
+            AvAState.GetState(client, client.Character.Map.Instance.GetPlayers());
+            if (client.Character.Party != null)
+            {
+                client.Character.Party.UpdateFollowingMap(client.Character);
+            }
             //TODO:TaxCollectors
             client.Character.Map.Instance.ShowFightsCount(client);
             client.Character.CheckMapTip(message.mapId);
@@ -52,6 +57,29 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleMapMovement(GameMapMovementRequestMessage message, WorldClient client)
         {
+            if (CharactersInvisibleRecord.CheckInvisible(client.Character.Record.Id))
+            {
+                if (CharactersInvisibleRecord.CanStillBeInvisible(client.Character.Record.Id))
+                {
+                    CharactersInvisibleRecord.DecreaseMovementAuthorized(client.Character.Record.Id);
+                    client.Character.Reply("Il vous reste <b>" + CharactersInvisibleRecord.getAuthorizedMovement(client.Character.Record.Id) + " déplacements</b> avant de redevenir visible !");
+                }
+                else
+                {
+                    if (CharactersInvisibleRecord.getCharacterLook(client.Character.Record.Id) == "{44|||}")
+                    {
+                        client.Character.Look = ContextActorLook.Parse(client.Character.Record.OldLook);
+                        client.Character.RefreshOnMapInstance();
+                    }
+                    else
+                    {
+                        client.Character.Look = ContextActorLook.Parse(CharactersInvisibleRecord.getCharacterLook(client.Character.Record.Id));
+                        client.Character.RefreshOnMapInstance();
+                    }
+                    client.Character.Reply("Votre potion d'invisbilité ne fait plus effet !");
+                    CharactersInvisibleRecord.DeleteInvisibleCharacter(client.Character.Record.Id);
+                }
+            }
             sbyte direction = PathParser.GetDirection(message.keyMovements.Last());
             short cellid = PathParser.ReadCell(message.keyMovements.Last());
             if (client.Character.IsFighting)
@@ -176,6 +204,7 @@ namespace Symbioz.World.Handlers
                     }
                 }
             }
+       
         }
 
         [MessageHandler]
@@ -250,7 +279,7 @@ namespace Symbioz.World.Handlers
                     canUse = client.Character.RemoveKamas(InteractiveActionProvider.GetTeleportationCost(client.Character.Map, MapRecord.GetMap(message.mapId)), true);
                     break;
             }
-
+    
             if (canUse)
             {
                 client.Character.Teleport(message.mapId, (short)InteractiveRecord.GetTeleporterCellId(message.mapId, (TeleporterTypeEnum)message.teleporterType));

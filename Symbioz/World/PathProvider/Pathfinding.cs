@@ -121,6 +121,53 @@ namespace Symbioz.World.PathProvider
             return Cells;
         }
 
+        public static bool isOnLeftLine(short cell)
+        {
+            bool gauche = false;
+            //0 a 14  -> gauche
+            //15 a 27  -> droite
+            //28 a 41 -> gauche
+            for (int i = 546; i > -1; i -= 14)
+            {
+                if (i <= cell)
+                    break;
+                if (gauche)
+                    gauche = false;
+                else
+                    gauche = true;
+            }
+            return gauche;
+        }
+
+        public static int getSeparatedNumberOfLines(short start, short end)
+        {
+            bool ok = false;
+            //0 a 14  -> gauche
+            //15 a 27  -> droite
+            //28 a 41 -> gauche
+            short tmp = 0;
+            if (start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+            int line = 0;
+            for (int i = 546; i > -1; i -= 14)
+            {
+                if (ok)
+                    line++;
+                if (i > end && (i - 14) < end)//si on et sur la ligne end
+                    ok = true;
+                if (i > start && (i - 14) < start)//si on et sur la ligne start
+                {
+                    ok = false;
+                    break;
+                }
+            }
+            return line;
+        }
+
         public static short[] getCiblesByZoneByWeapon(MapRecord CurrentMap, WeaponRecord template, int cell, int castCellID)
         {
             short[] allCell = new short[4];

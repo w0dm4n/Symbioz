@@ -4,6 +4,7 @@ using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
 using Symbioz.Network.Clients;
 using Symbioz.Network.Servers;
+using Symbioz.ORM;
 using Symbioz.World.Models;
 using Symbioz.World.Models.Alliances.Prisms;
 using Symbioz.World.Records;
@@ -35,6 +36,7 @@ namespace Symbioz.Providers
 
             //Handlers for ItemTypeId [ItemTypeID, CatchMethod(WorldClient, CharacterItemRecord)]
             CustomItemTypesIdsHandlers.Add(33, HandleBread); //Pain
+            CustomItemIdsHandlers.Add(9869, HandleInvisibleCharacter);
         }
 
         #region CustomItemIdsHandlers
@@ -127,12 +129,23 @@ namespace Symbioz.Providers
             if (client.Character.IsFighting)
                 return;
             var target = WorldServer.Instance.GetOnlineClient(TrackRecord.GetCharacterIdTrackedFromItemUID((int)item.UID));
+            var trackRecord = TrackRecord.GetFromItemuid((int)item.UID);
             if (target != null)
             {
-                var targetPosition = MapRecord.GetMap(target.Character.Record.MapId);
-                var targetCoordinates = new MapCoordinates((short)targetPosition.WorldX, (short)targetPosition.WorldY);
-                client.Character.Reply("<b>" + target.Character.Record.Name + "</b> se trouve actuellement en : (<b>" + targetPosition.WorldX + "," + targetPosition.WorldY + "</b>)");
-                client.Send(new CompassUpdatePvpSeekMessage(0, targetCoordinates, (uint)target.Character.Id, target.Character.Record.Name));
+                if (trackRecord.Tentative > 0)
+                {
+                    var targetPosition = MapRecord.GetMap(target.Character.Record.MapId);
+                    var targetCoordinates = new MapCoordinates((short)targetPosition.WorldX, (short)targetPosition.WorldY);
+                    client.Character.Reply("<b>" + target.Character.Record.Name + "</b> se trouve actuellement en : (<b>" + targetPosition.WorldX + "," + targetPosition.WorldY + "</b>)");
+                    client.Send(new CompassUpdatePvpSeekMessage(0, targetCoordinates, (uint)target.Character.Id, target.Character.Record.Name));
+                    TrackRecord.DecreaseTentative((int)item.UID);
+                }
+                else
+                {
+                    client.Character.Reply("Votre parchemin de traque sur ce joueur a expiré ! (5 par parchemin)");
+                    client.Character.Inventory.RemoveItem(item.UID, 1);
+                    SaveTask.RemoveElement(trackRecord);
+                }
             }
             else
             {
@@ -243,6 +256,34 @@ namespace Symbioz.Providers
         }
 
         #endregion
+
+        public static void HandleInvisibleCharacter(WorldClient client, CharacterItemRecord item)
+        {
+            if (client.Character.IsFighting)
+                return;
+
+            var template = ItemRecord.GetItem(item.GID);
+            if (template == null)
+                return;
+
+            if (client.Character.IsFighting)
+            {
+                client.Character.Reply("Impossible en combat !");
+            }
+            if (!CharactersInvisibleRecord.CheckInvisible(client.Character.Record.Id))
+            {
+                var characterInvisible = new CharactersInvisibleRecord(CharactersInvisibleRecord.PopId(), client.Character.Record.Id, client.Character.Record.Look, 20);
+                SaveTask.AddElement(characterInvisible);
+
+                client.Character.Look = ContextActorLook.Parse("{44}");
+                client.Character.RefreshOnMapInstance();
+
+                client.Character.Inventory.RemoveItem(item.UID, 1, true);
+                client.Character.Reply("Vous êtes désormais invisible pour les prochains <b>20 déplacements</b> !");
+            }
+            else
+                client.Character.Reply("Impossible car votre personnage est déjà invisible !");
+        }
 
         #endregion
     }

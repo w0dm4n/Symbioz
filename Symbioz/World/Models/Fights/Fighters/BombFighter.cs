@@ -126,7 +126,6 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             MarksHelper.Instance.CastDetonation(Master,this, BombWallRecord.DetonationSpellId, BombWallRecord.BombMonsterId,5);
             Die();
-           
         }
        
     }

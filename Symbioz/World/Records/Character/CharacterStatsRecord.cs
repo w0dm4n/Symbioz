@@ -178,6 +178,11 @@ namespace Symbioz.World.Records
         public short APAttack { get { return (short)(Wisdom / 10); } }
         [Ignore]
         public short MPAttack { get { return (short)(Agility / 10); } }
+        [Ignore]
+        public short TackleEvade { get { return (short)(Agility / 10); } set { Agility = value; } }
+        [Ignore]
+        public short TackleBlock{ get { return (short)(Agility / 10); } set{ Agility = value; } }
+
         public CharacterStatsRecord Clone()
         {
             return new CharacterStatsRecord(CharacterId, LifePoints, MaxEnergyPoints, Initiative, Prospecting,
@@ -278,8 +283,8 @@ namespace Symbioz.World.Records
             var align = character.GetActorExtendedAlignement();
             var expFloor = ExperienceRecord.GetExperienceForLevel(character.Record.Level);
 
-            var mpMax = character.CharacterStatsRecord.MovementPoints;
-            var apMax = character.CharacterStatsRecord.ActionPoints;
+            var mpMax = character.CharacterStatsRecord.MovementPoints > 6 ? 6 : character.CharacterStatsRecord.MovementPoints;
+            var apMax = character.CharacterStatsRecord.ActionPoints > 12 ? 12 : character.CharacterStatsRecord.ActionPoints;
 
 
             if (character.FighterInstance != null && character.IsRegeneratingLife == false)
@@ -297,7 +302,7 @@ namespace Symbioz.World.Records
                 GetBase((short)apMax), GetBase((short)mpMax), GetBase(stats.BaseStrength, stats.ContextStrength, stats.PermanentStrenght), GetBase(stats.BaseVitality, stats.ContextVitality, stats.PermanentVitality), GetBase(stats.BaseWisdom, stats.ContextWisdom, stats.PermanentWisdom), GetBase(stats.BaseChance, stats.ContextChance, stats.PermanentChance), GetBase(stats.BaseAgility, stats.ContextAgility, stats.PermanentAgility), GetBase(stats.BaseIntelligence, stats.ContextIntelligence, stats.PermanentIntelligence),
                 GetBase(stats._Range), GetBase(stats.SummonableCreaturesBoost), GetBase(stats.Reflect), GetBase(stats.CriticalHit), (ushort)stats.CriticalHitWeapon, GetBase(0), GetBase(stats.HealBonus), GetBase(stats.AllDamagesBonus),
                 GetBase(stats.WeaponDamagesBonusPercent), GetBase(stats.AllDamagesBonusPercent), GetBase(stats.TrapBonus), GetBase(stats.TrapBonusPercent), GetBase(stats.GlyphBonusPercent), GetBase(0),
-                GetBase(0), GetBase(0), GetBase(stats.APReduction, stats.ContextAPReduction), GetBase(0), GetBase(stats.PushDamageBonus), GetBase(stats.CriticalDamageBonus), GetBase(stats.NeutralDamageBonus), GetBase(stats.EarthDamageBonus),
+               GetBase(stats.TackleBlock), GetBase(stats.TackleEvade), GetBase(stats.APReduction, stats.ContextAPReduction), GetBase(0), GetBase(stats.PushDamageBonus), GetBase(stats.CriticalDamageBonus), GetBase(stats.NeutralDamageBonus), GetBase(stats.EarthDamageBonus),
                 GetBase(stats.WaterDamageBonus), GetBase(stats.AirDamageBonus), GetBase(stats.FireDamageBonus), GetBase(stats.DodgePA), GetBase(stats.DodgePM), GetBase(stats.NeutralResistPercent),
                 GetBase(stats.EarthResistPercent), GetBase(stats.WaterResistPercent), GetBase(stats.AirResistPercent), GetBase(stats.FireResistPercent), GetBase(stats.NeutralReduction),
                 GetBase(stats.EarthReduction), GetBase(stats.WaterReduction), GetBase(stats.AirReduction), GetBase(stats.FireReduction), GetBase(stats.PushDamageReduction),
@@ -329,10 +334,35 @@ namespace Symbioz.World.Records
             character.Record.CurrentLifePoint = character.CurrentStats.LifePoints;
             SaveTask.AddElement(stats, character.Id);
         }
+
+        public static void ReCreate(Character character)
+        {
+            var items = character.Inventory.GetEquipedItems();
+            foreach (var item in items)
+                character.Inventory.UnequipItem(item, 63, item.GetTemplate(), 1, false);
+            var breed = BreedRecord.GetBreed(character.Record.Breed);
+            character.Record.SpellPoints = character.Record.Level;
+            character.Record.StatsPoints = (ushort)((character.Record.Level * 5) - 5);
+            var lifePoint = breed.StartLifePoints + (character.Record.Level * 5);
+            int AP = 6;
+            if (character.Record.Level >= 100)
+                AP += 1;
+                var stats = new CharacterStatsRecord(character.Id, (short)lifePoint, (short)(ConfigurationManager.Instance.StartLevel * 10), (short)lifePoint, breed.StartProspecting, (short)AP, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
+            character.Record.CurrentLifePoint = character.CurrentStats.LifePoints;
+            SaveTask.AddElement(stats, character.Id);
+        }
         public static void InitializeCharacter(Character character)
         {
             var stats = CharacterStatsRecord.CharactersStats.Find(x => x.CharacterId == character.Id);
-            character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
+            if (stats != null)
+                character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
+            else
+            {
+                CharacterStatsRecord.ReCreate(character);
+                stats = CharacterStatsRecord.CharactersStats.Find(x => x.CharacterId == character.Id);
+                character.CurrentStats = new BasicStats((ushort)stats.MaxEnergyPoints, (uint)stats.LifePoints);
+            }
         }
         public static CharacterStatsRecord GetCharacterStatsRecord(int characterid)
         {
@@ -344,6 +374,12 @@ namespace Symbioz.World.Records
             if (field == null)
                 throw new Exception("Field " + name + " dosent exist in StatRecord");
             return field;
+        }
+
+        public static void Reset(CharacterStatsRecord old, CharacterStatsRecord newStats)
+        {
+            SaveTask.RemoveElement(old);
+            SaveTask.AddElement(newStats);
         }
     }
 }

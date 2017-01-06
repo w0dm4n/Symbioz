@@ -123,10 +123,28 @@ namespace Symbioz.World.Records.Guilds
             return null;
         }
 
+        public static GuildRecord GetGuildForSave(int GuildId)
+        {
+            foreach (var guild in Guilds)
+            {
+                if (guild.Id == GuildId)
+                    return guild;
+            }
+            return null;
+        }
+
         [BeforeSave]
         public static void BeforeSave()
         {
-            Guilds.ForEach(x => SaveTask.UpdateElement(x));
+            var GuildsCopy = new List<GuildRecord>();
+            foreach (var guild in Guilds)
+                GuildsCopy.Add(guild);
+
+            foreach (var guild in GuildsCopy)
+            {
+                SaveTask.UpdateElement(GetGuildForSave(guild.Id));
+            }
+            //Guilds.ForEach(x => SaveTask.UpdateElement(x));
         }
 
         #region Extended

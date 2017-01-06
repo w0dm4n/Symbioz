@@ -16,7 +16,6 @@ using Symbioz.World.Models.Fights.Fighters;
 using Symbioz.World.Models.Guilds;
 using Symbioz.World.Models.Maps;
 using Symbioz.World.Models.Parties;
-using Symbioz.World.Models.Parties.Dungeon;
 using Symbioz.World.Records;
 using Symbioz.World.Records.Alliances;
 using Symbioz.World.Records.Companions;
@@ -41,6 +40,8 @@ using Symbioz.World.Records.Tracks;
 using Symbioz.World.Models.Items;
 using System.Timers;
 using Symbioz.Auth.Models;
+using Symbioz.Helper;
+using Symbioz.Core.Startup;
 
 namespace Symbioz.World.Models
 {
@@ -56,6 +57,7 @@ namespace Symbioz.World.Models
         public int LastSalesMessage = 0;
         public int LastSeekMessage = 0;
         public int LastCharacterSave = 0;
+        public int LastCharacterStart = 0;
         public DateTime RegenStartTime;
         public bool IsRegeneratingLife;
         public bool CurrentlyInTrackRequest = false;
@@ -65,10 +67,12 @@ namespace Symbioz.World.Models
         public short MovedCell { get; set; }
         public WorldClient Client { get; set; }
         public ContextActorLook Look { get; set; }
+        public ContextActorLook LookSave { get; set; }
         public CharacterRecord Record { get; set; }
         public bool Busy { get { return ExchangeType != null; } }
         public Inventory Inventory { get; set; }
         public CharacterStatsRecord CharacterStatsRecord { get { return CharacterStatsRecord.CharactersStats.Find(x => x.CharacterId == Id); } }
+        public void ResetCharacterStatsRecord(CharacterStatsRecord newStats ) { CharacterStatsRecord.Reset(this.CharacterStatsRecord, newStats); }
         public BasicStats CurrentStats { get; set; }
         public List<HumanOption> HumanOptions { get; set; }
         public ActorRestrictionsInformations Restrictions = CharacterHelper.GetDefaultRestrictions();
@@ -77,16 +81,100 @@ namespace Symbioz.World.Models
         public List<ShortcutSpell> SpellsShortcuts { get { return SpellShortcutRecord.GetCharacterShortcuts(Id); } }
         public List<Shortcut> GeneralShortcuts { get { return GeneralShortcutRecord.GetCharacterShortcuts(Id); } }
         public List<SuccesRewards> SuccesShortcuts = new List<SuccesRewards>();
-        public PartyMember PartyMember;
         public List<FriendRecord> Friends = new List<FriendRecord>();
         public List<IgnoredRecord> Enemies = new List<IgnoredRecord>();
         public List<IgnoredRecord> Ignored = new List<IgnoredRecord>();
         public List<CharacterKeyring> Keyrings = new List<CharacterKeyring>();
         public List<CharactersMerchantsRecord> MerchantItems = new List<CharactersMerchantsRecord>();
+        public PlayerTradeRequest Request
+        {
+            get;
+            set;
+        }
+        public string Name { get { return Record.Name; } }
+        #region Party
+        public Party Party
+        {
+            get;
+            set;
+        }
 
+        private Dictionary<uint, PartyInvitation> PartyInvitations = new Dictionary<uint, PartyInvitation>();
+
+        public PartyInvitation GetPartyInvitation(uint partyId)
+        {
+            return PartyInvitations.ContainsKey(partyId) ? PartyInvitations[partyId] : null;
+        }
+
+        public bool IsInParty()
+        {
+            return Party != null;
+        }
+
+        public bool IsPartyLeader()
+        {
+            return IsInParty() && Party.Leader == this;
+        }
+
+        public void AddInvitation(PartyInvitation invitation)
+        {
+            PartyInvitations.Add(invitation.Party.Id, invitation);
+            invitation.Party.AddGuest(this);
+        }
+
+        public void RemoveInvitation(PartyInvitation invitation)
+        {
+            if (PartyInvitations.ContainsValue(invitation))
+                PartyInvitations.Remove(invitation.Party.Id);
+        }
+
+        public void RemoveInvitation(Party invitation)
+        {
+            if (PartyInvitations.ContainsKey(invitation.Id))
+                PartyInvitations.Remove(invitation.Id);
+        }
+
+        public void QuitParty(bool kicked)
+        {
+            if (Party != null)
+            {
+                Party.RemoveMember(this, kicked);
+                Party = null;
+            }
+        }
+
+        public PartyMemberInformations GetPartyMemberInformations()
+        {
+            var stats = this.CharacterStatsRecord;
+            int level = (int)this.Record.Level;
+            int maxhp = stats.LifePoints;
+            int align = (int)(sbyte)Record.AlignmentSide;
+            PlayerStatus status = new PlayerStatus((sbyte)0);
+            PartyCompanionMemberInformations[] memberInformationsArray = new PartyCompanionMemberInformations[0];
+            return new PartyMemberInformations((uint)Id, (byte)level, Name, Look.ToEntityLook(), (sbyte)Record.Breed, Record.Sex, (uint)CurrentStats.LifePoints, (uint)maxhp, (ushort)stats.Prospecting, (byte)1, (ushort)this.Initiative, (sbyte)align, (short)0, (short)0, this.Map.Id, (ushort)this.SubAreaId, status, (IEnumerable<PartyCompanionMemberInformations>)memberInformationsArray);
+        }
+
+        public PartyInvitationMemberInformations GetPartyInvitationMemberInformations()
+        {
+            BasicStats current = this.CurrentStats;
+            PartyCompanionMemberInformations[] memberInformationsArray = new PartyCompanionMemberInformations[0];
+            return new PartyInvitationMemberInformations((uint)Id, (byte)Record.Level, Record.Name, Look.ToEntityLook(), (sbyte)Record.Breed, Record.Sex, (short)0, (short)0, this.Map.Id, (ushort)this.SubAreaId, (IEnumerable<PartyCompanionMemberInformations>)memberInformationsArray);
+        }
+
+        public PartyGuestInformations GetPartyGuestInformations(Party party)
+        {
+            var invitation = PartyInvitations[party.Id];
+            if (invitation == null)
+                return new PartyGuestInformations();
+            PartyCompanionMemberInformations[] memberInformationsArray = new PartyCompanionMemberInformations[0];
+            return new PartyGuestInformations(Id, (int)invitation.Party.Id, Record.Name, Look.ToEntityLook(), Record.Breed, Record.Sex, new PlayerStatus((sbyte)0), (IEnumerable<PartyCompanionMemberInformations>)memberInformationsArray);
+        }
+        #endregion
         #region Exchanges
         public ExchangeTypeEnum? ExchangeType = null;
         public NpcBuySellExchange NpcShopExchange { get; set; }
+        public NpcShopExchange NpcPointsExchange { get; set; }
+        public NpcTradeExchange NpcTradeExchange { get; set; }
         public SmithMagicExchange SmithMagicInstance { get; set; }
         public BankExchange BankInstance { get; set; }
         public BidShopExchange BidShopInstance { get; set; }
@@ -96,7 +184,14 @@ namespace Symbioz.World.Models
         public PrismExchange PrismStorageInstance { get; set; }
         public GuildInvitationDialog GuildInvitationDialog { get; set; }
         public AllianceInvitationDialog AllianceInvitationDialog { get; set; }
+        public PlayerTrader Trader;
         #endregion
+
+        public void ResetTrade()
+        {
+            PlayerTradeInstance = null;
+            Trader = null;
+        }
 
         public bool IsFighting { get { return !FighterInstance.IsNull(); } }
 
@@ -125,19 +220,19 @@ namespace Symbioz.World.Models
             this.Client = client;
             this.Record = record;
 
-            this.Account = AccountsProvider.GetAccountFromDb(this.Record.AccountId);
-            AccountsProvider.UpdateAccountsOnlineState(this.Account.Id, true);
+                this.Account = AccountsProvider.GetAccountFromDb(this.Record.AccountId);
+                AccountsProvider.UpdateAccountsOnlineState(this.Account.Id, true);
 
-            this.Look = ContextActorLook.Parse(Record.Look);
-            this.HumanOptions = new List<HumanOption>();
+                this.Look = ContextActorLook.Parse(Record.Look);
+                this.HumanOptions = new List<HumanOption>();
 
-            this.Inventory = new Inventory(this);
+                this.Inventory = new Inventory(this);
 
-            this.LoadMerchantItems();
-            this.LoadFriends();
-            this.LoadEnemies();
+                this.LoadMerchantItems();
+                this.LoadFriends();
+                this.LoadEnemies();
 
-            this.PlayerStatus = new PlayerStatus((sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE);
+                this.PlayerStatus = new PlayerStatus((sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE);
         }
         public void OnConnectedBasicActions()
         {
@@ -199,9 +294,21 @@ namespace Symbioz.World.Models
         }
         public List<int> GetCharacterBaseIndexedColors()
         {
-            return this.Look.indexedColors.GetRange(0, 5);
+            var Color = this.Look.indexedColors;
+            var Empty = new List<int>();
+            if (Color.Count >= 5)
+                return this.Look.indexedColors.GetRange(0, 5);
+            else
+            {
+                Empty.Add(0);
+                Empty.Add(0);
+                Empty.Add(0);
+                Empty.Add(0);
+                Empty.Add(0);
+                return Empty;
+            }
         }
-        public CharacterFighter CreateFighter(FightTeam team)
+        public CharacterFighter CreateFighter(FightTeam team, Fight currentFight = null)
         {
             Look.UnsetAura();
             RefreshOnMapInstance();
@@ -213,8 +320,11 @@ namespace Symbioz.World.Models
             FighterInstance = fighter;
             if (EquipedCompanion != null)
             {
-                var cfighter = new CompanionFighter(EquipedCompanion, fighter, team);
-                team.AddFighter(cfighter);
+                if (currentFight != null && (currentFight is FightPvM || currentFight is FightDual))
+                {
+                    var cfighter = new CompanionFighter(EquipedCompanion, fighter, team);
+                    team.AddFighter(cfighter);
+                }
             }
             return fighter;
         }
@@ -474,12 +584,12 @@ namespace Symbioz.World.Models
             RefreshSpells();
             RefreshShortcuts();
             Client.Send(new CharacterLevelUpMessage(Record.Level));
-            if (this.PartyMember != null)
+            if (this.Party != null)
             {
-                foreach (WorldClient c in this.PartyMember.Party.Members)
+                foreach (Character c in this.Party.Members)
                 {
-                    c.Send(new PartyUpdateMessage((uint)this.PartyMember.Party.Id,
-                        this.PartyMember.GetPartyMemberInformations()));
+                    c.Client.Send(new PartyUpdateMessage((uint)this.Party.Id,
+                        this.GetPartyMemberInformations()));
                 }
             }
             if (level >= 100 && !this.Record.KnownOrnaments.Contains(13))
@@ -675,13 +785,16 @@ namespace Symbioz.World.Models
         {
             Client.Send(new GameContextDestroyMessage());
             Client.Send(new GameContextCreateMessage(1));
-            if (winner && FighterInstance.Fight.Map.DugeonMap)
+            if (FighterInstance != null && FighterInstance.Fight != null && FighterInstance.Fight.Map != null && FighterInstance.Fight.Map.DugeonMap != false)
             {
-                var dungeonMap = DungeonRecord.GetDungeonData(FighterInstance.Fight.Map.Id);
-                FighterInstance = null;
-                Client.Character.Teleport(dungeonMap.TeleportMapId, dungeonMap.TeleportCellId);
-                RefreshStats();
-                return;
+                if (winner && FighterInstance.Fight.Map.DugeonMap && FighterInstance.Fight is FightPvM)
+                {
+                    var dungeonMap = DungeonRecord.GetDungeonData(FighterInstance.Fight.Map.Id);
+                    FighterInstance = null;
+                    Client.Character.Teleport(dungeonMap.TeleportMapId, dungeonMap.TeleportCellId);
+                    RefreshStats();
+                    return;
+                }
             }
             FighterInstance = null;
             if (spawnjoin && !winner)
@@ -697,7 +810,8 @@ namespace Symbioz.World.Models
             }
             else
                 MapsHandler.SendCurrentMapMessage(Client, Client.Character.Record.MapId);
-            Client.Character.RegenLife(10);
+            if (Client.Character.Restrictions.isDead == false)
+                Client.Character.RegenLife(10);
             Client.Character.RefreshStats();
         }
         public void EquipCompanion(short templateid)
@@ -722,6 +836,7 @@ namespace Symbioz.World.Models
         {
             SendMap(new ChatSmileyMessage(Id, smileyid, Client.Account.Id));
         }
+
         public GameRolePlayCharacterInformations GetRolePlayActorInformations()
         {
             return new GameRolePlayCharacterInformations(Id, Look.ToEntityLook(),
@@ -810,7 +925,7 @@ namespace Symbioz.World.Models
         }
         public void ReplyError(object value)
         {
-            Reply("[Erreur] " + value, Color.Red, false, true);
+            Reply(value, Color.Red, false, false);
         }
 
         public void ReplyInConsole(string content, ConsoleMessageTypeEnum type = ConsoleMessageTypeEnum.CONSOLE_TEXT_MESSAGE)
@@ -823,7 +938,6 @@ namespace Symbioz.World.Models
         public void RefreshStats()
         {
             Client.Send(new CharacterStatsListMessage(CharacterStatsRecord.GetCharacterCharacteristics(CharacterStatsRecord, this)));
-            this.RefreshGroupInformations();
         }
         public void LeaveDialog()
         {
@@ -833,10 +947,6 @@ namespace Symbioz.World.Models
         {
             switch (ExchangeType)
             {
-                case ExchangeTypeEnum.PLAYER_TRADE:
-                    if (PlayerTradeInstance != null)
-                        PlayerTradeInstance.CancelExchange();
-                    break;
                 case ExchangeTypeEnum.CRAFT:
                     if (CraftInstance != null)
                         CraftInstance.CancelExchange();
@@ -863,50 +973,51 @@ namespace Symbioz.World.Models
                     if (NpcShopExchange != null)
                         NpcShopExchange.CancelExchange();
                     break;
+                case ExchangeTypeEnum.NPC_TRADE:
+                    if (NpcTradeExchange != null)
+                        NpcTradeExchange.CancelExchange();
+                    break;
             }
-
+            if (PlayerTradeInstance != null)
+                PlayerTradeInstance.CancelExchange();
             Client.Send(new ExchangeLeaveMessage((sbyte)DialogTypeEnum.DIALOG_EXCHANGE, true));
             ExchangeType = null;
         }
 
         public void Dispose()
         {
-            if (Map != null && this.Record.MerchantMode == 0)
-                Map.Instance.RemoveClient(Client);
-            if (SearchingArena)
-                ArenaProvider.Instance.OnClientDisconnected(Client);
-            if (IsFighting)
-                FighterInstance.OnDisconnect();
-            if (PlayerTradeInstance != null)
-                PlayerTradeInstance.Abort();
-            if (PartyMember != null)
-                PartyMember.Party.QuitParty(Client);
-            if (DungeonPartyProvider.Instance.GetDPCByCharacterId(this.Id) != null)
-                DungeonPartyProvider.Instance.RemoveCharacter(this);
-            Client.Character.Look.UnsetAura();
-            Record.Look = Look.ConvertToString();
+            if (this != null)
+            {
+                if (Map != null && this.Record.MerchantMode == 0)
+                    Map.Instance.RemoveClient(Client);
+                if (SearchingArena)
+                    ArenaProvider.Instance.OnClientDisconnected(Client);
+                if (IsFighting)
+                    FighterInstance.OnDisconnect();
+                if (PlayerTradeInstance != null)
+                    PlayerTradeInstance.CancelExchange();
+                if (Party != null)
+                    QuitParty(false);
+                foreach (var partyInvitation in PartyInvitations.Values)
+                {
+                    partyInvitation.Refuse();
+                }
+                Client.Character.Look.UnsetAura();
+                Record.Look = Look.ConvertToString();
+                SaveTask.UpdateElement(Record, this.Id);
+                SaveTask.UpdateElement(CharacterStatsRecord, this.Id);
+                Inventory.SaveItems();
+            }
+        }
+
+        public void Save()
+        {
             SaveTask.UpdateElement(Record, this.Id);
             SaveTask.UpdateElement(CharacterStatsRecord, this.Id);
             Inventory.SaveItems();
-            this.Save();
         }
 
-        public bool Save()
-        {
-            return SaveTask.SaveCharacter(this.Id);
-        }
-
-        public void RefreshGroupInformations()
-        {
-            if (this.PartyMember != null)
-            {
-                foreach (WorldClient client in this.PartyMember.Party.Members)
-                {
-                    client.Send(new PartyUpdateMessage((uint)this.PartyMember.Party.Id,
-                        this.PartyMember.GetPartyMemberInformations()));
-                }
-            }
-        }
+    
 
         public GuildRecord GetGuild()
         {
@@ -1021,12 +1132,16 @@ namespace Symbioz.World.Models
                 return;
             var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
             var LifePointsToAdd = 0;
+            var infinite = 0;
             while (StartTime < CurrentTime)
             {
                 if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.CharacterStatsRecord.LifePoints)
                     break;
                 LifePointsToAdd++;
                 StartTime++;
+                if (infinite > 100000)
+                    break;
+                infinite++;
             }
             //LifePointsToAdd = LifePointsToAdd / 2; If we wanna reduce the rate of life back at the reconnection
             this.CurrentStats.LifePoints += (uint)LifePointsToAdd;
@@ -1048,6 +1163,7 @@ namespace Symbioz.World.Models
                 var StartTime = DateTimeUtils.GetEpochFromDateTime(RegenStartTime);
                 var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                 var LifePointsToAdd = 0;
+                var infinite = 0;
                 while (StartTime < CurrentTime)
                 {
                     if ((this.CurrentStats.LifePoints + LifePointsToAdd) >= this.CharacterStatsRecord.LifePoints)
@@ -1057,6 +1173,9 @@ namespace Symbioz.World.Models
                     else if (this.RegenRate == 3)
                         LifePointsToAdd += 3;
                     StartTime++;
+                    if (infinite > 100000)
+                        break;
+                    infinite++;
                 }
                 if (this.RegenRate == 3)
                     LifePointsToAdd++;
@@ -1078,10 +1197,14 @@ namespace Symbioz.World.Models
                 var StartTime = LastSalesMessage;
                 var Seconds = 0;
                 var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                var infinite = 0;
                 while (StartTime < CurrentTime)
                 {
                     Seconds++;
                     StartTime++;
+                    infinite++;
+                    if (infinite > 100000)
+                        break;
                 }
                 if (Seconds >= ConfigurationManager.Instance.TimeBetweenSalesMessage)
                     return true;
@@ -1108,10 +1231,14 @@ namespace Symbioz.World.Models
                 var StartTime = LastSeekMessage;
                 var Seconds = 0;
                 var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                var infinite = 0;
                 while (StartTime < CurrentTime)
                 {
                     Seconds++;
                     StartTime++;
+                    infinite++;
+                    if (infinite > 100000)
+                        break;
                 }
                 if (Seconds >= ConfigurationManager.Instance.TimeBetweenSeekMessage)
                     return true;
@@ -1144,6 +1271,27 @@ namespace Symbioz.World.Models
             if (seconds < ConfigurationManager.Instance.TimeBetweenCharacterSave)
             {
                 this.Reply("Vous devez attendre encore " + (ConfigurationManager.Instance.TimeBetweenCharacterSave - seconds) + " seconde(s) pour pouvoir à nouveau sauvegarder votre personnage.");
+                return false;
+            }
+            else
+                return true;
+        }
+
+        public bool CanStart()
+        {
+            if (this.LastCharacterStart == 0)
+                return true;
+            var StartTime = this.LastCharacterStart;
+            var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+            var seconds = 0;
+            while (StartTime <= CurrentTime)
+            {
+                seconds++;
+                StartTime++;
+            }
+            if (seconds < ConfigurationManager.Instance.TimeBetweenStart)
+            {
+                this.Reply("Vous devez attendre encore " + (ConfigurationManager.Instance.TimeBetweenStart - seconds) + " seconde(s) pour pouvoir à nouveau téléporter votre personnage.");
                 return false;
             }
             else
@@ -1506,12 +1654,38 @@ namespace Symbioz.World.Models
                 target.Character.CurrentlyInTrackRequest = false;
             }
             else
+            {
+                this.Inventory.RemoveItem(itemRecord.UID, 1);
                 this.Reply("Vous n'avez pas obtenu de parchemin lié à <b>" + target.Character.Record.Name + "</b> car il s'est enfuit !", Color.Orange);
+                target.Character.Reply("Un joueur a essayé de vous traquer mais vous avez fui !", Color.Orange);
+            }
 
             this.IsTracking = false;
             actionTimer.Stop();
         }
 
         #endregion
+
+        public void increasePlayersKilled(int numbers)
+        {
+            this.Record.PlayersKilled = this.Record.PlayersKilled + numbers;
+        }
+
+        public void resetPlayersKilled()
+        {
+            this.Record.PlayersKilled = 0;
+        }
+
+        public CharacterItemRecord haveGuildalogemme()
+        {
+            var items = this.Inventory.GetAllItems();
+
+            foreach (var item in items)
+            {
+                if (item.GID == 1575) // ID guildalogemme
+                    return (item);
+            }
+            return null;
+        }
     }
 }

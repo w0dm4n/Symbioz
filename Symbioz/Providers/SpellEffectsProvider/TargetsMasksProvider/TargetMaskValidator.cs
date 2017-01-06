@@ -56,6 +56,17 @@ namespace Symbioz.Providers.SpellEffectsProvider.TargetsMasksProvider
             else
                 return new List<Fighter>();
         }
+        [TMValidator("E")]
+        public static List<Fighter> WithState2(Fighter fighter, string value, List<Fighter> exisiting)
+        {
+            List<Fighter> tmp = new List<Fighter>();
+            foreach (Fighter f in exisiting)
+            {
+                if (f.HaveState(short.Parse(value)))
+                    tmp.Add(f);
+            }
+            return (tmp);
+        }
         [TMValidator("*e")]
         public static List<Fighter> WithoutState(Fighter fighter, string value, List<Fighter> exisiting)
         {

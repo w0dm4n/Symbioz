@@ -23,12 +23,14 @@ namespace Symbioz.World.Records.Tracks
         public int Id;
         public int TrackedCharacterId;
         public int ItemUID;
+        public int Tentative;
 
-        public TrackRecord(int id, int trackedCharacterId, int itemUID)
+        public TrackRecord(int id, int trackedCharacterId, int itemUID, int Tentative)
         {
             this.Id = id;
             this.TrackedCharacterId = trackedCharacterId;
             this.ItemUID = itemUID;
+            this.Tentative = 5;
         }
 
         public static int GetCharacterIdTrackedFromItemUID(int UID)
@@ -57,7 +59,7 @@ namespace Symbioz.World.Records.Tracks
 
         public static void AddTracked(int trackedCharacterId, int itemUID)
         {
-            var newElement = new TrackRecord(TrackRecord.PopNextTrackedId(), trackedCharacterId, itemUID);
+            var newElement = new TrackRecord(TrackRecord.PopNextTrackedId(), trackedCharacterId, itemUID, 5);
             SaveTask.AddElement(newElement);
         }
 
@@ -69,6 +71,29 @@ namespace Symbioz.World.Records.Tracks
                 {
                     SaveTask.RemoveElement(tracked);
                     break;
+                }
+            }
+        }
+
+        public static TrackRecord GetFromItemuid(int itemUID)
+        {
+            foreach (var tracked in TrackRecord.CharactersTracked)
+            {
+                if (tracked.ItemUID == itemUID)
+                {
+                    return tracked;
+                }
+            }
+            return null;
+        }
+
+        public static void DecreaseTentative(int itemUID)
+        {
+            foreach (var tracked in TrackRecord.CharactersTracked)
+            {
+                if (tracked.ItemUID == itemUID)
+                {
+                    tracked.Tentative = tracked.Tentative - 1;
                 }
             }
         }

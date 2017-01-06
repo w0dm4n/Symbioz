@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Symbioz.World.Models.Fights.Fighters
@@ -21,6 +22,11 @@ namespace Symbioz.World.Models.Fights.Fighters
         public TreeFighter tree = null;
         public SacrifierFighter sacrifier = null;
         public bool isSummon = false;
+        private Fighter Master
+        {
+            get;
+            set;
+        }
         public MonsterFighter(MonsterSpawnMapRecord spawn, FightTeam team)
             : base(team)
         {
@@ -28,6 +34,29 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.Template = MonsterRecord.GetMonster(SpawnRecord.MonsterId);
             this.ReadyToFight = true;
             this.Brain = new MonsterBrain(this, Template.IAActions);
+        }
+        public MonsterFighter(MonsterRecord template, FightTeam team, sbyte grade, short cellid, int summonerid,Fighter master)
+           : base(team)
+        {
+            this.Master = master;
+            this.Template = template;
+            this.ReadyToFight = true;
+            this.Brain = new MonsterBrain(this, Template.IAActions);
+            this.SpawnRecord = new MonsterSpawnMapRecord(0, template.Id, -1, 0);
+            this.SpawnRecord.ActualGrade = grade;
+            this.Team = team;
+            this.Team.AddSummon(this);
+            this.isSummon = true;
+            switch (SpawnRecord.MonsterId)
+            {
+                case 282://Arbre
+                    this.tree = new TreeFighter(null, team, this, cellid, grade);
+                    break;
+                case 116://Sacrifier
+                    this.sacrifier = new SacrifierFighter(null, team, this, cellid, grade);
+                    break;
+            }
+            InitializeSummon(summonerid, cellid);
         }
         /// <summary>
         /// For summons
@@ -47,10 +76,10 @@ namespace Symbioz.World.Models.Fights.Fighters
             this.isSummon = true;
             switch (SpawnRecord.MonsterId)
             {
-                case 282://Arbre
+                case 282: //Arbre
                 this.tree = new TreeFighter(null, team, this, cellid, grade);
                     break;
-                case 116://Sacrifier
+                case 116: //Sacrifié
                     this.sacrifier = new SacrifierFighter(null, team, this, cellid, grade);
                     break;
             }
@@ -120,12 +149,35 @@ namespace Symbioz.World.Models.Fights.Fighters
         {
             return Template.GetGrade(SpawnRecord.ActualGrade).Level;
         }
+
+        static void EndMonsterTurn(System.Timers.Timer Timer, Fighter Monster)
+        {
+            Monster.EndTurn();
+            Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
+
+        }
+
         public override void StartTurn()
         {
-            this.DecrementCooldowns();
-            base.StartTurn();
-            Brain.StartPlay();
-            base.EndTurn();
+            try
+            {
+                this.DecrementCooldowns();
+
+                base.StartTurn();
+
+                Brain.StartPlay();
+
+                var Timer = new System.Timers.Timer();
+                Timer.Interval = 1500;
+                Timer.Elapsed += (sender, e) => { EndMonsterTurn(Timer, this); };
+                Timer.Enabled = true;
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
         public List<SpellRecord> GetSpellsByCategory(SpellCategoryEnum category)
         {

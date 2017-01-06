@@ -17,7 +17,6 @@ using Symbioz.World.Records.Monsters;
 using Symbioz.Helper;
 using Symbioz.World.Models.Fights.Marks;
 using Symbioz.Network.Servers;
-using Symbioz.World.Models.Parties;
 using Symbioz.World.Models.Challenges;
 using Symbioz.World.Models.Fights.FightsTypes;
 using Symbioz.World.Models.Maps;
@@ -25,6 +24,9 @@ using Symbioz.World.Models.Alliances;
 using System.Drawing;
 using Symbioz.World.Records.Alliances.Prisms;
 using Symbioz.World.Records.SubAreas;
+using Symbioz.World.Models.Alliances.Prisms;
+using Symbioz.Core.Startup;
+using Symbioz.World.Models.Parties;
 
 namespace Symbioz.World.Models.Fights
 {
@@ -91,6 +93,9 @@ namespace Symbioz.World.Models.Fights
 
         public bool Started = false;
 
+        public List<string> PlayersIP = new List<string>();
+
+
         /// <summary>
         /// Todo
         /// </summary>
@@ -143,6 +148,13 @@ namespace Symbioz.World.Models.Fights
         {
             Send(new GameFightUpdateTeamMessage((short)Id, team.GetFightTeamInformations()));
         }
+
+
+        public IEnumerable<MarkTrigger> GetTriggers()
+        {
+            return Marks;
+        }
+
         public void SetOption(FightOptionsEnum option, FightTeam team)
         {
             bool setted = false;
@@ -171,23 +183,33 @@ namespace Symbioz.World.Models.Fights
         }
         public virtual void StartFight()
         {
-            Map.Instance.RemoveFightSword(Id);
-            this.StartTime = DateTime.Now;
-            Started = true;
-            Send(new GameFightStartMessage(new Idol[0]));
-            Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
-            if (this is FightPvM)
-                ChallengesInstance = new ChallengesInstance(this);
-            SyncFighters();
-            TimeLine.StartFight();
-            TimeLine.GetFirstFighter().StartTurn();
+            try
+            {
+                if (this.Started == false)
+                {
+                    Map.Instance.RemoveFightSword(Id);
+                    this.StartTime = DateTime.Now;
+                    Started = true;
+                    Send(new GameFightStartMessage(new Idol[0]));
+                    Send(new GameFightTurnListMessage(TimeLine.GenerateTimeLine(), new int[0]));
+                    if (this is FightPvM)
+                        ChallengesInstance = new ChallengesInstance(this);
+                    SyncFighters();
+                    TimeLine.StartFight();
+                    TimeLine.GetFirstFighter().StartTurn();
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
         }
 
         public void FighterDisconnect(CharacterFighter f)
         {
             if (f.IsPlaying)
             {
-                f.EndTurn();
+                //f.EndTurn();
             }
             f.FirstRoundDisconnected = true;
             f.Disconnected = true;
@@ -222,6 +244,7 @@ namespace Symbioz.World.Models.Fights
             GetAllFighters().ForEach(x => x.RefreshStats());
             Send(new GameFightSynchronizeMessage(GetAllFighters().ConvertAll<GameFightFighterInformations>(x => x.FighterInformations)));
         }
+
         #region Placement
         public abstract FightCommonInformations GetFightCommonInformations();
 
@@ -229,7 +252,7 @@ namespace Symbioz.World.Models.Fights
 
         public bool CanJoin(WorldClient client, FightTeam team, Fighter mainFighter = null)
         {
-            if (!IsPlacementCellFree(team.TeamColor))
+            if (!IsPlacementCellFree(team.TeamColor) || team.FightersCount >= 8)
             {
                 client.Character.Reply("L'équipe est pleine.");
                 return false;
@@ -241,17 +264,17 @@ namespace Symbioz.World.Models.Fights
             }
             if (team.TeamOptions.isRestrictedToPartyOnly)
             {
-                if (client.Character.PartyMember == null)
+                if (client.Character.Party == null)
                 {
                     client.Character.Reply("Ce combat est reserver aux membres du groupe");
                     return false;
                 }
                 if (mainFighter != null)
                 {
-                    Party p = WorldServer.Instance.WorldClients.Find(x => x.Character.Id == mainFighter.ContextualId).Character.PartyMember.Party;
-                    if (p.Id != client.Character.PartyMember.Party.Id)
+                    Party p = WorldServer.Instance.WorldClients.Find(x => x.Character.Id == mainFighter.ContextualId).Character.Party;
+                    if (p.Id != client.Character.Party.Id)
                     {
-                        client.Character.Reply("Ce combat est reserver aux membres du groupe");
+                        client.Character.Reply("Ce combat est réservé aux membres du groupe");
                         return false;
                     }
                 }
@@ -262,6 +285,25 @@ namespace Symbioz.World.Models.Fights
                 {
                     client.Character.Reply("Vous devez être dans la même alliance que ce personnage pour rejoindre ce combat !");
                     return false;
+                }
+                else
+                {
+                    if ((this.BlueTeam.GetFighters(true).Count == 1 && this.RedTeam.GetFighters(true).Count >= 5)
+                        || (this.RedTeam.GetFighters(true).Count == 1 && this.BlueTeam.GetFighters(true).Count >= 5))
+                    {
+                        client.Character.Reply("Impossible de rejoindre cette agression ! (5v1 max)");
+                        return false;
+                    }
+                    if (!(this.PlayersIP.Contains(client.SSyncClient.OnlyIp)))
+                    {
+                        this.PlayersIP.Add(client.SSyncClient.OnlyIp);
+                        return true;
+                    }
+                    else
+                    {
+                        client.Character.Reply("Impossible de rejoindre une agression avec plus d'un personnage !");
+                        return false;
+                    }
                 }
             }
             return true;
@@ -318,7 +360,7 @@ namespace Symbioz.World.Models.Fights
         #region ManageMethods
         /*public List<short> BreakAtFirstObstacles(List<short> cells)
         {
-
+ 
             List<short> results = new List<short>();
             if (cells == null)
                 return results;
@@ -338,51 +380,65 @@ namespace Symbioz.World.Models.Fights
         }*/
         public List<short> BreakAtFirstObstacles(short endcell, List<short> cells, DirectionsEnum direction)
         {
-
-            List<short> results = new List<short>();
-            if (cells == null)
-                return results;
-            foreach (var cell in cells)
+            try
             {
-                if (!IsObstacle(cell) && !IsOutMap(endcell, cell, direction))
+                List<short> results = new List<short>();
+                if (cells == null)
+                    return results;
+                foreach (var cell in cells)
                 {
-                    results.Add(cell);
+                    if (!IsObstacle(cell) && !IsOutMap(endcell, cell, direction))
+                    {
+                        results.Add(cell);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    endcell = cell;
                 }
-                else
-                {
-                    break;
-                }
-                endcell = cell;
+                return results;
             }
-            return results;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return null;
+            }
         }
 
         public List<Fighter> GetFighterBreakAtFirstObstacles(short endcell, List<short> cells, DirectionsEnum direction)
         {
-
-            List<Fighter> results = new List<Fighter>();
-            if (cells == null)
-                return null;
-            bool colled = false;
-            foreach (var cell in cells)
+            try
             {
-                if (GetAllFighters().ConvertAll<short>(x => x.CellId).Contains(cell) && !IsOutMap(endcell, cell, direction))
+                List<Fighter> results = new List<Fighter>();
+                if (cells == null)
+                    return null;
+                bool colled = false;
+                foreach (var cell in cells)
                 {
-                    colled = true;
-                    foreach (var f in GetAllFighters())
+                    if (GetAllFighters().ConvertAll<short>(x => x.CellId).Contains(cell) && !IsOutMap(endcell, cell, direction))
                     {
-                        if (f.CellId == cell)
-                            results.Add(f);
+                        colled = true;
+                        foreach (var f in GetAllFighters())
+                        {
+                            if (f.CellId == cell)
+                                results.Add(f);
+                        }
                     }
+                    else
+                    {
+                        if (colled)
+                            break;
+                    }
+                    endcell = cell;
                 }
-                else
-                {
-                    if (colled)
-                        break;
-                }
-                endcell = cell;
+                return results;
             }
-            return results;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return null;
+            }
         }
 
         public bool IsOutMap(short endcellid, short cellid, DirectionsEnum dir)
@@ -527,6 +583,14 @@ namespace Symbioz.World.Models.Fights
             var list = results.OfType<T>().ToList();
             return list.FindAll(predicate);
         }
+
+        public List<Buff> GetAllBuffs()
+        {
+            List<Buff> result = new List<Buff>();
+            GetAllFighters().ForEach(x => result.AddRange(x.Buffs));
+            return result;
+        }
+
         public void RemoveAllBuffs<T>(Predicate<T> predicate) where T : Buff
         {
             foreach (var fighter in GetAllFighters())
@@ -551,6 +615,7 @@ namespace Symbioz.World.Models.Fights
         {
             return GetAllFighters(withdeaths).FindAll(x => x is CharacterFighter).ConvertAll<CharacterFighter>(x => (CharacterFighter)x);
         }
+
         public void Send(Message message)
         {
             GetAllCharacterFighters(true).FindAll(x => !x.HasLeft).ForEach(x => x.Client.Send(message));
@@ -593,9 +658,9 @@ namespace Symbioz.World.Models.Fights
         {
             var message = new GameActionFightMarkCellsMessage(0, fighter.ContextualId, mark.GetMark());
             if (team == null)
-               Send(message);
+                Send(message);
             else
-               team.Send(message);
+                team.Send(message);
             mark.Intitialize(this, mark.GetType());
             Marks.Add(mark);
         }
@@ -623,25 +688,34 @@ namespace Symbioz.World.Models.Fights
             }
             Dispose();
         }
+
         public virtual void OnFightEnded(TeamColorEnum winner)
         {
 
         }
+
         public bool CheckFightEnd()
         {
-            if (Ended)
-                return true;
-            if (BlueTeam.GetFighters().Alives().Count == 0 || RedTeam.GetFighters().Alives().Count == 0)
+            try
             {
-
-                if (Started)
-                    Synchronizer.Start(EndFight);
-                else
-                    EndFight();
-                Ended = true;
-                return true;
+                if (Ended)
+                    return true;
+                if (BlueTeam.GetFighters().Alives().Count <= 0 || RedTeam.GetFighters().Alives().Count <= 0 || this.TimeLine.m_fighters.Count <= 0)
+                {
+                    if (Started)
+                        Synchronizer.Start(EndFight);
+                    else
+                        EndFight();
+                    Ended = true;
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return false;
+            }
 
         }
         public void TryEndSequence(sbyte sequenceType, ushort actionId)
@@ -689,41 +763,84 @@ namespace Symbioz.World.Models.Fights
         #endregion
         public void Dispose()
         {
-            var charactersFighting = GetAllCharacterFighters(true).FindAll(x => !x.HasLeft);
-            foreach (var fighter in charactersFighting)
-            {
-                bool winner = GetWinner() == fighter.Team.TeamColor;
-                if (fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)
+            Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                try
                 {
-                    if (fighter.Client.Character.GetLifePoints == true)
+                    var charactersFighting = GetAllCharacterFighters(true).FindAll(x => !x.HasLeft);
+                    foreach (var fighter in charactersFighting)
                     {
-                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.Client.Character.CharacterStatsRecord.LifePoints;
-                        fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
-                        fighter.Client.Character.GetLifePoints = false;
+                        bool winner = GetWinner() == fighter.Team.TeamColor;
+                        if (fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_PvM || fighter.Fight.FightType == FightTypeEnum.FIGHT_TYPE_AGRESSION)
+                        {
+                            if (fighter.Client.Character.GetLifePoints == true)
+                            {
+                                fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.Client.Character.CharacterStatsRecord.LifePoints;
+                                fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                                fighter.Client.Character.GetLifePoints = false;
+                            }
+                            else
+                            {
+                                fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
+                                fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
+                            }
+                        }
+                        fighter.Client.Character.RejoinMap(SpawnJoin, winner);
                     }
-                    else
-                    {
-                        fighter.Client.Character.CurrentStats.LifePoints = (uint)fighter.FighterStats.Stats.LifePoints;
-                        fighter.Client.Character.Record.CurrentLifePoint = fighter.Client.Character.CurrentStats.LifePoints;
-                    }
+                    FightProvider.Instance.RemoveFight(this);
+                    this.BlueTeam.Dispose();
+                    this.RedTeam.Dispose();
+                    this.RedTeam = null;
+                    this.BlueTeam = null;
+                    this.Synchronizer = null;
+                    this.ChallengesInstance = null;
                 }
-                fighter.Client.Character.RejoinMap(SpawnJoin, winner);
-            }
-            FightProvider.Instance.RemoveFight(this);
-            this.BlueTeam.Dispose();
-            this.RedTeam.Dispose();
-            this.RedTeam = null;
-            this.BlueTeam = null;
-            this.Synchronizer = null;
-            this.ChallengesInstance = null;
+                catch (Exception error)
+                {
+                    Logger.Error(error);
+                }
+            }));
         }
         public void NewTurn()
         {
-            Fighter newFighter = TimeLine.PopNextFighter();
-            newFighter.StartTurn();
-
+            if (!this.CheckFightEnd())
+            {
+                Fighter newFighter = TimeLine.PopNextFighter();
+                newFighter.StartTurn();
+            }
         }
         public abstract void ShowFightResults(List<FightResultListEntry> results, WorldClient client);
+
+
+        public void GetRewards(DungeonsRewardRecord Rewards, int CharacterId, int mapId)
+        {
+            int KamasWon = 0;
+            WorldClient client = null;
+            List<string> itemsWon = new List<string>();
+            if (Rewards != null)
+            {
+                KamasWon = Rewards.gain_kamas;
+                client = WorldServer.Instance.GetOnlineClient(CharacterId);
+                if (client != null)
+                {
+                    var itemsList = DungeonsRewardRecord.itemToAdd(mapId);
+                    foreach (var item in itemsList)
+                    {
+                        client.Character.Inventory.Add(ushort.Parse(item.Id.ToString()), 1, false);
+                        itemsWon.Add(item.Name);
+                    }
+                }
+            }
+            string toSend = "Pour vous récompenser de votre bravoure, nous vous offrons : <br/>";
+            foreach (var itemWon in itemsWon)
+                toSend += "- " + itemWon + "<br/>";
+            toSend += "<b>" + KamasWon + "</b> Kamas sur votre personnage";
+            if (client != null)
+            {
+                client.Character.ShowNotification(toSend);
+                if (KamasWon > 0)
+                    client.Character.AddKamas(KamasWon);
+            }
+        }
 
         public List<FightResultListEntry> GetFightResults(TeamColorEnum winner)
         {
@@ -745,25 +862,55 @@ namespace Symbioz.World.Models.Fights
                         tmp.Character.Reply("Votre prisme en  (<b>" + this.Map.WorldX + "," + this.Map.WorldY + "</b>, " + SubAreaRecord.GetSubAreaName(this.Map.SubAreaId) + "), n'a pas survécu !", Color.Orange);
                     var prism = PrismRecord.GetPrismByMapId(this.Map.Id);
                     if (prism != null)
-                    {
-                        PrismRecord.RemovePrismFromMapid(this.Map.Id);
-                        this.Map.Instance.Prism = null;
-                        prism.RefreshOnMapInstance();
-                    }
+                        this.Map.Instance.DeletePrism(prism);
                 }
             }
             List<FightResultListEntry> results = new List<FightResultListEntry>();
+            ulong xpwinnable = 0;
+
             var fighters = GetAllFighters(true);
+
             foreach (Fighter fighter in fighters)
             {
-                if (fighter is CharacterFighter)
+                try
                 {
-                    results.Add(new FightResultPlayer(fighter as CharacterFighter, winner).GetEntry());
+                    if (fighter.Team.TeamColor != winner && fighter is CharacterFighter && fighter.Dead)
+                        xpwinnable += ((fighter as CharacterFighter).Client.Character.Record.Exp / 4);
                 }
-                if (fighter is MonsterFighter)
+                catch (Exception error)
                 {
-                    if (!fighter.FighterStats.Summoned)
-                        results.Add(new FightResultMonster(fighter as MonsterFighter, winner).GetEntry());
+                    Logger.Error(error);
+                }
+            }
+
+            if (xpwinnable > 0)
+                xpwinnable = xpwinnable / (ulong)(winner == TeamColorEnum.RED_TEAM ? this.RedTeam.FightersCount : this.BlueTeam.FightersCount);
+
+            foreach (Fighter fighter in fighters)
+            {
+                try
+                {
+                    if (fighter is CharacterFighter)
+                    {
+                        if (fighter.Team.TeamColor == winner)
+                            this.GetRewards(DungeonsRewardRecord.RewardOnCurrentMap(fighter.Fight.Map.Id), fighter.FighterStats.RealStats.CharacterId, fighter.Fight.Map.Id);
+                        results.Add(new FightResultPlayer(fighter as CharacterFighter, winner, (xpwinnable == 0 ? 0 : (xpwinnable / (ulong)fighter.Team.FightersCount))).GetEntry());
+                    }
+                    if (fighter is MonsterFighter)
+                    {
+                        if (!fighter.FighterStats.Summoned)
+                            results.Add(new FightResultMonster(fighter as MonsterFighter, winner).GetEntry());
+                    }
+                    if (fighter is PrismFighter)
+                    {
+                        FightOutcomeEnum OutCome = (fighter.Team.TeamColor == winner) ? FightOutcomeEnum.RESULT_VICTORY : FightOutcomeEnum.RESULT_LOST;
+                        if (!fighter.FighterStats.Summoned)
+                            results.Add(new FightResultFighterListEntry((ushort)OutCome, 0, new FightLoot(new List<ushort>(), 0), fighter.ContextualId, !fighter.Dead));
+                    }
+                }
+                catch (Exception error)
+                {
+                    Logger.Error(error);
                 }
             }
             return results;
@@ -773,16 +920,48 @@ namespace Symbioz.World.Models.Fights
         {
             List<FightResultListEntry> results = new List<FightResultListEntry>();
             var fighters = GetAllFighters(true);
+
+            ulong xpwinnable = 0;
+
             foreach (Fighter fighter in fighters)
             {
-                if (fighter is CharacterFighter)
+                try
                 {
-                    results.Add(new FightResultPlayer(fighter as CharacterFighter, winner, true).GetEntryForLeaver());
+                    if (fighter.Team.TeamColor != winner && fighter is CharacterFighter && fighter.Dead)
+                        xpwinnable += ((fighter as CharacterFighter).Client.Character.Record.Exp / 4);
                 }
-                if (fighter is MonsterFighter)
+                catch (Exception error)
                 {
-                    if (!fighter.FighterStats.Summoned)
-                        results.Add(new FightResultMonster(fighter as MonsterFighter, winner).GetEntry());
+                    Logger.Error(error);
+                }
+            }
+
+            if (xpwinnable > 0)
+                xpwinnable = xpwinnable / (ulong)(winner == TeamColorEnum.RED_TEAM ? this.RedTeam.FightersCount : this.BlueTeam.FightersCount);
+
+            foreach (Fighter fighter in fighters)
+            {
+                try
+                {
+                    if (fighter is CharacterFighter)
+                    {
+                        results.Add(new FightResultPlayer(fighter as CharacterFighter, winner, (xpwinnable == 0 ? 0 : (xpwinnable / (ulong)fighter.Team.FightersCount)), true).GetEntryForLeaver());
+                    }
+                    if (fighter is MonsterFighter)
+                    {
+                        if (!fighter.FighterStats.Summoned)
+                            results.Add(new FightResultMonster(fighter as MonsterFighter, winner).GetEntry());
+                    }
+                    if (fighter is PrismFighter)
+                    {
+                        FightOutcomeEnum OutCome = (fighter.Team.TeamColor == winner) ? FightOutcomeEnum.RESULT_VICTORY : FightOutcomeEnum.RESULT_LOST;
+                        if (!fighter.FighterStats.Summoned)
+                            results.Add(new FightResultFighterListEntry((ushort)OutCome, 0, new FightLoot(new List<ushort>(), 0), fighter.ContextualId, !fighter.Dead));
+                    }
+                }
+                catch (Exception error)
+                {
+                    Logger.Error(error);
                 }
             }
             return results;

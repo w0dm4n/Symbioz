@@ -16,14 +16,25 @@ namespace Symbioz.World.Handlers
 {
     class ExchangeHandler
     {
+
         [MessageHandler]
         public static void HandleExchangeBuy(ExchangeBuyMessage message, WorldClient client)
         {
 
+            if (client.Character.Restrictions.cantExchange == true || client.Character.Record.Energy == 0
+                || client.Character.Restrictions.isDead == true)
+            {
+                client.Character.Reply("Impossible car vous êtes mort.");
+                return;
+            }
             if (client.Character.NpcShopExchange != null)
                 client.Character.NpcShopExchange.Buy((ushort)message.objectToBuyId, message.quantity);
             if (client.Character.ShopStockInstance != null)
                 client.Character.ShopStockInstance.Buy(message.objectToBuyId, message.quantity);
+            if (client.Character.NpcPointsExchange != null)
+            {
+                client.Character.NpcPointsExchange.Buy((ushort)message.objectToBuyId, message.quantity);
+            }
 
         }
         [MessageHandler]
@@ -40,12 +51,14 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Impossible car le joueur est occupé.");
                 return;
             }
-            else if (target.Character.Restrictions.cantExchange == true)
+            else if (target.Character.Restrictions.cantExchange == true || target.Character.Record.Energy == 0
+                || target.Character.Restrictions.isDead == true)
             {
                 client.Character.Reply("Impossible car le joueur est mort.");
                 return;
             }
-            else if (client.Character.Restrictions.cantExchange == true)
+            else if (client.Character.Restrictions.cantExchange == true || client.Character.Record.Energy == 0
+                || target.Character.Restrictions.isDead == true)
             {
                 client.Character.Reply("Impossible car vous êtes mort.");
                 return;
@@ -55,9 +68,10 @@ namespace Symbioz.World.Handlers
                 client.Send(new TextInformationMessage(1, 370, new string[1] { target.Character.Record.Name }));
                 return;
             }
-            target.Character.PlayerTradeInstance = new PlayerTradeExchange(target, client);
-            client.Character.PlayerTradeInstance = new PlayerTradeExchange(client, target);
-            client.Character.PlayerTradeInstance.Ask();
+            var request = new PlayerTradeRequest(client.Character, target.Character);
+            client.Character.Request = request;
+            target.Character.Request = request;
+            request.Open();
         }
         [MessageHandler]
         public static void HandleExchangeReplay(ExchangeReplayMessage message, WorldClient client)
@@ -88,22 +102,15 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleExchangeAccept(ExchangeAcceptMessage message, WorldClient client)
         {
-            switch (client.Character.ExchangeType)
-            {
-                case ExchangeTypeEnum.PLAYER_TRADE:
-                    client.Character.PlayerTradeInstance.AcceptExchange();
-                    break;
-            }
 
+            if (client.Character.Request != null)
+                client.Character.Request.Accept();
         }
         [MessageHandler]
         public static void HandleExchangeObjectMove(ExchangeObjectMoveMessage message, WorldClient client)
         {
             switch (client.Character.ExchangeType)
             {
-                case ExchangeTypeEnum.PLAYER_TRADE:
-                    client.Character.PlayerTradeInstance.MoveItem(message.objectUID, message.quantity);
-                    break;
                 case ExchangeTypeEnum.CRAFT:
                     client.Character.CraftInstance.MoveItem(message.objectUID, message.quantity);
                     break;
@@ -127,24 +134,30 @@ namespace Symbioz.World.Handlers
                 case ExchangeTypeEnum.RUNES_TRADE:
                     client.Character.SmithMagicInstance.MoveItem(message.objectUID, message.quantity);
                     break;
+                case ExchangeTypeEnum.NPC_TRADE:
+                    client.Character.NpcTradeExchange.MoveItem(message.objectUID, message.quantity);
+                    break;
             }
-
+            if (client.Character.PlayerTradeInstance != null)
+                client.Character.Trader.MoveItem(message.objectUID, message.quantity);
         }
         [MessageHandler]
         public static void HandleExchangeReady(ExchangeReadyMessage message, WorldClient client)
         {
             switch (client.Character.ExchangeType)
             {
-                case ExchangeTypeEnum.PLAYER_TRADE:
-                    client.Character.PlayerTradeInstance.Ready(message.ready, message.step);
-                    break;
                 case ExchangeTypeEnum.CRAFT:
                     client.Character.CraftInstance.Ready(message.ready, message.step);
                     break;
                 case ExchangeTypeEnum.RUNES_TRADE:
                     client.Character.SmithMagicInstance.Ready(message.ready, message.step);
                     break;
+                case ExchangeTypeEnum.NPC_TRADE:
+                    client.Character.NpcTradeExchange.Ready(message.ready);
+                    break;
             }
+            if (client.Character.PlayerTradeInstance != null)
+                client.Character.Trader.Ready(message.ready, client.Character.Id);
         }
         [MessageHandler]
         public static void HandleExchangeObjectMoveKamas(ExchangeObjectMoveKamaMessage message, WorldClient client)
@@ -153,14 +166,12 @@ namespace Symbioz.World.Handlers
                 return;
             switch (client.Character.ExchangeType)
             {
-                case ExchangeTypeEnum.PLAYER_TRADE:
-                    client.Character.PlayerTradeInstance.MoveKamas(message.quantity);
-                    break;
                 case ExchangeTypeEnum.STORAGE:
                     client.Character.BankInstance.MoveKamas(message.quantity);
-                    break;
+                    break;   
             }
-
+            if (client.Character.PlayerTradeInstance != null)
+                client.Character.Trader.MoveKamas(message.quantity, client.Character.Id);
         }
 
     }

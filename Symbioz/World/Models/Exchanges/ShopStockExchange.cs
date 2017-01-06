@@ -186,10 +186,14 @@ namespace Symbioz.World.Models.Exchanges
             {
                 if (tmpQuantity <= ItemMerchant.Quantity)
                 {
+                    var infinite = 0;
                     while (tmpQuantity > 0)
                     {
                         price += (int)ItemMerchant.Price;
                         tmpQuantity--;
+                        infinite++;
+                        if (infinite > 100000)
+                            break;
                     }
                     if (Client.Character.Record.Kamas >= price)
                     {

@@ -73,10 +73,14 @@ namespace Symbioz.World.Records.SubAreas
                     var StartTime = subarea.ArchMonsterTime;
                     var CurrentTime = DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
                     var seconds = 0;
+                    var infinite = 0;
                     while (StartTime >= CurrentTime)
                     {
                         seconds = 0;
                         StartTime++;
+                        infinite++;
+                        if (infinite > 100000)
+                            break;
                     }
                     if (seconds >= ConfigurationManager.Instance.TimeBetweenSpawnArchMonster)
                     {

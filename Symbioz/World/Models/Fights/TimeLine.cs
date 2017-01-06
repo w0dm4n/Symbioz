@@ -54,20 +54,20 @@ namespace Symbioz.World.Models.Fights
         }
         public void RemoveFighter(Fighter fighter)
         {
-            var removed = m_fighters.Find(x => x == fighter);
-            if (removed == null)
-                return;
-            int num = this.m_fighters.IndexOf(fighter);
-            m_fighters.Remove(fighter);
-            if (num <= m_currentIndex)
+            if(m_fighters.Any(x => x.ContextualId == fighter.ContextualId))
             {
-                this.m_currentIndex--;
-            }
-            
+                var removed = m_fighters.First(x => x == fighter);
+                int num = this.m_fighters.IndexOf(fighter);
+                m_fighters.Remove(fighter);
+                if (num <= m_currentIndex)
+                {
+                    this.m_currentIndex--;
+                }
+            }                     
         }
         public Fighter PopNextFighter()
         {
-            m_currentIndex++;
+             m_currentIndex++;
             if (m_currentIndex == m_fighters.Count())
             {
                 m_round++;
@@ -75,8 +75,8 @@ namespace Symbioz.World.Models.Fights
                 OnNewRound(m_round);
                 m_currentIndex = 0;
             }
-            if (m_currentIndex == -1)
-                m_currentIndex++;
+            if (m_currentIndex <= -1)
+                m_currentIndex = 0;
           
             return m_fighters[m_currentIndex];
         }

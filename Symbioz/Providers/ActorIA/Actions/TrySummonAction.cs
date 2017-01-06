@@ -17,47 +17,42 @@ namespace Symbioz.Providers.ActorIA.Actions
     {
         public override void Execute(MonsterFighter fighter)
         {
-            Logger.Log("summon IA");
-            var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
-            SpellRecord summonSpell = null;
-            foreach (SpellRecord record in spells)
+            try
             {
-                if (summonSpell != null)
-                    break;
-                foreach (int s in record.SpellLevels)
+                var spells = fighter.Template.Spells.ConvertAll<SpellRecord>(x => SpellRecord.GetSpell(x));
+                SpellRecord summonSpell = null;
+                foreach (SpellRecord record in spells)
                 {
-                    SpellLevelRecord lvlrecord = SpellLevelRecord.GetLevel(s);
-                    if (record == null)
-                        continue;
-                    if (lvlrecord.Effects.Find(x => x.BaseEffect.EffectType == EffectsEnum.Eff_Summon) != null)
-                    {
-                        Logger.Log("SPELL SELECTED ID:" + record.Id);
-
-                        summonSpell = record;
+                    if (summonSpell != null)
                         break;
+                    foreach (int s in record.SpellLevels)
+                    {
+                        SpellLevelRecord lvlrecord = SpellLevelRecord.GetLevel(s);
+                        if (record == null)
+                            continue;
+                        if (lvlrecord.Effects.Find(x => x.BaseEffect.EffectType == EffectsEnum.Eff_Summon) != null)
+                        {
+                            summonSpell = record;
+                            break;
+                        }
                     }
                 }
-            }
 
 
-            if (summonSpell == null)
-                Logger.Log("summon IA spell null");
-            Logger.Log("IA invoc Count" + fighter.SummonCount);
-            if (summonSpell != null && fighter.SummonCount <= 1)
-            {
-                var cells = PathHelper.Getalldirection(fighter.Fight, fighter.CellId);
-
-                foreach (short c in cells)
+                if (summonSpell != null && fighter.SummonCount <= 1)
                 {
-                    Logger.Log("summon lst cell:" + c);
-                }
-                var cell = cells.Find(x=> fighter.Fight.IsObstacle(x) == false);
+                    var cells = PathHelper.Getalldirection(fighter.Fight, fighter.CellId);
+                    var cell = cells.Find(x => fighter.Fight.IsObstacle(x) == false);
 
-                Logger.Log("summon added" + cell);
-                if (cell != 0)
-                    fighter.CastSpellOnCell(summonSpell.Id, cell);
-                else
-                    fighter.Fight.Reply("Unable to summon");
+                    if (cell != 0)
+                        fighter.CastSpellOnCell(summonSpell.Id, cell);
+                    else
+                        fighter.Fight.Reply("Unable to summon");
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
             }
         }
     }

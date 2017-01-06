@@ -125,10 +125,14 @@ namespace Symbioz.World.Models.Challenges
                 character.Client.Character.Reply("<b>" + dueTo.GetName() + "</b>" + " a fait échouer le challenge " + challenge.ChallengeName + ".");
             }
             Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
         }
 
         public void ChallengeFailure(ChallengesRecord challenge, Fighter dueTo)
         {
+            if (challenge.ChallengeSuccess == false)
+                return;
             foreach (var tmp in CurrentChallenges)
             {
                 if (tmp == challenge)

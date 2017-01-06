@@ -23,16 +23,31 @@ namespace Symbioz.World.Models.Fights
         {
             m_timer = new Timer(TURN_TIMEMOUT);
             m_timer.Elapsed += m_timer_Elapsed;
-            m_timer.Start();
+            m_timer.Enabled = true;
         }
         public void EndTurn()
         {
             if (m_timer != null)
-            m_timer.Dispose();
+            {
+                m_timer.Stop();
+                m_timer.Dispose();
+            }
         }
         void m_timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            m_fighter.EndTurn();
+            if(this.m_fighter != null)
+            {
+                m_fighter.EndTurn();
+            }
+        }
+
+        ~FightTurnEngine()
+        {
+           if(this.m_timer != null)
+            {
+                this.m_timer.Stop();
+                this.m_timer.Dispose();
+            }
         }
     }
 }

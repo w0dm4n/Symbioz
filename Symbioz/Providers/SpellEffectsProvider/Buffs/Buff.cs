@@ -47,6 +47,11 @@ namespace Symbioz.Providers.SpellEffectsProvider.Buffs
             return new GameActionFightDispellableEffectMessage((ushort)effect, SourceId, new FightTemporaryBoostEffect((uint)Fighter.BuffIdProvider.Pop(), Fighter.ContextualId, Duration,1, (ushort)SourceSpellId, (uint)effect, 16, Delta));
         }
 
+        /*public FightDispellableEffectExtendedInformations GetFightDispellableEffectExtendedInformations()
+        {
+            return new FightDispellableEffectExtendedInformations((ushort)effect(), (int)SourceId, GetAbstractFightDispellableEffect());
+        }*/
+
         public void setDuration(int value, Fighter modifier)
         {
             this.Duration = (short)value;

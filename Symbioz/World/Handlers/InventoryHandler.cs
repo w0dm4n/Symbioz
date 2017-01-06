@@ -87,7 +87,8 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleObjectSetPosition(ObjectSetPositionMessage message, WorldClient client)
         {
-            client.Character.Inventory.MoveItem(message.objectUID, message.position, message.quantity);
+            if (client.Character.ShopStockInstance == null && client.Character.Trader == null)
+                client.Character.Inventory.MoveItem(message.objectUID, message.position, message.quantity);
         }
 
         [MessageHandler]

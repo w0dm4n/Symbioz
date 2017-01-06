@@ -51,7 +51,7 @@ namespace Symbioz.World.Models
                     }
                     catch (Exception e)
                     {
-                        Logger.Error("[ItemParsing] " + e.Message);
+                        //Logger.Error("[ItemParsing] " + e.Message);
                     }
                 }
                 ObjectEffects.Add(eff);

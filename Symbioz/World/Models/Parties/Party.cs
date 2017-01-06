@@ -1,9 +1,8 @@
 ﻿using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
-using Symbioz.Network.Clients;
-using Symbioz.Network.Servers;
-using Symbioz.World.Models.Parties.Dungeon;
+using Symbioz.Helper;
+using Symbioz.World.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,259 +13,231 @@ namespace Symbioz.World.Models.Parties
 {
     public class Party
     {
-        public int Id;
-        public int BossCharacterId;
+        public sbyte MAX_MEMBER_COUNT = 8;
+        public PartyTypeEnum Type = PartyTypeEnum.PARTY_TYPE_CLASSICAL;
 
-        public string Name;
+        public uint Id { get; set; }
 
-        public int MAX_PARTY_MEMBER_COUNT = 8;
+        public Character Leader { get; set; }
 
-        public PartyTypeEnum PartyType;
+        public List<Character> Members = new List<Character>();
+        public List<Character> Guests = new List<Character>();
+        private Dictionary<Character, List<Character>> Followed;
 
-        public List<WorldClient> Members = new List<WorldClient>();
-        public List<PartyMember> PMembers = new List<PartyMember>();
-        public List<WorldClient> Guests = new List<WorldClient>();
-        public List<PartyGuest> PGuests = new List<PartyGuest>();
+        public int MembersCount { get { return Members.Count(); } }
 
-        public Party(int id, int bossCharacterId, string name, PartyTypeEnum type = PartyTypeEnum.PARTY_TYPE_CLASSICAL)
+        public int Count { get { return Members.Count() + Guests.Count(); } }
+
+        public bool IsFull { get { return MembersCount >= MAX_MEMBER_COUNT; } }
+
+        public Party(Character leader)
         {
-            this.Id = id;
-            this.BossCharacterId = bossCharacterId;
-            this.Name = name;
-            this.PartyType = type;
-            WorldServer.Instance.Parties.Add(this);
+            var id = PartyProvider.GetIdParty();
+            Id = (uint)id;
+            Leader = leader;
+            AddMember(leader);
+            Followed = new Dictionary<Character, List<Character>>();
         }
 
-        public void SetName(string name, WorldClient client)
+        public void AddMember(Character character)
         {
-            if (client.Character.Id == this.BossCharacterId)
+            if(Count < MAX_MEMBER_COUNT)
             {
-                this.Name = name;
-                this.Members.SendTo(new PartyNameUpdateMessage((uint)this.Id, this.Name));
-            }
-        }
-
-        public int CountMembers()
-        {
-            return this.Members.Count + this.Guests.Count;
-        }
-
-        public void CreateInvitation(WorldClient by, WorldClient to, PartyTypeEnum type = PartyTypeEnum.PARTY_TYPE_CLASSICAL, ushort dungeonId = 0)
-        {
-            if (to != null)
-            {
-                if (to.Character.PartyMember != null && to.Character.PartyMember.Loyal)
+                if (Guests.Contains(character))
+                    Guests.Remove(character);
+                Members.Add(character);
+                for (int i = 0; i < Members.Count; i++)
                 {
-                    by.Character.Reply("Ce joueur est déjà dans un groupe et ne veut pas recevoir d'autre invitations");
-                    return;
+                    Members[i].Client.Send(new PartyNewMemberMessage(Id, character.GetPartyMemberInformations()));
                 }
-                if (to.Character.PlayerStatus.statusId != (sbyte)PlayerStatusEnum.PLAYER_STATUS_AVAILABLE)
-                {
-                    string toName = to.Character.Record.Name;
-                    switch (to.Character.PlayerStatus.statusId)
-                    {
-                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_PRIVATE:
-                            by.Character.ReplyImportant(toName + " est actuellement en mode privé");
-                            break;
-                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_SOLO:
-                            by.Character.ReplyImportant(toName + " est actuellement en mode solo");
-                            break;
-                        case (sbyte)PlayerStatusEnum.PLAYER_STATUS_AFK:
-                            by.Character.ReplyImportant(toName + " est actuellement absent");
-                            break;
-                    }
-                    return;
-                }
-                this.NewGuest(to, by);
-                if (type == PartyTypeEnum.PARTY_TYPE_DUNGEON)
-                {
-                    to.Send(new PartyInvitationDungeonMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_DUNGEON, this.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Id, dungeonId));
-                    return;
-                }
-                to.Send(new PartyInvitationMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_CLASSICAL, by.Character.Record.Name, (sbyte)this.MAX_PARTY_MEMBER_COUNT, (uint)by.Character.Id, by.Character.Record.Name, (uint)to.Character.Record.Id));
-            }
+                PartyHandler.SendPartyJoinMessage(character.Client, this);
+            }       
         }
 
-        public void AcceptInvitation(WorldClient client)
+        public void RemoveMember(Character character, bool isKicked)
         {
-            if (client.Character.PartyMember != null)
+            if(isKicked)
             {
-                client.Character.PartyMember.Party.QuitParty(client);
-            }
-            this.RemoveGuest(client);
-            this.NewMember(client);
-            if (DungeonPartyProvider.Instance.GetDPCByCharacterId(client.Character.Id) != null)
-            {
-                List<ushort> dungeonsId = new List<ushort>();
-                client.Send(new DungeonPartyFinderRegisterSuccessMessage((IEnumerable<ushort>)dungeonsId));
-            }
-        }
-
-        public void RefuseInvitation(WorldClient client)
-        {
-            if (client.Character.PartyMember != null && client.Character.PartyMember.Party == this)
-                return;
-            this.RemoveGuest(client);
-
-            foreach (WorldClient c in this.Members)
-            {
-                c.Send(new PartyRefuseInvitationNotificationMessage((uint)this.Id, (uint)c.Character.Id));
-            }
-            if (this.CountMembers() < 2)
-            {
-                this.Delete();
-            }
-        }
-
-        public void CancelInvitation(WorldClient by, WorldClient to)
-        {
-            this.Members.SendTo(new PartyRefuseInvitationNotificationMessage((uint)this.Id, (uint)to.Character.Id));
-            this.RemoveGuest(to);
-            to.Send(new PartyInvitationCancelledForGuestMessage((uint)this.Id, (uint)to.Character.Id));
-            if (this.CountMembers() < 2)
-            {
-                this.Delete();
-            }
-        }
-
-
-
-        public void SendInvitationDetail(WorldClient to)
-        {
-      
-            PartyGuest g = this.PGuests.Find(x => x.Character.Id == to.Character.Id);
-
-            var members = this.PMembers.ConvertAll<PartyInvitationMemberInformations>(x=>x.GetPartyInvitationMemberInformations());
-            var guests = this.PGuests.ConvertAll<PartyGuestInformations>(x=>x.GetPartyGuestInformations());
-
-            to.Send(new PartyInvitationDetailsMessage((uint)this.Id,
-                (sbyte)PartyTypeEnum.PARTY_TYPE_CLASSICAL, this.Name,
-                    (uint)g.InvitedBy.Id, g.InvitedBy.Record.Name, (uint)this.BossCharacterId,members,
-              guests));
-
-
-
-        }
-
-        public void QuitParty(WorldClient client)
-        {
-            this.RemoveMember(client);
-            foreach (WorldClient c in this.Members)
-            {
-                c.Send(new PartyMemberRemoveMessage((uint)this.Id, (uint)client.Character.Id));
-            }
-            if (client.Character.Id == this.BossCharacterId)
-            {
-                this.ChangeLeader();
-            }
-            client.Send(new PartyLeaveMessage((uint)this.Id));
-            if (this.CountMembers() < 2)
-            {
-                this.Delete();
-            }
-        }
-
-        public void PlayerKick(int playerId, WorldClient sender)
-        {
-            if (sender.Character.Id == this.BossCharacterId)
-            {
-                WorldClient client = WorldServer.Instance.WorldClients.Find(x => x.Character.Id == playerId);
-                if (this.Members.Contains(client))
-                {
-                    this.RemoveMember(client);
-                    client.Send(new PartyKickedByMessage((uint)this.Id, (uint)sender.Character.Id));
-
-                    Members.SendTo(new PartyMemberRemoveMessage((uint)this.Id, (uint)client.Character.Id));
-
-                    if (this.CountMembers() < 2)
-                    {
-                        this.Delete();
-                    }
-                }
-            }
-        }
-
-        public void ChangeLeader(int newLeader = 0)
-        {
-            if (newLeader == 0)
-            {
-                this.BossCharacterId = this.PMembers.First().Character.Id;
+                character.Client.Send(new PartyKickedByMessage(Id, (uint)Leader.Id));
             }
             else
             {
-                this.BossCharacterId = this.PMembers.Find(x => x.Character.Id == newLeader).Character.Id;
+                character.Client.Send(new PartyLeaveMessage(Id));
             }
-            Members.SendTo(new PartyLeaderUpdateMessage((uint)this.Id, (uint)this.BossCharacterId));
-
-        }
-
-        public PartyMemberInformations GetPartyMemberInformations(int id)
-        {
-            PartyMember m = this.PMembers.Find(x => x.Character.Id == id);
-            return m.GetPartyMemberInformations();
-        }
-        public PartyGuestInformations GetPartyGuestInformations(int id)
-        {
-            PartyGuest m = this.PGuests.Find(x => x.Character.Id == id);
-            return m.GetPartyGuestInformations();
-        }
-
-        public void Delete()
-        {
-            this.Members.SendTo(new PartyDeletedMessage((uint)this.Id));
-            this.Members.ForEach(x => x.Character.PartyMember = null);
-
-            this.Guests.SendTo(new PartyDeletedMessage((uint)this.Id));
-            this.Guests.ForEach(x => x.Character.PartyMember = null);
-            WorldServer.Instance.Parties.Remove(this);
-        }
-
-        public void NewMember(WorldClient c)
-        {
-            if (this.Members.Count + this.Guests.Count < this.MAX_PARTY_MEMBER_COUNT)
+            if(Members.Contains(character))
             {
-                PartyMember m = new PartyMember(c.Character, this);
-                foreach (WorldClient clients in this.Members)
+                RemoveFollowers(character);
+                Members.Remove(character); 
+                for (int i = 0; i < Members.Count; i++)
                 {
-                    clients.Send(new PartyNewMemberMessage((uint)this.Id, m.GetPartyMemberInformations()));
+                    Members[i].Client.Send(new PartyMemberRemoveMessage(Id, (uint)character.Id));
                 }
-                this.Members.Add(c);
-                this.PMembers.Add(m);
-                c.Character.PartyMember = m;
-                c.Send(new PartyJoinMessage((uint)this.Id, (sbyte)PartyTypeEnum.PARTY_TYPE_CLASSICAL, (uint)this.BossCharacterId, (sbyte)this.MAX_PARTY_MEMBER_COUNT,
-                   from members in this.PMembers
-                   select members.GetPartyMemberInformations(),
-                   from guests in this.PGuests
-                   select guests.GetPartyGuestInformations(),
-                   false, this.Name));
+                if (character == Leader && Members.Count > 0)
+                    ChangeLeader(Members.First());
+                if (this.Count < 2 && Guests.Count < 1)
+                    Disband();
+            }
+        }
+        
+        public void Kick(Character kicked)
+        {
+            if (Members.Contains(kicked))
+            {
+                RemoveMember(kicked, true);
+                if (MembersCount <= 1 && Guests.Count < 1)
+                {
+                    Disband();
+                }
+                else
+                {
+                    if (Leader == kicked)
+                        ChangeLeader(Members.First());
+                }
+            }   
+        }
+
+        public void AddGuest(Character character)
+        {
+            if(!Members.Contains(character) && Count < MAX_MEMBER_COUNT)
+            {
+                Guests.Add(character);
+                foreach(var member in Members)
+                    member.Client.Send(new PartyNewGuestMessage(Id, character.GetPartyGuestInformations(this)));
             }
         }
 
-        public void NewGuest(WorldClient c, WorldClient invitedBy)
+        public void RemoveGuest(Character character)
         {
-            if (this.CountMembers() < this.MAX_PARTY_MEMBER_COUNT)
+            if(Guests.Contains(character))
             {
-                this.Guests.Add(c);
-                PartyGuest g = new PartyGuest(this, c.Character, invitedBy.Character);
-                this.PGuests.Add(g);
-                foreach (WorldClient clients in this.Members)
+                Guests.Remove(character);
+                if(Count < 2 && Guests.Count() <= 2)
                 {
-                    clients.Send(new PartyNewGuestMessage((uint)this.Id, g.GetPartyGuestInformations()));
+                    Disband();
                 }
             }
         }
 
-        public void RemoveMember(WorldClient c)
+        public void ChangeLeader(Character newLeader)
         {
-            this.Members.Remove(c);
-            c.Character.PartyMember = null;
-            this.PMembers.Remove(c.Character.PartyMember);
+            if(newLeader.Party == this && newLeader != Leader)
+            {
+                Leader = newLeader;
+                for (int i = 0; i < Members.Count; i++)
+                {
+                    Members[i].Client.Send(new PartyLeaderUpdateMessage(Id, (uint)newLeader.Id));
+                }
+            }
         }
 
-        public void RemoveGuest(WorldClient c)
+        public void StartFollowPlayer(Character follower, int playerId)
         {
-            this.Guests.Remove(c);
-            this.PGuests.Remove(this.PGuests.Find(x => x.Character == c.Character));
+            var target = Members.FirstOrDefault(x => x.Id == playerId);
+            if(target != null)
+            {
+                if (this.Followed.ContainsKey(target))
+                    this.Followed[target].Add(follower);
+                else
+                    this.Followed.Add(target, new List<Character> { follower });
+                follower.Client.Send(new CompassUpdatePartyMemberMessage((sbyte)CompassTypeEnum.COMPASS_TYPE_PARTY, new MapCoordinates((short)target.Map.WorldX, (short)target.Map.WorldY), (uint)playerId));
+                follower.Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 368, new string[] { target.Name }));
+                target.Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 52, new string[] { follower.Name }));
+                follower.Client.Send(new PartyFollowStatusUpdateMessage(this.Id, target != null, target == null ? 0 : (uint)target.Id));
+            }
+        }
+
+        public void StopFollowingPlayer(Character character)
+        {
+            var clients = new List<Character>();
+            foreach (var pair in this.Followed)
+            {
+                if (pair.Value.Contains(character))
+                {
+                    pair.Value.Remove(character);
+                    if (pair.Value.Count <= 0)
+                        clients.Add(pair.Key);
+                    pair.Key.Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 53, new List<string> { character.Name }));
+                    character.Client.Send(new CompassResetMessage((sbyte)CompassTypeEnum.COMPASS_TYPE_PARTY));
+                    character.Client.Send(new PartyFollowStatusUpdateMessage(this.Id, true, 0));
+                    character.Client.Send(new PartyFollowStatusUpdateMessage(this.Id, false, 0));
+                }
+            }
+            clients.ForEach(x => this.Followed.Remove(x));
+        }
+
+        private void RemoveFollowers(Character character)
+        {
+            if (this.Followed.ContainsKey(character))
+            {
+                this.Followed[character].ForEach(x =>
+                {
+                    x.Client.Send(new PartyFollowStatusUpdateMessage(this.Id, true, 0));
+                    x.Client.Send(new PartyFollowStatusUpdateMessage(this.Id, false, 0));
+                    x.Client.Send(new CompassResetMessage((sbyte)CompassTypeEnum.COMPASS_TYPE_PARTY));
+                });
+
+                this.Followed.Remove(character);
+            }
+            foreach (var pair in this.Followed)
+            {
+                if (pair.Value.Contains(character))
+                {
+                    pair.Value.Remove(character);
+                    pair.Key.Client.Send(new TextInformationMessage((sbyte)TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 53,
+                        new List<string> { character.Name }));
+                }
+            }
+            this.Followed.Remove(character);
+        }
+
+        public void UpdateFollowingMap(Character character)
+        {
+            if (!this.Followed.ContainsKey(character))
+                return;
+            this.Followed[character].ForEach(x => x.Client.Send(new CompassUpdatePartyMemberMessage(
+                (sbyte)CompassTypeEnum.COMPASS_TYPE_PARTY,
+               new MapCoordinates((short)character.Map.WorldX, (short)character.Map.WorldY), (uint)character.Id)));
+        }
+
+        public void StartFollowingThisPlayer(Character character, int playerId)
+        {
+            var target = this.Members.FirstOrDefault(x => x.Id == playerId);
+            var members = this.Members.Where(x => x.Id != playerId);
+            if (target != null)
+            {
+                foreach (var member in members)
+                {
+                    StartFollowPlayer(member, playerId);
+                }
+            }
+        }
+        public void StopFollowingPlayerThis(int playerId)
+        {
+            var target = this.Members.FirstOrDefault(x => x.Id == playerId);
+            var members = this.Members.Where(x => x.Id != playerId);
+            if (target != null)
+            {
+                foreach (var member in members)
+                {
+                    StopFollowingPlayer(member);
+                }
+            }
+        }
+
+        public void Disband()
+        {
+            for (int i = 0; i < Members.Count; i++)
+            {
+                Members[i].Client.Send(new PartyDeletedMessage(Id));
+                Members[i].Party = null;
+            }
+            for (int i = 0; i < Guests.Count; i++)
+            {
+                Guests[i].Client.Send(new PartyDeletedMessage(Id));
+                Guests[i].Client.Send(new PartyInvitationCancelledForGuestMessage(Id, (uint)Guests[i].Id));
+                Guests[i].RemoveInvitation(this);
+            }
+            PartyProvider.Remove(this);
         }
     }
 }

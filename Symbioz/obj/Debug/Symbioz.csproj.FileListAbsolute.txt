@@ -253,3 +253,119 @@ C:\Users\Master\Desktop\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
 C:\Users\Master\Desktop\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
 C:\Users\Master\Desktop\Symbioz\Symbioz\bin\Debug\YAXLib.xml
 C:\Users\Master\Desktop\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.dll
+C:\Users\W0dm4\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.xml
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.dll
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.xml
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\yamis\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.dll
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.xml
+C:\Users\utilisateur\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\root\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\root\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.dll
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\root\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.xml
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\MySql.Data.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.dll
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Cyrille\Dropbox\Symbioz\Symbioz\bin\Debug\Dapper.xml
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Symbioz.exe.config
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\obj\Debug\Symbioz.exe
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\obj\Debug\Symbioz.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Symbioz.exe
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Symbioz.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\MySql.Data.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.Helper.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.ORM.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.Protocol.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.SSync.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\YAXLib.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Dapper.dll
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.Helper.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.ORM.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.Protocol.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Shader.SSync.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\YAXLib.pdb
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\YAXLib.xml
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\bin\Debug\Dapper.xml
+C:\Users\Cyrille\Dropbox\Symbioz (1)\Symbioz\obj\Debug\Symbioz.csprojResolveAssemblyReference.cache

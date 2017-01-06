@@ -105,7 +105,7 @@ namespace Symbioz.World.Handlers
                     {
                         var cmd = cominfo.Split('.')[1];
                         if (!(String.IsNullOrEmpty(cmd)))
-                            client.Character.Reply("La commande " + cmd + " n'existe pas !");
+                            client.Character.Reply("La commande " + cmd + " n'existe pas ! (.help pour la liste)");
                         return;
                     }
 
@@ -171,9 +171,23 @@ namespace Symbioz.World.Handlers
         [InGameCommand("start", ServerRoleEnum.PLAYER, "Téléporte a la carte de départ")]
         public static void StartCommand(string value, WorldClient client)
         {
-
-            client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);
-            client.Character.Reply("Vous avez été téléporté sur la carte de départ.");
+            if (client.Character.IsFighting)
+                client.Character.Reply("Impossible de téleporter votre personnage en combat !");
+            else if (client.Character.CanStart())
+            {
+                if (client.Character.Record.Level >= 20)
+                {
+                    client.Character.Teleport(84674563, 315);
+                    client.Character.Reply("Vous avez été téléporté au zaap Astrub.");
+                    client.Character.LastCharacterStart = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                }
+                else
+                {
+                    client.Character.Teleport(ConfigurationManager.Instance.StartMapId, ConfigurationManager.Instance.StartCellId);
+                    client.Character.Reply("Vous avez été téléporté sur la carte de départ.");
+                    client.Character.LastCharacterStart = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
+                }
+            }
         }
 
         [InGameCommand("disobs", ServerRoleEnum.FONDATOR)]
@@ -263,10 +277,11 @@ namespace Symbioz.World.Handlers
         [InGameCommand("infos", ServerRoleEnum.ANIMATOR)]
         public static void InfosCommand(string value, WorldClient client)
         {
-            client.Character.Reply("Il y a " + WorldServer.Instance.WorldClients.Count() + " client(s) actuellement connecté(s). <br/>Record de client(s) en ligne : " + WorldServer.Instance.InstanceMaxConnected);
+            client.Character.Reply("Il y a " + WorldServer.Instance.GetAllClientsOnline().Count() + " joueurs(s) actuellement connecté(s). <br/>Record de joueur(s) en ligne : " + WorldServer.Instance.InstanceMaxConnected
+                + "<br/>Uptime : " + WorldServer.Instance.GetUptime(), Color.PeachPuff);
         }
 
-        [InGameCommand("clist", ServerRoleEnum.ADMINISTRATOR)]
+        [InGameCommand("clist", ServerRoleEnum.MODERATOR)]
         public static void ClientsListCommand(string value, WorldClient client)
         {
             client.Character.Reply("Client(s) connecté(s) :", true);
@@ -343,6 +358,26 @@ namespace Symbioz.World.Handlers
                 Look("{" + int.Parse(value) + "}", client);
         }
 
+        [InGameCommand("oldlook", ServerRoleEnum.MODERATOR)]
+        public static void setOldLook(string value, WorldClient client)
+        {
+            if (value == null)
+                return;
+            var target = WorldServer.Instance.GetOnlineClient(value);
+            if (target != null)
+                Look(target.Character.Record.OldLook, target);
+        }
+
+        [InGameCommand("demorph", ServerRoleEnum.MODERATOR)]
+        public static void DemorphCommand(string value, WorldClient client)
+        {
+            if (client.Character.LookSave != null)
+            {
+                client.Character.Look = client.Character.LookSave;
+                client.Character.RefreshOnMapInstance();
+            }
+        }
+
         [InGameCommand("debugmap", ServerRoleEnum.ANIMATOR)]
         public static void DebugMapCommand(string value, WorldClient client)
         {
@@ -356,11 +391,12 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("look", ServerRoleEnum.ADMINISTRATOR)]
         public static void Look(string value, WorldClient client)
         {
             value = value.Replace("&#123;", "{");
             value = value.Replace("&#125;", "}");
+            if (client.Character.LookSave == null)
+                client.Character.LookSave = client.Character.Look;
             client.Character.Look = ContextActorLook.Parse(value);
             client.Character.RefreshOnMapInstance();
         }
@@ -489,13 +525,15 @@ namespace Symbioz.World.Handlers
         [InGameCommand("who", ServerRoleEnum.FONDATOR)]
         public static void WhoCommand(string value, WorldClient client)
         {
-            if (value == null)
-                return;
             var target = WorldServer.Instance.GetOnlineClient(value);
             if (target != null)
                 client.Character.Reply("Account: " + target.Account.Username + " IP: " + target.SSyncClient.Ip, Color.CornflowerBlue);
             else
-                client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+            {
+                var clients = WorldServer.Instance.GetAllClientsOnline();
+                foreach (var tmp in clients)
+                    client.Character.Reply("Player: " + tmp.Character.Record.Name + ", Account: " + tmp.Account.Username + " IP: " + tmp.SSyncClient.Ip, Color.CornflowerBlue);
+            }
         }
 
         /*[InGameCommand("baleine", ServerRoleEnum.PLAYER)]
@@ -574,10 +612,22 @@ namespace Symbioz.World.Handlers
             }
         }
 
-        [InGameCommand("ornament", ServerRoleEnum.MODERATOR)]
+        [InGameCommand("ornement", ServerRoleEnum.MODERATOR)]
         public static void AddOrnamentCommand(string value, WorldClient client)
         {
-            client.Character.AddOrnament(ushort.Parse(value));
+            if (value == null)
+                return;
+            string[] Array = value.Split(' ');
+            if (Array != null && Array.Length == 2)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(Array[0]);
+                if (target != null)
+                    target.Character.AddOrnament(ushort.Parse(Array[1]));
+                else
+                    client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+            }
+            else
+                client.Character.Reply("Syntaxe incorrecte : (joueur, ornement)");
         }
 
         [InGameCommand("title", ServerRoleEnum.MODERATOR)]
@@ -724,11 +774,13 @@ namespace Symbioz.World.Handlers
                 client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
         }
 
-        [InGameCommand("guild", ServerRoleEnum.PLAYER, "Permet de créer une guilde")]
+        [InGameCommand("guilde", ServerRoleEnum.PLAYER, "Permet de créer une guilde")]
         public static void CreateGuildCommand(string value, WorldClient client)
         {
             if (!client.Character.HasGuild)
-                client.Send(new GuildCreationStartedMessage());
+            {
+                client.Send(new GuildCreationStartedMessage());    
+            }
             else
                 client.Send(new GuildCreationResultMessage((sbyte)GuildCreationResultEnum.GUILD_CREATE_ERROR_ALREADY_IN_GUILD));
         }
@@ -812,7 +864,7 @@ namespace Symbioz.World.Handlers
             else if (client.Character.CanSave())
             {
                 client.Character.LastCharacterSave = (int)DateTimeUtils.GetEpochFromDateTime(DateTime.Now);
-                client.Character.Save();
+                //client.Character.Save();
                 client.Character.Reply("Votre personnage a bien été sauvegardé.");
             }
         }
@@ -843,20 +895,20 @@ namespace Symbioz.World.Handlers
         {
             if (string.IsNullOrEmpty(value))
             {
-                if (!client.Character.IsFighting)
-                {
+                //if (!client.Character.IsFighting)
+                //{
                     if (!client.Character.Restrictions.isDead)
                     {
-                        client.Character.CurrentStats.LifePoints = (uint)client.Character.CharacterStatsRecord.LifePoints;
+                        client.Character.CurrentStats.LifePoints -= (uint)client.Character.CharacterStatsRecord.LifePoints;
                         client.Character.Record.CurrentLifePoint = client.Character.CurrentStats.LifePoints;
                         client.Character.RefreshStats();
                         client.Character.Reply("Vous avez récupéré vos points de vie !");
                     }
                     else
                         client.Character.Reply("Impossible de récupérer vos points de vie lorsque vous êtes mort !");
-                }
-                else
-                    client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
+                //}
+                //else
+                //    client.Character.Reply("Impossible de récupérer ses points de vie en combat !");
             }
             else
             {
@@ -961,13 +1013,21 @@ namespace Symbioz.World.Handlers
             if (!string.IsNullOrEmpty(value))
             {
                 foreach (var tmp in clients)
-                    tmp.Character.Reply("[" + client.Character.Record.Name + "]" + ": " + value, Color.DeepSkyBlue, false, false);
+                    tmp.Character.Reply("(ALL) <b>" + client.Character.Record.Name + "</b>" + ": " + value, Color.PaleTurquoise, false, false);
             }
         }
 
         static void ExitLoop(System.Timers.Timer Timer, int timeElapsed)
         {
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            foreach (var client in clients)
+            {
+                client.Character.Dispose();
+                client.Disconnect();
+            }
             Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
             var Accounts = AuthDatabaseProvider.GetAccountsOnline();
             foreach (var account in Accounts)
                 AccountsProvider.UpdateAccountsOnlineState(account, false);
@@ -999,6 +1059,75 @@ namespace Symbioz.World.Handlers
                 AccountsProvider.UpdateAccountsOnlineState(account, false);
             client.Character.Reply("Reset effectué avec succès !");
         }
+
+        static void ExitFight(System.Timers.Timer Timer, WorldClient client)
+        {
+            if (client != null && client.Character != null && client.Character.FighterInstance != null)
+            {
+                if (client.Character.FighterInstance.Fight != null)
+                    client.Character.FighterInstance.Fight = null;
+                client.Character.FighterInstance = null;
+                Timer.Enabled = false;
+                Timer.Stop();
+                Timer.Dispose();
+            }
+            else
+            {
+                Timer.Enabled = false;
+                Timer.Stop();
+                Timer.Dispose();
+            }
+        }
+
+        [InGameCommand("endfight", ServerRoleEnum.MODERATOR, "Termine le combat")]
+        public static void EndCurrentFight(string value, WorldClient client)
+        {
+            if (value == null)
+            {
+                if (client.Character.IsFighting)
+                {
+                    var Against = client.Character.FighterInstance.GetOposedTeam();
+                    var Fighters = Against.GetFighters();
+
+                    foreach (var fighter in Fighters)
+                        fighter.Die();
+                    client.Character.FighterInstance.Fight.CheckFightEnd();
+
+                    var Timer = new System.Timers.Timer();
+                    Timer.Interval = 2000;
+                    Timer.Elapsed += (sender, e) => { ExitFight(Timer, client); };
+                    Timer.Enabled = true;        
+                }
+                else
+                    client.Character.Reply("Vous devez etre en combat pour effectuer cette action.");
+            }
+            else
+            {
+                var target = WorldServer.Instance.GetOnlineClient(value);
+                if (target != null)
+                {
+                    if (target.Character.IsFighting)
+                    {
+                        var Against = target.Character.FighterInstance.GetOposedTeam();
+                        var Fighters = Against.GetFighters();
+
+                        foreach (var fighter in Fighters)
+                            fighter.Die();
+                        target.Character.FighterInstance.Fight.CheckFightEnd();
+                        target.Character.Reply("Votre combat a été terminé par un membre de l'équipe !", Color.Red);
+
+                        var Timer = new System.Timers.Timer();
+                        Timer.Interval = 6000;
+                        Timer.Elapsed += (sender, e) => { ExitFight(Timer, target); };
+                        Timer.Enabled = true;
+                    }
+                    else
+                        target.Character.Reply("Ce joueur n'est pas en combat !");
+                }
+                else
+                    client.Character.Reply("Le joueur n'existe pas ou n'est pas connecté");
+            }
+        }
         #endregion
 
         static void TrySendRaw(WorldClient client, string targetname, string rawname, string succesmessage = null)
@@ -1009,10 +1138,136 @@ namespace Symbioz.World.Handlers
                 if (succesmessage != null)
                     target.Character.ShowNotification(succesmessage);
                 target.SendRaw(rawname);
-                client.Character.ShowNotification("Raw " + rawname + " sended");
+                if (client != null)
+                    client.Character.ShowNotification("Raw " + rawname + " sended");
             }
             else
-                client.Character.NotificationError("Le client " + targetname + " n'existe pas ou n'est pas connecté.");
+            {
+                if (client != null)
+                    client.Character.NotificationError("Le client " + targetname + " n'existe pas ou n'est pas connecté.");
+            }
+        }
+
+        [InGameCommand("revive", ServerRoleEnum.MODERATOR, "Permet de ressuciter un personnage mort")]
+        public static void RessucitePlayer(string value, WorldClient client)
+        {
+           if (value != null)
+            {
+                var target = WorldServer.Instance.GetOnlineClient(value);
+                if (target != null)
+                {
+                    target.Character.Restrictions.cantMove = false;
+                    target.Character.Restrictions.cantSpeakToNPC = false;
+                    target.Character.Restrictions.cantExchange = false;
+                    target.Character.Restrictions.cantAttackMonster = false;
+                    target.Character.Restrictions.isDead = false;
+                    target.Character.Record.Energy = 10000;
+                    target.Character.Reply("Votre personnage a été ressucité par un membre de l'équipe", Color.Red);
+                    target.Character.Look = ContextActorLook.Parse(target.Character.Record.OldLook);
+                    target.Character.RefreshOnMapInstance();
+                    client.Character.Reply("Le personnage " + target.Character.Record.Name + " est connecté et a été ressucité !");
+                }
+                else
+                {
+                    var character = CharacterRecord.GetCharacterRecordByName(value);
+                    if (character != null)
+                    {
+                        character.Energy = 10000;
+                        character.Look = character.OldLook;
+                        client.Character.Reply("Le personnage " + character.Name + " est déconnecté et a été ressucité !");
+                    }
+                }
+            }
+        }
+
+        [InGameCommand("restat", ServerRoleEnum.PLAYER, "Permet de remettre a zéro les caractéristiques")]
+        public static void RestatCharacter(string value, WorldClient client)
+        {
+            var items = client.Character.Inventory.GetEquipedItems();
+            foreach (var item in items)
+                client.Character.Inventory.UnequipItem(item, 63, item.GetTemplate(), 1, false);
+            var breed = BreedRecord.GetBreed(client.Character.Record.Breed);
+            client.Character.CharacterStatsRecord.LifePoints = (short)(breed.StartLifePoints + (client.Character.Record.Level * 5));
+
+            client.Character.ResetCharacterStatsRecord(new CharacterStatsRecord(client.Character.Id, (short)client.Character.CharacterStatsRecord.LifePoints, (short)(ConfigurationManager.Instance.StartLevel * 10), (short)client.Character.CharacterStatsRecord.LifePoints, breed.StartProspecting, 6, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+            if (client.Character.Record.Level >= 100)
+                client.Character.CharacterStatsRecord.ActionPoints = 7;
+            else
+                client.Character.CharacterStatsRecord.ActionPoints = 6;
+            client.Character.CharacterStatsRecord.MovementPoints = 3;
+            client.Character.Record.StatsPoints = (ushort)((client.Character.Record.Level * 5) - 5);
+            client.Character.Record.CurrentLifePoint = (uint)client.Character.CharacterStatsRecord.LifePoints;
+            client.Character.RefreshStats();
+            client.Character.Inventory.Refresh();
+        }
+
+        [InGameCommand("reboot", ServerRoleEnum.MODERATOR, "Redémarre le serveur en sauvegardant les joueurs")]
+        public static void RebootServer(string value, WorldClient client)
+        {
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            foreach (var tmp in clients)
+            {
+                tmp.Character.Dispose();
+                tmp.Disconnect();
+            }
+            SaveTask.Save();
+            var fileName = Assembly.GetExecutingAssembly().Location;
+            System.Diagnostics.Process.Start("Symbioz.exe");
+            Environment.Exit(0);
+        }
+
+        [InGameCommand("disconnect", ServerRoleEnum.FONDATOR, "Déconnecte tout les joueurs")]
+        public static void DisconnectPlayers(string value, WorldClient client)
+        {
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            foreach (var tmp in clients)
+            {
+                if (tmp.Account.Role == ServerRoleEnum.PLAYER)
+                {
+                    tmp.Character.Dispose();
+                    tmp.Disconnect();
+                }
+            }
+        }
+
+        [InGameCommand("shop", ServerRoleEnum.PLAYER, "Téléporte a la boutique")]
+        public static void ShopTeleportation(string value, WorldClient client)
+        {
+            client.Character.Teleport(115609089, 442);
+            client.Character.Reply("Vous avez été téléporter a la boutique !");
+        }
+
+        [InGameCommand("boutique", ServerRoleEnum.PLAYER, "Téléporte a la boutique")]
+        public static void BoutiqueTeleportation(string value, WorldClient client)
+        {
+            client.Character.Teleport(115609089, 442);
+            client.Character.Reply("Vous avez été téléporter a la boutique !");
+        }
+
+        [InGameCommand("points", ServerRoleEnum.PLAYER, "Affiche le nombre de points disponible")]
+        public static void PrintPoint(string value, WorldClient client)
+        {
+            client.Character.Reply("Vous avez <b>" + AuthDatabaseProvider.GetPoints(client.Account.Id) + "</b> points boutique", System.Drawing.Color.Orange);
+        }
+
+        [InGameCommand("resu", ServerRoleEnum.PLAYER, "Commande boutique pour ressusciter un personnage mort (1000 points boutique)")]
+        public static void ReviveCharacter(string value, WorldClient client)
+        {
+            client.SendRaw("revive");
+        }
+
+        [InGameCommand("refresh", ServerRoleEnum.PLAYER, "Rafraichis les monstres de la carte")]
+        public static void RefreshMobs(string value, WorldClient client)
+        {
+           client.Character.Map.Instance.SyncMonsters(false);
+            var actors = client.Character.Map.Instance.GetActors(client);
+            foreach (var actor in actors)
+            {
+                client.Send(new GameRolePlayShowActorMessage(actor));
+            }
+            client.Character.Map.Instance.GetMonsters();
+            client.Character.RefreshOnMapInstance();
         }
 
         static void TrySendRaw(WorldClient targetClient, string rawname)

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Symbioz.World.Handlers
 {
@@ -48,8 +49,8 @@ namespace Symbioz.World.Handlers
                 }
                 sMessage.accept = true;
                 target.Send(sMessage);
-                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
-                fight.RedTeam.AddFighter(target.Character.CreateFighter(fight.RedTeam));
+                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam, fight));
+                fight.RedTeam.AddFighter(target.Character.CreateFighter(fight.RedTeam, fight));
                 fight.StartPlacement();
             }
             else
@@ -90,7 +91,6 @@ namespace Symbioz.World.Handlers
             }
             if (message.friendly)
             {
-
                 FightDual fight = FightProvider.Instance.CreateDualFight(client.Character.Map, client.Character.Record.CellId, message.targetCellId);
                 fight.InitiatorId = client.Character.Id;
                 fight.AcceptorId = target.Character.Id;
@@ -100,11 +100,36 @@ namespace Symbioz.World.Handlers
             }
             else
             {
-               FightAgression fight = (FightAgression)FightProvider.Instance.CreateAgressionFight(client.Character.Map, client.Character.Record.CellId, target.Character.Record.CellId);
-               Logger.Log(message.targetCellId);
-               fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam));
-               fight.RedTeam.AddFighter(target.Character.CreateFighter(fight.RedTeam));
-               fight.StartPlacement();
+                if (client.Character.Record.Level < 50)
+                {
+                    client.Character.Reply("Vous devez etre au minimum niveau 50 pour agresser un joueur");
+                    return;
+                }
+                if (target.Character.Record.Level > 50)
+                {
+                    if (target.Character.Map.SubAreaId == 95 || target.Character.Map.SubAreaId == 96 || target.Character.Map.SubAreaId == 97 || target.Character.Map.SubAreaId == 98 
+                        || target.Character.Map.SubAreaId == 99 || target.Character.Map.SubAreaId == 100 || target.Character.Map.SubAreaId == 92 || target.Character.Map.SubAreaId == 173
+                        || target.Character.Map.SubAreaId == 335 || target.Character.Map.Id == 115609089)
+                    {
+                        client.Character.Reply("Impossible d'agresser sur cette zone !");
+                        return;
+                    }
+                    if (target.Account.Role > Auth.Models.ServerRoleEnum.PLAYER)
+                    {
+                        client.Character.Reply("Impossible sur un membre de l'équipe d'Hestia");
+                        return;
+                    }
+                    FightAgression fight = (FightAgression)FightProvider.Instance.CreateAgressionFight(client.Character.Map, client.Character.Record.CellId, target.Character.Record.CellId);
+                    fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam, fight));
+                    fight.RedTeam.AddFighter(target.Character.CreateFighter(fight.RedTeam, fight));
+                    fight.PlayersIP.Add(client.SSyncClient.OnlyIp);
+                    fight.PlayersIP.Add(target.SSyncClient.OnlyIp);
+                    fight.StartPlacement();
+                }
+                else
+                {
+                    client.Character.Reply("Impossible d'agresser un personnage qui n'est pas au moin niveau 50 !");
+                }
             }
         }
 
@@ -121,15 +146,17 @@ namespace Symbioz.World.Handlers
             if (!client.Character.Map.IsValid())
             {
                 if (client.Character.isDebugging)
-                    client.Character.Reply("Unable to start placement, this map is not valid");
+                    client.Character.Reply("Impossible car cette map est invliade !");
                 return;
             }
             var group = client.Character.Map.Instance.GetMapMonsterGroup(message.monsterGroupId);
             if (group != null)
             {
+                client.Character.Map.Instance.MonstersGroups.Remove(group);
+                client.Character.Map.Instance.RefreshActorsOnMap();
                 FightPvM fight = FightProvider.Instance.CreatePvMFight(group, client.Character.Map, (short)group.CellId);
 
-                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam)); // on ajoute le perso
+                fight.BlueTeam.AddFighter(client.Character.CreateFighter(fight.BlueTeam, fight)); // on ajoute le perso
 
                 group.Monsters.ForEach(x => fight.RedTeam.AddFighter(x.CreateFighter(fight.RedTeam))); // on ajoute les monstres
 
@@ -189,6 +216,15 @@ namespace Symbioz.World.Handlers
             client.Character.FighterInstance.ToogleReady(message.isReady);
         }
 
+
+        static void LeaveFight(System.Timers.Timer Timer, WorldClient client)
+        {
+            client.Character.FighterInstance.Leave();
+            Timer.Enabled = false;
+            Timer.Stop();
+            Timer.Dispose();
+        }
+
         [MessageHandler]
         public static void HandleGameContextQuit(GameContextQuitMessage message, WorldClient client)
         {
@@ -199,7 +235,11 @@ namespace Symbioz.World.Handlers
             }
             try
             {
-                client.Character.FighterInstance.Leave();
+                Random r = new Random();
+                var Timer = new System.Timers.Timer();
+                Timer.Interval = 1000;
+                Timer.Elapsed += (sender, e) => { LeaveFight(Timer, client); };
+                Timer.Enabled = true;
             }
             catch
             {

@@ -1,4 +1,5 @@
 ﻿
+using Shader.SSync;
 using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Helper;
@@ -14,9 +15,10 @@ using System.Threading.Tasks;
 
 namespace Symbioz.Core.Startup
 {
-    class Startup 
+    public class Startup  : Singleton<Startup>
     {
-       
+
+        public SelfRunningTaskPool IOTask;
         public static void Initialize()
         {
             Logger.Init2("Chargement des données ...");
@@ -56,6 +58,8 @@ namespace Symbioz.Core.Startup
                     }
                 }
             }
+            Startup.Instance.IOTask = new SelfRunningTaskPool(50, "IO Task Pool");
+        
             watch.Stop();
             Logger.Init2("Chargement des données terminé en " + watch.Elapsed.Seconds + "s");
         }

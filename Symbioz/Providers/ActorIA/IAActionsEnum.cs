@@ -15,6 +15,9 @@ namespace Symbioz.Providers.ActorIA.Actions
         AgressivSpellCast = 4,
         Flee = 5,
         ANIMATED_BAG = 7,
-        MoveToalignEnemy = 8
+        MoveToalignedEnemy = 8,
+        CastOnLineAction = 9,
+        CastDiagonalAction = 10,
+        MoveToDiagonalEnemy = 11
     }
 }

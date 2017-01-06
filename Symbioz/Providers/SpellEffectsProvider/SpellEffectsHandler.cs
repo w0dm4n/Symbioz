@@ -17,8 +17,10 @@ namespace Symbioz.Providers
 {
     class SpellEffectsHandler
     {
+        //interface des fonctions pointé vers les EffectsEnums
         public delegate void SpellHandlerDelegate(Fighter source, SpellLevelRecord level, ExtendedSpellEffect effect,List<Fighter> affecteds, short castcellid);
 
+        //Dictionary des Effects a activé l'ors d'un ajout d'une interface avec toutes les informations
         public static Dictionary<EffectsEnum, SpellHandlerDelegate> Handlers = new Dictionary<EffectsEnum, SpellHandlerDelegate>();
 
         [StartupInvoke(StartupInvokeType.Others)]
@@ -46,22 +48,45 @@ namespace Symbioz.Providers
 
         public static void Handle(Fighter fighter, SpellLevelRecord record, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
-            var handler = Handlers.FirstOrDefault(x => x.Key == effect.BaseEffect.EffectType);
-            if (handler.Value != null)
+            //Ajout des Effets dans le dictionnaire
+            try
             {
-                int[] actorsShieldPointsBeforeApplyEffect = new int[affecteds.Count()];
-                actorsShieldPointsBeforeApplyEffect = GetActorsShieldPoints(affecteds, actorsShieldPointsBeforeApplyEffect);
+                var handler = Handlers.FirstOrDefault(x => x.Key == effect.BaseEffect.EffectType);
 
-                handler.Value(fighter, record, effect, affecteds, castcellid);
+                Logger.Error("EFFECT " + effect.BaseEffect.EffectType);
+                bool exist = false;
 
-                if (fighter.Fight.ChallengesInstance != null)
-                    fighter.Fight.ChallengesInstance.HandleSpellCast(fighter, affecteds, effect, actorsShieldPointsBeforeApplyEffect);
-            }
-            else
+                foreach (EffectsEnum e in Handlers.Keys)
+                {
+                    if (e == effect.BaseEffect.EffectType)
+                    {
+                        Logger.Error("POINTER OF THIS EFFECT " + e + " EXIST");
+                        exist = true;
+                    }
+                }
+                if (!exist)
+                    Logger.Error("POINTER OF THIS EFFECT " + effect.BaseEffect.EffectType + " DOESN'T EXIST");
+
+                if (handler.Value != null)
+                {
+                    int[] actorsShieldPointsBeforeApplyEffect = new int[affecteds.Count()];
+                    actorsShieldPointsBeforeApplyEffect = GetActorsShieldPoints(affecteds, actorsShieldPointsBeforeApplyEffect);
+
+                    //Active les Atribut des Effets qui lance c'est information dans la fonction ataché a l'attribut
+                    handler.Value(fighter, record, effect, affecteds, castcellid);
+
+                    if (fighter.Fight.ChallengesInstance != null)
+                        fighter.Fight.ChallengesInstance.HandleSpellCast(fighter, affecteds, effect, actorsShieldPointsBeforeApplyEffect);
+                }
+                else
+                {
+                    if (WorldServer.Instance.GetOnlineClient(fighter.Fight.Id) != null &&
+                        WorldServer.Instance.GetOnlineClient(fighter.Fight.Id).Character.isDebugging)
+                        fighter.Fight.Reply(effect.BaseEffect.EffectType + " is not handled...");
+                }
+            } catch (Exception e)
             {
-                if (WorldServer.Instance.GetOnlineClient(fighter.Fight.Id) != null  &&
-                    WorldServer.Instance.GetOnlineClient(fighter.Fight.Id).Character.isDebugging)
-                    fighter.Fight.Reply(effect.BaseEffect.EffectType + " is not handled...");
+                Logger.Error(e);
             }
         }
         public static short GetRandom(ExtendedSpellEffect record)

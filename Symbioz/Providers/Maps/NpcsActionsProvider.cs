@@ -17,16 +17,19 @@ namespace Symbioz.Providers
 {
     class NpcsActionsProvider
     {
-        private static Dictionary<NpcActionTypeEnum, Action<WorldClient, NpcSpawnRecord, NpcActionsRecord>> NpcActions = new Dictionary<NpcActionTypeEnum, Action<WorldClient, NpcSpawnRecord, NpcActionsRecord>>();
+        private static Dictionary<NpcActionTypeEnum, Action<WorldClient, NpcSpawnRecord, NpcActionsRecord, int>> NpcActions = new Dictionary<NpcActionTypeEnum, Action<WorldClient, NpcSpawnRecord, NpcActionsRecord, int>>();
+
         [StartupInvoke(StartupInvokeType.Others)]
         public static void LoadHandlers()
         {
+            NpcActions.Add(NpcActionTypeEnum.ACTION_EXCHANGE, ExchangeItem);
             NpcActions.Add(NpcActionTypeEnum.ACTION_TALK, Talk);
             NpcActions.Add(NpcActionTypeEnum.ACTION_BUY, Buy);
             NpcActions.Add(NpcActionTypeEnum.ACTION_SELL, Sell);
             NpcActions.Add(NpcActionTypeEnum.ACTION_BUY_SELL, BuySell);
         }
-        public static void Handle(WorldClient client, NpcSpawnRecord npc, sbyte clientnpcactionid)
+
+        public static void Handle(WorldClient client, NpcSpawnRecord npc, sbyte clientnpcactionid, int ContextualId = 0)
         {
             var actionType = (NpcActionTypeEnum)clientnpcactionid;
             var handler = NpcActions.FirstOrDefault(x => x.Key == actionType);
@@ -35,7 +38,7 @@ namespace Symbioz.Providers
             {
                 var action = NpcActionsRecord.GetNpcAction(npc.Id, actionType);
                 if (action != null)
-                    handler.Value(client, npc, action);
+                    handler.Value(client, npc, action, ContextualId);
                 else if (client.Character.isDebugging)
                     client.Character.NotificationError("Unable to find npc action record (" + clientnpcactionid + ") for Npc " + npc.Id);
 
@@ -45,7 +48,7 @@ namespace Symbioz.Providers
                 client.Character.NotificationError("Unable to find npc generic action handler (" + clientnpcactionid + ") for Npc " + npc.Id);
             }
         }
-        static void Buy(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
+        static void Buy(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action, int ContextualId = 0)
         {
             if (client.Character.BidShopInstance != null)
             {
@@ -64,7 +67,7 @@ namespace Symbioz.Providers
                 client.Character.NotificationError("Hôtel de vente non disponible !");
         }
 
-        static void Sell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
+        static void Sell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action, int ContextualId = 0)
         {
             if (client.Character.BidShopInstance != null)
             {
@@ -82,20 +85,25 @@ namespace Symbioz.Providers
             else
                 client.Character.Reply("Hôtel de vente non disponible !");
         }
-        static void BuySell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
+        static void BuySell(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action, int ContextualId = 0)
         {
+            if (action == null || client.Character.Restrictions.isDead == true)
+            {
+                client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
+                return;
+            }
             client.Character.NpcShopExchange = new NpcBuySellExchange(client,action,npc);
             client.Character.NpcShopExchange.OpenPanel();
-
-           
         }
-        static void Talk(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action)
+
+        static void Talk(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action, int ContextualId = 0)
         {
             if (action == null || client.Character.Restrictions.cantMove == true)
             {
                 client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
                 return;
             }
+           
             ushort messageId = ushort.Parse(action.OptionalValue1);
 
             List<NpcReplyRecord> replies = NpcsRepliesProvider.GetPossibleReply(client, NpcReplyRecord.GetNpcReplies(messageId));
@@ -104,6 +112,17 @@ namespace Symbioz.Providers
             client.Send(new NpcDialogCreationMessage(npc.MapId, -npc.Id));
 
             client.Send(new NpcDialogQuestionMessage(messageId, new string[] { "0" }, replies.ConvertAll<ushort>(x=>(ushort)x.ReplyId)));
+        }
+
+        static void ExchangeItem(WorldClient client, NpcSpawnRecord npc, NpcActionsRecord action, int ContextualId = 0)
+        {
+            if (action == null || client.Character.Restrictions.isDead == true)
+            {
+                client.Character.Reply("Impossible de dialoguer avec ce PNJ !");
+                return;
+            }
+            client.Character.NpcTradeExchange = new NpcTradeExchange(client, action, npc, ContextualId);
+            client.Character.NpcTradeExchange.OpenExchange();
         }
     }
 }

@@ -85,7 +85,7 @@ namespace  Symbioz.World.PathProvider
             int left = 0;
             int right = this.Count - 1;
             int center = 0;
-
+            var infinite = 0;
             while (left <= right)
             {
                 center = (left + right) / 2;
@@ -98,6 +98,9 @@ namespace  Symbioz.World.PathProvider
                     left = center;
                     break;
                 }
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             this.Insert(left, node);
         }

@@ -13,15 +13,27 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
 {
     public class StatsEffects
     {
+
+        /// <summary>
+        /// dgrg
+        /// </summary>
+        /// <param name="fighter"></param>
+        /// <param name="level"></param>
+        /// <param name="effect"></param>
+        /// <param name="affected"></param>
+        /// <param name="castcellid"></param>
+        /// mdr
         [EffectHandler(EffectsEnum.Eff_AddWeaponDamagePercent)] // Maitrise d'arme
-        public static void AddWeapnDamageBonusPercen(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affected, short castcellid)
+        public static void AddWeaponDamagePercent(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affected, short castcellid)
         {
+
             foreach (var target in affected)
             {
                 var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("WeaponDamagesBonusPercent"), target.FighterStats.Stats);
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
+
         [EffectHandler(EffectsEnum.Eff_AddAgility)]
         public static void AddAgility(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
@@ -32,6 +44,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
             }
 
         }
+
         [EffectHandler(EffectsEnum.Eff_AddIntelligence)]
         public static void AddIntelligence(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
@@ -41,6 +54,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
                 target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId, effect.BaseEffect.DiceNum, effect.BaseEffect.Delay));
             }
         }
+
         [EffectHandler(EffectsEnum.Eff_AddChance)]
         public static void AddChance(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castcellid)
         {
@@ -77,8 +91,8 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         {
             foreach (var target in affecteds)
             {
-                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("CriticalHit"), target.FighterStats.Stats);
-                target.AddBuff(new StatBuff((uint)target.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId,(short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
+                var definition = new UInt16ReflectedStat(CharacterStatsRecord.GetFieldInfo("CriticalHit"), fighter.FighterStats.Stats);
+                fighter.AddBuff(new StatBuff((uint)fighter.BuffIdProvider.Pop(), definition, (uint)effect.BaseEffect.EffectType, effect.BaseEffect.DiceNum, effect.BaseEffect.Duration, fighter.ContextualId, (short)level.SpellId,(short)(-effect.BaseEffect.DiceNum), effect.BaseEffect.Delay));
             }
         }
         /// <summary>
@@ -91,6 +105,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
            
            
         }
+
         [EffectHandler(EffectsEnum.Eff_SubRange)]
         public static void SubRange(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect effect, List<Fighter> affecteds, short castspellid)
         {

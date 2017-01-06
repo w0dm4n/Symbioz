@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Symbioz.Core
 {
     public class AuthDatabaseProvider
     {
-        private static MySqlConnection AuthConnection { get; set; }
+        public static MySqlConnection AuthConnection { get; set; }
 
         [StartupInvoke("AuthConnection",StartupInvokeType.SQL)]
         public static void Initialize() 
@@ -21,7 +22,7 @@ namespace Symbioz.Core
             AuthConnection = DatabaseManager.GetNewProvider();
             AuthConnection.Open();
         }
-        private static void CheckConnectionState()
+      /*  private static void CheckConnectionState()
         {
             if (!AuthConnection.Ping())
             {
@@ -30,14 +31,14 @@ namespace Symbioz.Core
             }
         }
 
-        public static MySqlConnection Connection
+      /*  public static MySqlConnection Connection
         {
             get
             {
                 CheckConnectionState();
                 return AuthConnection;
             }
-        }
+        }*/
 
         public static void Update(string table, string column, string value, string where, string wherevalue)
         {
@@ -66,24 +67,33 @@ namespace Symbioz.Core
 
         public static void Execute(string query)
         {
-            CheckConnectionState();
-            if (AuthConnection.State == ConnectionState.Open)
+            //CheckConnectionState();
+            Monitor.Enter(AuthConnection);
+            try
             {
-                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
-                try
+                if (AuthConnection.State == ConnectionState.Open)
                 {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (Exception ex) 
-                {
-                    Logger.Error("[SQL Execute Query]"+ ex.Message);
-                }
+                    MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("[SQL Execute Query]" + ex.Message);
+                    }
 
+                }
+                else
+                {
+                    Logger.Error("Unable to execute query " + query + " SqlConnection cannot be oppened");
+                }
             }
-            else
+            finally
             {
-                Logger.Error("Unable to execute query " + query + " SqlConnection cannot be oppened");
+                Monitor.Exit(AuthConnection);
             }
+            
         }
 
         public static void Clean(IEnumerable<string> tables)
@@ -99,32 +109,83 @@ namespace Symbioz.Core
 
         public static string SelectData(string table, string where, string wherevalue, string resultcolum)
         {
-            CheckConnectionState();
-            string query = "SELECT * FROM " + table + " WHERE " + where + " = '" + wherevalue + "'";
-            string result = "";
-            MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-            while (dataReader.Read())
+            //  CheckConnectionState();
+            Monitor.Enter(AuthConnection);
+            try
             {
-                result = dataReader[resultcolum].ToString();
+                string query = "SELECT * FROM " + table + " WHERE " + where + " = '" + wherevalue + "'";
+                string result = "";
+                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    result = dataReader[resultcolum].ToString();
+                }
+                dataReader.Close();
+                return result;
             }
-            dataReader.Close();
-            return result;
+            finally
+            {
+                Monitor.Exit(AuthConnection);
+            }
         }
 
         public static List<int> GetAccountsOnline()
         {
-            List<int> Accounts = new List<int>();
-            CheckConnectionState();
-            string query = "SELECT * FROM accounts WHERE isOnline = '1'";
-            MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-            while (dataReader.Read())
+            Monitor.Enter(AuthConnection);
+            try
             {
-                Accounts.Add(Int32.Parse(dataReader["Id"].ToString()));
+                List<int> Accounts = new List<int>();
+                //  CheckConnectionState();
+                string query = "SELECT * FROM accounts WHERE isOnline = '1'";
+                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    Accounts.Add(Int32.Parse(dataReader["Id"].ToString()));
+                }
+                dataReader.Close();
+                return (Accounts);
+            }finally
+            {
+                Monitor.Exit(AuthConnection);
             }
-            dataReader.Close();
-            return (Accounts);
+        }
+
+        public static void UpdatePoints(int Points, int account)
+        {
+            Monitor.Enter(AuthConnection);
+            try
+            {
+                string query = "UPDATE accounts SET PointCount = '" + Points + "' WHERE Id = '" + account + "'";
+                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                Monitor.Exit(AuthConnection);
+            }
+        }
+
+        public static int GetPoints(int account)
+        {
+            int Points = 0;
+            Monitor.Enter(AuthConnection);
+            try
+            {         
+                string query = "SELECT * FROM accounts WHERE Id = '" + account + "'";
+                MySqlCommand cmd = new MySqlCommand(query, AuthConnection);
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                    Points = Int32.Parse(dataReader["PointCount"].ToString());
+                dataReader.Close();
+                return Points;
+            }
+            finally
+            {
+                Monitor.Exit(AuthConnection);
+            }
+            return 0;
         }
     }
 }

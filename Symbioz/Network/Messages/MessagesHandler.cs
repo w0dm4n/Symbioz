@@ -34,7 +34,12 @@ namespace Symbioz.Network.Messages
             {
                 {
                     if (ConfigurationManager.Instance.ShowProtocolMessages)
-                        Logger.Write("[Rcv] Message: " + message.ToString(), ConsoleColor.Gray);
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("[Rcv] Message: " + message.ToString());
+                        // Logger.Write("[Rcv] Message: " + message.ToString(), ConsoleColor.Gray);
+                    }
+
                     try
                     {
 

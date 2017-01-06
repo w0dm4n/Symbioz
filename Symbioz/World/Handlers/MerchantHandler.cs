@@ -22,6 +22,11 @@ namespace Symbioz.World.Handlers
         [MessageHandler]
         public static void HandleExchangeRequestOnShopStockMessage(ExchangeRequestOnShopStockMessage message, WorldClient client)
         {
+            if (client.Character.Restrictions.isDead || client.Character.Record.Energy == 0)
+            {
+                client.Character.Reply("Impossible car vous êtes mort !");
+                return;
+            }
             var CharacterMerchants = CharactersMerchantsRecord.GetCharactersItems(client.Character.Id);
             var ItemsList = new List<ObjectItemToSell>();
 

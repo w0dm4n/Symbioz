@@ -31,9 +31,11 @@ namespace Symbioz.World.Models.Maps
             bool OwnTerritory = false;
             if (MapInstance != null)
             {
+                if (MapInstance.Record.Id == 115609089)
+                    return;
                 if (PrismRecord.PrismOnSubArea(MapInstance.Record.SubAreaId))
                 {
-                    if (client.Character.HasAlliance)
+                    /*if (client.Character.HasAlliance)
                     {
                         var alliance = client.Character.GetAlliance();
                         if (alliance != null)
@@ -54,6 +56,13 @@ namespace Symbioz.World.Models.Maps
                                     client.Send(new UpdateMapPlayersAgressableStatusMessage(PlayersIEnumerable((uint)actor.contextualId), StateIEnumerable(AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE)));
                                 }
                             }
+                        }
+                    }*/
+                    if (client.Character.HasAlliance)
+                    {
+                        foreach (var actor in actors)
+                        {
+                            client.Send(new UpdateMapPlayersAgressableStatusMessage(PlayersIEnumerable((uint)actor.contextualId), StateIEnumerable(AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE)));
                         }
                     }
                 }

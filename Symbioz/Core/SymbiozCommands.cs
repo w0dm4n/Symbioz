@@ -43,6 +43,7 @@ namespace Symbioz.Core
             commands.Add("loadraws", ReloadRaws);
             commands.Add("maxco", MaxCo);
             commands.Add("shutdown", Shutdown);
+            commands.Add("reboot", Reboot);
         }
 
         public static void HandleCommands()
@@ -75,6 +76,21 @@ namespace Symbioz.Core
             SaveTask.Save();
             Logger.Init("Server is now shutting down...");
             Thread.Sleep(4000);
+            Environment.Exit(0);
+        }
+
+        internal static void Reboot()
+        {
+            var clients = WorldServer.Instance.GetAllClientsOnline();
+            foreach (var client in clients)
+            {
+                client.Character.Dispose();
+                client.Disconnect();
+            }
+            var Accounts = AuthDatabaseProvider.GetAccountsOnline();
+            SaveTask.Save();
+            var fileName = Assembly.GetExecutingAssembly().Location;
+            System.Diagnostics.Process.Start("Symbioz.exe");
             Environment.Exit(0);
         }
 

@@ -1,6 +1,7 @@
 ﻿using Symbioz.Auth.Models;
 using Symbioz.Auth.Records;
 using Symbioz.Core;
+using Symbioz.Core.Startup;
 using Symbioz.DofusProtocol.Messages;
 using Symbioz.DofusProtocol.Types;
 using Symbioz.Enums;
@@ -22,8 +23,9 @@ namespace Symbioz.Auth.Handlers
         public static object LockObject = new object();
 
         [MessageHandler]
-        public static void HandleIdentificationMessage(IdentificationMessage message,AuthClient client)
+        public static void HandleIdentificationMessage(IdentificationMessage message, AuthClient client)
         {
+            
             lock (LockObject)
             {
                 Account account = AccountsProvider.DecryptCredentialsFromClient(client, message.sessionOptionalSalt.ToString(), message.credentials);
@@ -50,9 +52,10 @@ namespace Symbioz.Auth.Handlers
                     client.Send(new NicknameRegistrationMessage());
                     return;
                 }
-                Login(client, message.autoconnect);
+
+               Login(client, message.autoconnect);
             }
-          
+            
         }
         [MessageHandler]
         public static void HandleNicknameChoice(NicknameChoiceRequestMessage message, AuthClient client)
@@ -76,8 +79,15 @@ namespace Symbioz.Auth.Handlers
                 client.Send(new NicknameRefusedMessage((sbyte)NicknameErrorEnum.ALREADY_USED));
         }
         private static void Login(AuthClient client, bool autoconnect)
-        {   
-            ServersManager.DisconnectAlreadyConnectedClient(client,client.Account.Id);
+        {
+            try
+            {
+                ServersManager.DisconnectAlreadyConnectedClient(client, client.Account.Id);
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
             AuthServer.Instance.AuthClients.Add(client);
             bool hasRights = false;
             if (client.Account.Role > ServerRoleEnum.PLAYER)
@@ -100,10 +110,15 @@ namespace Symbioz.Auth.Handlers
         [MessageHandler]
         public static void SelectedServer(ServerSelectionMessage message,AuthClient client)
         {
-            string host = ConfigurationManager.Instance.IsCustomHost == true ? ConfigurationManager.Instance.RealHost : ConfigurationManager.Instance.Host;
-            var encrypted = AccountsProvider.EncryptTicket(ServersManager.TransfertToGame(client.Account),client.AesKey);
-            client.Send(new SelectedServerDataMessage((ushort)ConfigurationManager.Instance.ServerId, host, (ushort)ConfigurationManager.Instance.WorldPort, true, encrypted));
+            //Singleton<Startup>.Instance.IOTask.AddMessage(new Action(() => {
+                string host = ConfigurationManager.Instance.IsCustomHost == true ? ConfigurationManager.Instance.RealHost : ConfigurationManager.Instance.Host;
+                var encrypted = AccountsProvider.EncryptTicket(ServersManager.TransfertToGame(client.Account),client.AesKey);
+            if (ConfigurationManager.Instance.Host != "192.168.6.2")
+                client.Send(new SelectedServerDataMessage((ushort)ConfigurationManager.Instance.ServerId, host, (ushort)ConfigurationManager.Instance.WorldPort, true, encrypted));
+            else
+                client.Send(new SelectedServerDataMessage((ushort)ConfigurationManager.Instance.ServerId, "151.80.93.125", (ushort)ConfigurationManager.Instance.WorldPort, true, encrypted));
             client.Disconnect();
+            //}));
         }
         public static void SendServerListMessage(DofusClient client, int charactercount)
         {

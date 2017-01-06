@@ -33,6 +33,7 @@ namespace Symbioz.Providers.SpellEffectsProvider.Effects
         [EffectHandler(EffectsEnum.Eff_Summon)]
         public static void Summon(Fighter fighter, SpellLevelRecord level, ExtendedSpellEffect record, List<Fighter> affecteds, short castCellid)
         {
+            
             fighter.Fight.AddSummon(fighter, record.BaseEffect.DiceNum, fighter.GetSpellLevel(level.SpellId).Grade, castCellid, fighter.Team);
         }
 

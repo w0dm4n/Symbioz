@@ -87,10 +87,21 @@ namespace Symbioz.Providers.DataWriter
             List<GuildVersatileInformations> guildVersatileInformations = new List<GuildVersatileInformations>();
             foreach (var guild in GuildRecord.Guilds)
             {
-                GuildVersatileInformations guildVersatileInformation = new GuildVersatileInformations((uint)guild.Id,
-                    (uint)GuildProvider.GetLeader(guild.Id).CharacterId, (byte)guild.Level,
-                    (byte)CharacterGuildRecord.GetMembers(guild.Id).Length);
-                guildVersatileInformations.Add(guildVersatileInformation);
+                var leader = GuildProvider.GetLeader(guild.Id);
+                var leaderId = 0;
+                var membersCount = 0;
+                if (leader != null)
+                    leaderId = leader.CharacterId;
+                var members = CharacterGuildRecord.GetMembers(guild.Id);
+                if (members != null)
+                    membersCount = members.Length;
+                if (membersCount != 0)
+                {
+                    GuildVersatileInformations guildVersatileInformation = new GuildVersatileInformations((uint)guild.Id,
+                        (uint)leaderId, (byte)guild.Level,
+                        (byte)membersCount);
+                    guildVersatileInformations.Add(guildVersatileInformation);
+                }
             }
 
             GuildVersatileInfoListMessage guildVersatileInfoListMessage = new GuildVersatileInfoListMessage(guildVersatileInformations);

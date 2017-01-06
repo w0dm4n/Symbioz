@@ -134,8 +134,11 @@ namespace Symbioz.World.Models
         }
 
         public ContextActorLook CharacterToRider(ushort bonesid, List<ushort> rskins, List<int> rcolors, short rscale)
-        {
+        {       
             this.bonesId = 2;
+            // add random colors to fix count < 5
+            rcolors.Add(33542780);
+            rcolors.Add(33542780);
             ContextActorLook newLook = new ContextActorLook(bonesid, rskins, rcolors, new List<short>() { rscale }, new List<SubEntity>() { new SubEntity((sbyte)SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, ToEntityLook()) });
             return newLook;
         }
@@ -193,6 +196,7 @@ namespace Symbioz.World.Models
                 i = num + 1;
             }
             System.Collections.Generic.List<SubEntity> list = new System.Collections.Generic.List<SubEntity>();
+            var infinite = 0;
             while (i < str.Length)
             {
                 int num2 = str.IndexOf('@', i, 3);
@@ -221,6 +225,9 @@ namespace Symbioz.World.Models
                 while (num4 > 0);
                 list.Add(new SubEntity((sbyte)category, (sbyte)b, Parse(stringBuilder.ToString())));
                 i = num5 + 1;
+                infinite++;
+                if (infinite > 100000)
+                    break;
             }
             List<int> colors = new List<int>();
             foreach (var color in source)

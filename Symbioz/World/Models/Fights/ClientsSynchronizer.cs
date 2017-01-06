@@ -10,19 +10,19 @@ using System.Timers;
 
 namespace Symbioz.World.Models.Fights
 {
-    public class ClientsSynchronizer
+    public class ClientsSynchronizer 
     {
         public const int Timeout = 5000;
 
         Action m_action { get; set; }
         Fight m_fight { get; set; }
 
-        public Timer m_timout_timer { get; set; }
+   //     public Timer m_timout_timer { get; set; }
         public ClientsSynchronizer(Fight fight)
         {
             this.m_fight = fight;
-            this.m_timout_timer = new Timer(Timeout);
-            this.m_timout_timer.Elapsed += m_timout_timer_Elapsed;
+           // this.m_timout_timer = new Timer(Timeout);
+      //      this.m_timout_timer.Elapsed += m_timout_timer_Elapsed;
         }
 
         void m_timout_timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -45,7 +45,7 @@ namespace Symbioz.World.Models.Fights
                     }
                 }
             }
-            m_timout_timer.Stop();
+          //  m_timout_timer.Stop();
             m_action();
 
         }
@@ -56,26 +56,32 @@ namespace Symbioz.World.Models.Fights
             {
                 // Action
                 m_fight.OnCharacterFighters(x => x.Character.FighterInstance.ReadyToSee = false);
-                m_timout_timer.Stop();
-                m_action();
+             //   m_timout_timer.Stop();
+//m_action();
             }
         }
         public void Start(Action action)
         {
             if (m_fight.Ended)
-                return;
-            this.m_action = action;
-            if (m_fight.TimeLine.m_fighters.Count > 0)
             {
-                m_fight.OnCharacterFighters(x => x.Send(new GameFightTurnReadyRequestMessage(m_fight.TimeLine.GetPlayingFighter().ContextualId)));
-                m_timout_timer.Start();
-            }
-            else
+                this.m_fight.CheckFightEnd();
+            }else
             {
-                m_fight.OnCharacterFighters(x => x.Send(new GameFightTurnReadyRequestMessage(0)));
-                m_timout_timer.Start();
-            }
-
+                // this.m_action = action;
+                if (m_fight.TimeLine.m_fighters.Count > 0)
+                {
+                    m_fight.OnCharacterFighters(x => x.Send(new GameFightTurnReadyRequestMessage(m_fight.TimeLine.GetPlayingFighter().ContextualId)));
+                    //   m_timout_timer.Start();
+                }
+                else
+                {
+                    m_fight.OnCharacterFighters(x => x.Send(new GameFightTurnReadyRequestMessage(0)));
+                    //    m_timout_timer.Start();
+                }
+                action();
+            }          
         }
+       
+
     }
 }

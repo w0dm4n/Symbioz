@@ -116,8 +116,8 @@ namespace Symbioz.World.Models.Fights
             RedTeam.ForEach(x => MapsHandler.SendCurrentMapMessage(x.WorldClient, arenaMapId));
 
             var fight = FightProvider.Instance.CreateArenaFight(MapRecord.GetMap(arenaMapId), this);
-            BlueTeam.ForEach(x => fight.BlueTeam.AddFighter(x.WorldClient.Character.CreateFighter(fight.BlueTeam)));
-            RedTeam.ForEach(x => fight.RedTeam.AddFighter(x.WorldClient.Character.CreateFighter(fight.RedTeam)));
+            BlueTeam.ForEach(x => fight.BlueTeam.AddFighter(x.WorldClient.Character.CreateFighter(fight.BlueTeam, fight)));
+            RedTeam.ForEach(x => fight.RedTeam.AddFighter(x.WorldClient.Character.CreateFighter(fight.RedTeam, fight)));
             fight.StartPlacement();
             Clients.Clear();
             ArenaProvider.Instance.m_arena_groups.Remove(this);
